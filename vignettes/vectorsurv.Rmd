@@ -1,8 +1,8 @@
 ---
-title: "vectorR"
+title: "vectorsurvR"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{vectorR}
+  %\VignetteIndexEntry{vectorsurvR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -4,7 +4,7 @@
 \alias{getArthroCollections}
 \title{Get arthropod collections data}
 \usage{
-getArthroCollections(token, start_year, end_year)
+getArthroCollections(token, start_year, end_year, arthropod)
 }
 \arguments{
 \item{token}{A valid access token returned from `getToken()`}
@@ -12,15 +12,17 @@ getArthroCollections(token, start_year, end_year)
 \item{start_year}{Start year of data}
 
 \item{end_year}{End year of data}
+
+\item{arthropod}{Specify arthropod type from: 'mosquito', 'tick'}
 }
 \value{
 A dataframe of collections data specific to users account
 }
 \description{
-`getArthroCollections()` obtains collections data on a year range (start_year, end_year) for authorized VectorSurv Gateway accounts.
+`getArthroCollections()` obtains collections data on a year range [start_year, end_year] for authorized VectorSurv Gateway accounts.
 }
 \examples{
 \dontrun{
 token = getToken()
-getArthroCollections(token, 2021, 2022)}
+collections = getArthroCollections(token, 2021, 2022, 'mosquito')}
 }

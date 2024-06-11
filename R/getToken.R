@@ -32,7 +32,8 @@ getToken = function(){
   response_content <- content(response, 'parsed')
 
   if(is.null(response_content$token)){
-    stop("Check username and password")
+    print(response_content)
+    stop("Error, check returned response above")
   }
     token <- response_content$token
   # ids = c()

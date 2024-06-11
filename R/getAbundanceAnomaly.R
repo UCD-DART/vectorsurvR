@@ -5,7 +5,7 @@
 #' @param target_year Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)
 #' @param  species_list Species filter for calculating abundance. Species_display_name is the accepted notation.To see a list of species present in your data run `unique(collections$species_display_name)`. If species is unspecified, the default NULL will return data for all species in data
 #' @param trap_list Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(collections$trap_acronym)` to see trap types present in your data. If trap_list is unspecified,the default NULL will return data for all trap types
-#' @param species_seperate Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time description
+#' @param species_separate Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time description
 #' @keywords abundance
 #' @export
 #' @return Abundance anomaly calculation
@@ -13,7 +13,7 @@
 #' getAbundanceAnomaly(sample_collections,"Biweek",target_year=2020, species_list="Cx pipiens")
 #'
 getAbundanceAnomaly <- function(collections, interval, target_year,
-                               species_list = NULL, trap_list = NULL, species_seperate=FALSE){
+                               species_list = NULL, trap_list = NULL, species_separate=FALSE){
 
 
   if(nrow(collections)<=0){
@@ -54,11 +54,11 @@ getAbundanceAnomaly <- function(collections, interval, target_year,
  }
 
 
-ab_data = getAbundance(collections,interval, species_list, trap_list,species_seperate)
+ab_data = getAbundance(collections,interval, species_list, trap_list,species_separate)
 
   colnames(ab_data)[2] ="INTERVAL"
 
-  if(species_seperate==T){
+  if(species_separate==T){
     ab_data %>%
       group_by(INTERVAL, species_display_name) %>%
       dplyr::filter(surv_year != target_year )%>%

@@ -5,16 +5,16 @@
 #' @param interval Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month.
 #' @param species_list Species filter for calculating abundance. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
 #' @param trap_list Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap_list is unspecified, the default NULL will return data for all trap types.
-#' @param species_seperate Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time.
+#' @param species_separate Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time.
 #' @return A dataframe of abundance values grouped by interval and filtered by parameters
 #' @export
 #' @examples
-#' print(sample_collections)
+#'
 #' getAbundance(sample_collections,
 #'              interval = 'Week',
 #'              species_list = list('Cx pipiens'),
 #'              trap_list = list('GRVD', 'CO2'),
-#'              species_seperate = FALSE)
+#'              species_separate = FALSE)
 #' @export
 #' @importFrom dplyr summarise summarize filter group_by distinct_at vars arrange mutate desc
 #' @importFrom tidyr pivot_wider pivot_longer
@@ -32,7 +32,7 @@
 #species_list, trap_list filter the data according to abbreviated scientific name and trap acronym
 #If species_list, trap_list are left as NULL, the default assumes "All Options Selected"
 #
-getAbundance <- function(collections,interval, species_list = NULL, trap_list = NULL, species_seperate=FALSE){
+getAbundance <- function(collections,interval, species_list = NULL, trap_list = NULL, species_separate=FALSE){
   # collections$collection_date=as.Date(collections[['collection_date']])
 
 
@@ -81,7 +81,7 @@ getAbundance <- function(collections,interval, species_list = NULL, trap_list = 
     trap_list = unique(collections$trap_acronym)
   }
 
-  if(species_seperate==FALSE){
+  if(species_separate==FALSE){
     #We want to filter for females in the case of counts so here we care about species and trap type
     collections %>% group_by(surv_year, INTERVAL) %>%
       dplyr::filter(species_display_name %in% species_list,
@@ -98,7 +98,7 @@ getAbundance <- function(collections,interval, species_list = NULL, trap_list = 
   }
 
 
-  if(species_seperate==TRUE){
+  if(species_separate==TRUE){
     #We want to filter for females in the case of counts so here we care about species and trap type
     collections %>% group_by(surv_year, INTERVAL, species_display_name) %>%
       dplyr::filter(species_display_name %in% species_list,

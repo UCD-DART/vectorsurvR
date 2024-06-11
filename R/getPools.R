@@ -1,23 +1,25 @@
 #' Get Pools data
 #'
 #' Retrieves VectorSurv pools data for desired year range
-#' @param token access token retrived from getToken()
+#' @param token access token retrived from `getToken()`
 #' @param start_year  Beginning of year range
 #' @param end_year End of year range
+#' @param arthropod Specify arthropod type from: 'mosquito', 'tick', 'nontick'
 #' @keywords pools
 #' @return Dataframe of pools data
+#'
 #' @examples
 #' \dontrun{
 #' token = getToken()
-#' getPools(token, 2020, 2021)}
+#' getPools(token, start_year = 2020, end_year = 2021, arthropod = 'tick')}
 #' @export
 
 
 
 
-getPools<- function(token, start_year, end_year){
+getPools<- function(token, start_year, end_year, arthropod){
 
-
+  valid_arthopods = c("tick", "mosquito", "nontick")
   if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
     stop("Incorrect date format, start_year and end_year must be numeric")
   }
@@ -29,6 +31,9 @@ getPools<- function(token, start_year, end_year){
   }
   if(end_year>year(today())){
     stop("Impossible year range. Check end_year")
+  }
+  if (any(!(arthropod %in% valid_arthopods))) {
+    stop("Invaid arthropod type selected. Choose from: 'mosquito', 'tick', 'nontick'")
   }
 
 
@@ -45,6 +50,7 @@ getPools<- function(token, start_year, end_year){
   i=1
   while(i>0){
     params <- list(
+      #type = arthropod,
       `populate[]` = "agency",
       `populate[]` = "test",
       `populate[]` = "status",
@@ -71,10 +77,14 @@ getPools<- function(token, start_year, end_year){
       response <- GET(url_with_params, add_headers(headers))
       content <- content(response, as = "text")
       df_content = fromJSON(content, flatten = T)
-
+      if(!is.null(df_content$code)){
+        print(df_content)
+        stop("Error, see response above")
+      }
       if(length(df_content$rows)<=0){break}
-
       pools =  rbind(pools, df_content$rows)
+
+
 
     }, error = function(e) {
       stop(e)
@@ -84,13 +94,11 @@ getPools<- function(token, start_year, end_year){
   }
   #Prevents conflicting data types within $test list
   pools$test=lapply(pools$test, as.data.frame)
-
   pools = pools%>%
     unnest(test, keep_empty = T, names_sep = "_")
   colnames(pools) =  str_replace(colnames(pools), "test_","")%>%
     str_replace_all(pattern = "\\.",replacement = "_")
-  colnames(pools)[1]="pool_id"
-  colnames(pools)[5]="pool_comments"
+  colnames(pools)[c(1,5,13)] = c("pool_id","pool_comments","test_id")
 
   return(pools)
 

@@ -7,7 +7,7 @@
 #'                              interval = "Biweek",
 #'                              target_year = 2020,
 #'                              species_list = c("Cx tarsalis", "Cx pipiens"),
-#'                              species_seperate = TRUE)
+#'                              species_separate = TRUE)
 #' AbAnOut_L = processAbunAnom(AbAnOut)
 #' @export
 #' @return Abundance anomaly output processed into long form

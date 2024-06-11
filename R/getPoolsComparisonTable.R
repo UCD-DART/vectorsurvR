@@ -5,12 +5,12 @@
 #' @param interval Calculation interval for comparison table, accepts “collection_date”,“Biweek”,“Week”, and “Month
 #' @param target_disease The disease to calculate infection rate for–i.e. “WNV”.
 #'  Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`
-#' @param species_seperate Should the pools comparison be split by species of each pool. Default is FALSE
+#' @param species_separate Should the pools comparison be split by species of each pool. Default is FALSE
 #' @examples
 #' getPoolsComparisionTable(sample_pools,
 #'                          interval = "Biweek",
 #'                          target_disease = "WNV",
-#'                           species_seperate = TRUE)
+#'                           species_separate = TRUE)
 #' @export
 #' @return Frequency table of for pools data
 #' @importFrom dplyr count
@@ -22,7 +22,7 @@
 
 #Produces a frequency table for positive and negative pools counts by year
 
-getPoolsComparisionTable = function(pools, interval, target_disease, species_seperate=FALSE){
+getPoolsComparisionTable = function(pools, interval, target_disease, species_separate=FALSE){
 
 
   if(nrow(pools)<=0){
@@ -59,7 +59,7 @@ collection_date, num_trap, trap_nights, num_count, sex_type, species_display_nam
     mutate(Total = sum(Confirmed,Negative, na.rm=T))%>%
     mutate(`Percent Positive` = round((Confirmed/Total)*100,2))
 
-  if(species_seperate == T){
+  if(species_separate == T){
     pools_status = pools %>% dplyr::filter(target_acronym==target_disease)%>%
       group_by(surv_year, species_display_name, INTERVAL) %>%
       count(status_name)%>%

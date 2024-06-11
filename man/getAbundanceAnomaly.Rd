@@ -10,7 +10,7 @@ getAbundanceAnomaly(
   target_year,
   species_list = NULL,
   trap_list = NULL,
-  species_seperate = FALSE
+  species_separate = FALSE
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ getAbundanceAnomaly(
 
 \item{trap_list}{Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(collections$trap_acronym)` to see trap types present in your data. If trap_list is unspecified,the default NULL will return data for all trap types}
 
-\item{species_seperate}{Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time description}
+\item{species_separate}{Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time description}
 }
 \value{
 Abundance anomaly calculation

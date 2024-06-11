@@ -3,7 +3,7 @@
 export("%>%")
 export(getAbundance)
 export(getAbundanceAnomaly)
-export(getCollections)
+export(getArthroCollections)
 export(getInfectionRate)
 export(getPools)
 export(getPoolsComparisionTable)

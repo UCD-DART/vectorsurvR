@@ -62,7 +62,7 @@ getVectorIndex  = function(collections, pools, interval,
   AB = getAbundance(collections,interval,
                     species_list,
                     trap_list,
-                    species_seperate=FALSE)
+                    species_separate=FALSE)
 
  VI = merge(AB,IR, by = c(interval, "surv_year"))
  VI$VectorIndex = VI$Abundance*VI$Point_Estimate

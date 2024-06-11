@@ -45,7 +45,7 @@ test_that("getAbundance returns accurate abundance", {
 
   # Now, you can compare the result of getAbundance with the manually calculated test_cut_aggregated
   # For example:
-  result <- getAbundance(collections = sample_collections, interval = "Week", species_list = list("Cx pipiens"), species_seperate = FALSE)
+  result <- getAbundance(collections = sample_collections, interval = "Week", species_list = list("Cx pipiens"), species_separate = FALSE)
   # Assert that the result matches your expectations
   expect_equal(sort(test_cut_count$Count, decreasing = T), sort(result$Count, decreasing = T))
 })

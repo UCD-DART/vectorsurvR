@@ -17,7 +17,7 @@ generateTestData <- function(startDate = as.Date("2016-01-01"), endDate = as.Dat
 }
 
 test=generateTestData()
-ab = getAbundanceAnomaly(test, "Biweek", target_year = 2022,species_seperate = F)
+ab = getAbundanceAnomaly(test, "Biweek", target_year = 2022,species_separate = F)
 processAbunAnom(ab)
 
 # Test for ProcessAbunAnom function

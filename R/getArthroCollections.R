@@ -66,12 +66,10 @@ getArthroCollections <- function(token, start_year, end_year, arthropod){
 
       tryCatch({
         response <- GET(url_with_params, add_headers(headers))
-        print(response)
         content <- content(response, as = "text")
-
         df_content = fromJSON(content, flatten = T)
-        if(!is.null(df_content$code)){
-          print(df_content)
+        if(response$status_code!=200){
+          print(content(response, as = "parsed"))
           stop("Error, see response above")
         }
         #Breaks loop when df_content returns no more data
@@ -123,8 +121,8 @@ getArthroCollections <- function(token, start_year, end_year, arthropod){
         response <- GET(url_with_params, add_headers(headers))
         content <- content(response, as = "text")
         df_content = fromJSON(content, flatten = T)
-        if(!is.null(df_content$code)){
-          print(df_content)
+        if(response$status_code!=200){
+          print(content(response, as = "parsed"))
           stop("Error, see response above")
         }
 

@@ -22,7 +22,7 @@ test_that("Error thorwn if target year missing",{
 #Test 3: Warning
 test_that("Warning if years before target year, check these are not included in calculation result",{
 
-  expect_warning(getAbundanceAnomaly(sample_collections,interval = "Biweek", target_year =  2018, species_seperate=FALSE),"There are years greater than the target year in the data. These years will not be included in the anomaly calculation.")
+  expect_warning(getAbundanceAnomaly(sample_collections,interval = "Biweek", target_year =  2018, species_separate=FALSE),"There are years greater than the target year in the data. These years will not be included in the anomaly calculation.")
   #check that years before target year are
   #for(year in unique(ab$surv_year)){expect_lte(year,2021)}
 

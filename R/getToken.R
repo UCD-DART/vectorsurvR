@@ -30,7 +30,6 @@ getToken = function(){
   response <- POST( url = "https:/api.vectorsurv.org/login", body = body, add_headers(headers))
 
   response_content <- content(response, 'parsed')
-
   if(is.null(response_content$token)){
     print(response_content)
     stop("Error, check returned response above")

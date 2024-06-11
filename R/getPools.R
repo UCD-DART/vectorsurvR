@@ -77,8 +77,8 @@ getPools<- function(token, start_year, end_year, arthropod){
       response <- GET(url_with_params, add_headers(headers))
       content <- content(response, as = "text")
       df_content = fromJSON(content, flatten = T)
-      if(!is.null(df_content$code)){
-        print(df_content)
+      if(response$status_code!=200){
+        print(content(response, as = "parsed"))
         stop("Error, see response above")
       }
       if(length(df_content$rows)<=0){break}

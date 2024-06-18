@@ -5,6 +5,7 @@
 #' @param start_year Start year of data
 #' @param end_year  End year of data
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick'
+#' @param agency_id Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code
 #' @return A dataframe of collections data specific to users account
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
@@ -15,7 +16,7 @@
 #' token = getToken()
 #' collections = getArthroCollections(token, 2021, 2022, 'mosquito')}
 
-getArthroCollections <- function(token, start_year, end_year, arthropod){
+getArthroCollections <- function(token, start_year, end_year, arthropod, agency_id = NULL){
   if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
     stop("Incorrect date format, start_year and end_year must be numeric")
   }
@@ -55,10 +56,11 @@ getArthroCollections <- function(token, start_year, end_year, arthropod){
         pageSize = "1000",
         page = as.character(i),
         `query[surv_year][$between][0]` = start_year,
-        `query[surv_year][$between][1]` = end_year
-
+        `query[surv_year][$between][1]` = end_year,
+        `query[agency][0]` = agency_id
 
       )
+
 
 
       # Append the query string to the URL
@@ -113,7 +115,9 @@ getArthroCollections <- function(token, start_year, end_year, arthropod){
         pageSize = "1000",
         page = as.character(i),
         `query[surv_year][$between][0]` = start_year,
-        `query[surv_year][$between][1]` = end_year
+        `query[surv_year][$between][1]` = end_year,
+        `query[agency][0]` = agency_id
+
       )
       url_with_params <- modify_url(url, query = params)
 

@@ -31,17 +31,17 @@ getToken = function(){
 
   response_content <- content(response, 'parsed')
   if(is.null(response_content$token)){
-    print(response_content)
     stop("Error, check returned response above")
   }
     token <- response_content$token
-  # ids = c()
-  # for (i in 1:length(response_content$agencies)){
-  #
-  #   ids = rbind(ids,cbind(response_content$agencies[[i]]$id,response_content$agencies[[i]]$code))
-  #
-  # }
+    agencies = c()
+   for (i in 1:length(response_content$agencies)){
 
+     agencies = rbind(agencies,paste("Id:",response_content$agencies[[i]]$id,"Name:",response_content$agencies[[i]]$name, sep=" "))
+
+   }
+
+  print(agencies)
 
   return(token)
 }

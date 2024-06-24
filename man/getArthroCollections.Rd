@@ -4,7 +4,7 @@
 \alias{getArthroCollections}
 \title{Get arthropod collections data}
 \usage{
-getArthroCollections(token, start_year, end_year, arthropod)
+getArthroCollections(token, start_year, end_year, arthropod, agency_id = NULL)
 }
 \arguments{
 \item{token}{A valid access token returned from `getToken()`}
@@ -14,6 +14,8 @@ getArthroCollections(token, start_year, end_year, arthropod)
 \item{end_year}{End year of data}
 
 \item{arthropod}{Specify arthropod type from: 'mosquito', 'tick'}
+
+\item{agency_id}{Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code}
 }
 \value{
 A dataframe of collections data specific to users account

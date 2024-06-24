@@ -1,6 +1,6 @@
 
 
-## VectorSurvR Package Documentation and User Guide
+## vectorsurvR Package Documentation and User Guide
 
 VectorSurv provides public health agencies the tools to manage, visualize and analyze the spread of vector-borne diseases and make informed decisions to protect public health.
  

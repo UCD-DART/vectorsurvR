@@ -1,6 +1,6 @@
 
 #' @title Get Token
-#' @description getToken() returns a token needed to run getArthroCollections() and getPools(). The function prompts users for a VectorSurv account credentials.
+#' @description getToken() returns a token needed to run getArthroCollections() and getPools(). Prints agencies associated with account credentials. The function prompts users for a VectorSurv account credentials.
 #' @keywords authentication
 #' @return User token
 #' @importFrom rstudioapi askForPassword

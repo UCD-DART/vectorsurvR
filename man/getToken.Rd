@@ -10,7 +10,7 @@ getToken()
 User token
 }
 \description{
-getToken() returns a token needed to run getArthroCollections() and getPools(). The function prompts users for a VectorSurv account credentials.
+getToken() returns a token needed to run getArthroCollections() and getPools(). Prints agencies associated with account credentials. The function prompts users for a VectorSurv account credentials.
 }
 \examples{
  \dontrun{token = getToken()}

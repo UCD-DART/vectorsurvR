@@ -26,6 +26,6 @@ A data frame with 200 rows and 10 variables:
 sample_collections
 }
 \description{
-Sample Arthropod Collections data imitates the essential components of real collections data
+Sample Arthropod Collections data imitates the essential components of real mosquito collections data
 }
 \keyword{datasets}

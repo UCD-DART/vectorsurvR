@@ -10,7 +10,7 @@ A data frame with 82644 rows and 10 variables:
   \item{\code{pool_id}}{integer Pool identification number}
   \item{\code{surv_year}}{integer Surveillance year of pool}
   \item{\code{collection_date}}{character The date the trap was picked up for collection}
-  \item{\code{sex}}{integer Sex of collected arthropods}
+  \item{\code{sex_type}}{integer Sex type of collected arthropods}
   \item{\code{num_count}}{integer Number of arthropods present in collection}
   \item{\code{target_acronym}}{character The disease being tested for in the pool}
   \item{\code{status_name}}{character Status of the tested disease}
@@ -25,6 +25,6 @@ A data frame with 82644 rows and 10 variables:
 sample_pools
 }
 \description{
-Sample Pools data imitates the essential components of real pools data needed for calculations
+Sample Pools data imitates the essential components of real mosquito pools data needed for calculations
 }
 \keyword{datasets}

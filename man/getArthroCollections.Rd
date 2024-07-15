@@ -26,5 +26,5 @@ A dataframe of collections data specific to users account
 \examples{
 \dontrun{
 token = getToken()
-collections = getArthroCollections(token, 2021, 2022, 'mosquito')}
+collections = getArthroCollections(token, 2021, 2022, 'mosquito', 55)}
 }

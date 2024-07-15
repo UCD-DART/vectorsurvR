@@ -31,7 +31,7 @@ getToken = function(){
 
   response_content <- content(response, 'parsed')
   if(is.null(response_content$token)){
-    stop("Error, check returned response above")
+    stop(content(response, 'parsed'))
   }
     token <- response_content$token
     agencies = c()

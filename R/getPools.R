@@ -5,19 +5,20 @@
 #' @param start_year  Beginning of year range
 #' @param end_year End of year range
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick', 'nontick'
+#' @param agency_id Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code
 #' @keywords pools
 #' @return Dataframe of pools data
 #'
 #' @examples
 #' \dontrun{
 #' token = getToken()
-#' getPools(token, start_year = 2020, end_year = 2021, arthropod = 'tick')}
+#' getPools(token, start_year = 2020, end_year = 2021, arthropod = 'tick', 55)}
 #' @export
 
 
 
 
-getPools<- function(token, start_year, end_year, arthropod){
+getPools<- function(token, start_year, end_year, arthropod, agency_id=NULL){
 
   valid_arthopods = c("tick", "mosquito", "nontick")
   if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
@@ -56,11 +57,13 @@ getPools<- function(token, start_year, end_year, arthropod){
       `populate[]` = "status",
       `populate[]` = "trap",
       `populate[]` = "species",
+      `populate[]` = "sex",
+
       pageSize = "1000",
       page= as.character(i),
       `query[surv_year][$between][0]` = start_year,
-      `query[surv_year][$between][1]` = end_year
-      # `query[agency]` = agency_id
+      `query[surv_year][$between][1]` = end_year,
+      `query[agency]` = agency_id
 
 
     )
@@ -78,8 +81,8 @@ getPools<- function(token, start_year, end_year, arthropod){
       content <- content(response, as = "text")
       df_content = fromJSON(content, flatten = T)
       if(response$status_code!=200){
-        print(content(response, as = "parsed"))
-        stop("Error, see response above")
+
+        stop(content(response, as = "parsed"))
       }
       if(length(df_content$rows)<=0){break}
       pools =  rbind(pools, df_content$rows)

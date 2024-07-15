@@ -38,7 +38,7 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
 
     }
 
-  pools_columns <- c("pool_id", "collection_date", "surv_year", "num_count", "sex", "species_display_name", "trap_acronym", "target_acronym", "status_name")
+  pools_columns <- c("pool_id", "collection_date", "surv_year", "num_count", "sex_type", "species_display_name", "trap_acronym", "target_acronym", "status_name")
 
   if (!all(pools_columns %in% colnames(pools))) {
     stop("Insufficent pools data")

@@ -14,10 +14,13 @@
 #' @examples
 #' \dontrun{
 #' token = getToken()
-#' collections = getArthroCollections(token, 2021, 2022, 'mosquito')}
+#' collections = getArthroCollections(token, 2021, 2022, 'mosquito', 55)}
 
 getArthroCollections <- function(token, start_year, end_year, arthropod, agency_id = NULL){
-  if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
+
+   valid_arthopods = c("tick", "mosquito")
+
+   if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
     stop("Incorrect date format, start_year and end_year must be numeric")
   }
   if(end_year<start_year){
@@ -31,11 +34,9 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
   }
 
 
-
-
-
-
-
+ if (any(!(arthropod %in% valid_arthopods))) {
+     stop("Invaid arthropod type selected. Choose from: 'mosquito', 'tick', 'nontick'")
+ }
 
   headers <- c(
     Authorization = paste("Bearer", token),
@@ -71,8 +72,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         content <- content(response, as = "text")
         df_content = fromJSON(content, flatten = T)
         if(response$status_code!=200){
-          print(content(response, as = "parsed"))
-          stop("Error, see response above")
+          stop(content(response, 'parsed'))
         }
         #Breaks loop when df_content returns no more data
         if(length(df_content$rows)<=0){break}
@@ -126,8 +126,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         content <- content(response, as = "text")
         df_content = fromJSON(content, flatten = T)
         if(response$status_code!=200){
-          print(content(response, as = "parsed"))
-          stop("Error, see response above")
+          stop(content(response, 'parsed'))
         }
 
         #Breaks loop when df_content returns no more data

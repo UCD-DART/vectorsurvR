@@ -1,5 +1,5 @@
 #' @title Sample Arthropod Collections Data
-#' @description Sample Arthropod Collections data imitates the essential components of real collections data
+#' @description Sample Arthropod Collections data imitates the essential components of real mosquito collections data
 #' @format A data frame with 200 rows and 10 variables:
 #' \describe{
 #'   \item{\code{collection_id}}{double Collection identification number}
@@ -18,7 +18,7 @@
 
 
 #' @title Sample Pools Data
-#' @description Sample Pools data imitates the essential components of real pools data needed for calculations
+#' @description Sample Pools data imitates the essential components of real mosquito pools data needed for calculations
 #' @format A data frame with 82644 rows and 10 variables:
 #' \describe{
 #'   \item{\code{pool_id}}{integer Pool identification number}

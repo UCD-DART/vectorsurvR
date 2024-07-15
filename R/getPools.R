@@ -51,7 +51,7 @@ getPools<- function(token, start_year, end_year, arthropod, agency_id=NULL){
   i=1
   while(i>0){
     params <- list(
-      #type = arthropod,
+       type = arthropod,
       `populate[]` = "agency",
       `populate[]` = "test",
       `populate[]` = "status",
@@ -63,7 +63,6 @@ getPools<- function(token, start_year, end_year, arthropod, agency_id=NULL){
       page= as.character(i),
       `query[surv_year][$between][0]` = start_year,
       `query[surv_year][$between][1]` = end_year,
-      `query[type][0]` = arthropod,
       `query[agency][0]` = agency_id
 
 

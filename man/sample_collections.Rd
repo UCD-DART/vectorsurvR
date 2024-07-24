@@ -3,13 +3,14 @@
 \docType{data}
 \name{sample_collections}
 \alias{sample_collections}
-\title{Sample Arthropod Collections Data}
+\title{Sample Mosquito Collections Data}
 \format{
-A data frame with 200 rows and 10 variables:
+A data frame with 2500 rows and 13 variables:
 \describe{
   \item{\code{collection_id}}{double Collection identification number}
   \item{\code{collection_date}}{character The date the trap was picked up for collection}
   \item{\code{num_trap}}{integer The number of unique traps in operation at one site}
+  \item{\code{site}}{integer Identifying code of site}
   \item{\code{surv_year}}{double Surveillance year of collection}
   \item{\code{trap_nights}}{integer The number of nights a trap was in the field}
   \item{\code{trap_problem_bit}}{logical If these was an issue with the trap}
@@ -26,6 +27,6 @@ A data frame with 200 rows and 10 variables:
 sample_collections
 }
 \description{
-Sample Arthropod Collections data imitates the essential components of real mosquito collections data
+Sample Mosquito Collections data imitates the essential components of real mosquito collections data
 }
 \keyword{datasets}

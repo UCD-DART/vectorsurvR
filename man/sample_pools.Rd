@@ -9,6 +9,7 @@ A data frame with 82644 rows and 10 variables:
 \describe{
   \item{\code{pool_id}}{integer Pool identification number}
   \item{\code{surv_year}}{integer Surveillance year of pool}
+  \item{\code{site}}{integer Identifying code of site}
   \item{\code{collection_date}}{character The date the trap was picked up for collection}
   \item{\code{sex_type}}{integer Sex type of collected arthropods}
   \item{\code{num_count}}{integer Number of arthropods present in collection}

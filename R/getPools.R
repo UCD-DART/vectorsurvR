@@ -56,8 +56,9 @@ getPools<- function(token, start_year, end_year, arthropod, agency_id=NULL){
       `populate[]` = "test",
       `populate[]` = "status",
       `populate[]` = "trap",
-      `populate[]` = "species",
       `populate[]` = "sex",
+      `populate[]` = "species",
+
 
       pageSize = "1000",
       page= as.character(i),

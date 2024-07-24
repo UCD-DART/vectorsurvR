@@ -5,7 +5,7 @@
 \alias{sample_pools}
 \title{Sample Pools Data}
 \format{
-A data frame with 82644 rows and 10 variables:
+A data frame with 2500 rows and 10 variables:
 \describe{
   \item{\code{pool_id}}{integer Pool identification number}
   \item{\code{surv_year}}{integer Surveillance year of pool}

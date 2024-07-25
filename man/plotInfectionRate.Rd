@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotInfectionRate.R
 \name{plotInfectionRate}
 \alias{plotInfectionRate}
-\title{Plot Infection Rate}
+\title{Plot infection rate}
 \usage{
 plotInfectionRate(InfRtOutput, year)
 }

@@ -1,5 +1,5 @@
 
-#' @title Get Token
+#' @title Get authentication token
 #' @description getToken() returns a token needed to run getArthroCollections() and getPools(). Prints agencies associated with account credentials. The function prompts users for a VectorSurv account credentials.
 #' @keywords authentication
 #' @return User token

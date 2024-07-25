@@ -1,4 +1,4 @@
-#' @title Plot Infection Rate
+#' @title Plot infection rate
 #' @description plotInfectionRate() plots the output returned from `getInfectionRate()` with confidence intervals using ggplot
 #' @param InfRtOutput Output from returned `getInfectionRate()`
 #' @param year Year to plot infection rate on

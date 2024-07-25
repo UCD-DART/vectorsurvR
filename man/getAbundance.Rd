@@ -2,7 +2,7 @@
 % Please edit documentation in R/getAbundance.R
 \name{getAbundance}
 \alias{getAbundance}
-\title{Get abundance}
+\title{Calculate abundance}
 \usage{
 getAbundance(
   collections,
@@ -24,7 +24,7 @@ getAbundance(
 \item{species_separate}{Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time.}
 }
 \value{
-A dataframe of abundance values grouped by interval and filtered by parameters
+A dataframe of abundance calculations
 }
 \description{
 Calculates abundance

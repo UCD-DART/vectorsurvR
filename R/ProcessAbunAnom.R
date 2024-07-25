@@ -1,6 +1,6 @@
-#' process Abundance Anomaly
+#' @title Process abundance anomaly
 #'
-#' @description `processAbunAnom()` processes the output returned from `getAbundanceAnomaly()` into a long form suitable for plotting in 'ggplot'
+#' @description `processAbunAnom()` processes the output returned from `getAbundanceAnomaly()` into a long form suitable for plotting using 'ggplot'
 #' @param AbAnomOutput output from `getAbunAnom()`
 #' @examples
 #' AbAnOut = getAbundanceAnomaly(sample_collections,

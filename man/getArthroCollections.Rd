@@ -18,7 +18,7 @@ getArthroCollections(token, start_year, end_year, arthropod, agency_id = NULL)
 \item{agency_id}{Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code}
 }
 \value{
-A dataframe of collections data specific to users account
+A dataframe of collections
 }
 \description{
 `getArthroCollections()` obtains collections data on a year range [start_year, end_year] for authorized VectorSurv Gateway accounts.

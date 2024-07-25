@@ -6,7 +6,7 @@
 #' @param end_year  End year of data
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick'
 #' @param agency_id Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code
-#' @return A dataframe of collections data specific to users account
+#' @return A dataframe of collections
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
 #' @importFrom stringr str_replace str_replace_all

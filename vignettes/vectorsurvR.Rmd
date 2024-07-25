@@ -80,7 +80,7 @@ token = getToken()
 - token: access token retrieved from `getToken()`
 - start_year: Beginning of year range 
 - end_year: End of year range
-- arthropod: Type of pools to retrieve: 'tick' , 'mosquito'
+- arthropod: Type of collections to retrieve: 'tick', 'mosquito'
 - agency_id: Default to NULL returns data for all available agencies, specifying a single agency id will return data just for that agency. This parameter is best used by accounts with access to multiple agencies. 
 
 ```{r, eval=F}
@@ -103,7 +103,7 @@ collections = getArthroCollections(token, 2022,2023, 'mosquito')
 - token: access token retrieved from `getToken()`
 - start_year: Beginning of year range 
 - end_year: End of year range
-- arthropod: Type of collections to retrieve: 'tick' , 'mosquito'
+- arthropod: Type of pools to retrieve: 'tick' , 'mosquito', 'nontick'
 - agency_id: Default to NULL returns data for all available agencies, specifying a single agency id will return data just for that agency. This parameter is best used by accounts with access to multiple agencies. 
 
 ```{r, eval=F}

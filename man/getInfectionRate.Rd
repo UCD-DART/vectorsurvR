@@ -2,7 +2,7 @@
 % Please edit documentation in R/getInfectionRate.R
 \name{getInfectionRate}
 \alias{getInfectionRate}
-\title{Get Infection Rate}
+\title{Calculate infection rate}
 \usage{
 getInfectionRate(
   pools,
@@ -30,7 +30,7 @@ getInfectionRate(
 \item{trap_list}{Trap filter for calculating infection rate. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.}
 }
 \value{
-Infection rate calculation
+Dataframe of infection rate calculation
 }
 \description{
 `getInfectionRate()` requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.

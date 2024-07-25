@@ -2,7 +2,7 @@
 % Please edit documentation in R/getToken.R
 \name{getToken}
 \alias{getToken}
-\title{Get Token}
+\title{Get authentication token}
 \usage{
 getToken()
 }

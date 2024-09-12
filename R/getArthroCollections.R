@@ -5,7 +5,6 @@
 #' @param start_year Start year of data
 #' @param end_year  End year of data
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick'
-#' @param regional Specify wether data should return regional information where the collection was found. Default is FALSE.
 #' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids
 #' @return A dataframe of collections
 #' @importFrom jsonlite fromJSON
@@ -18,7 +17,7 @@
 #' token = getToken()
 #' collections = getArthroCollections(token, 2021, 2022, 'mosquito',55, TRUE)}
 
-getArthroCollections <- function(token, start_year, end_year, arthropod, agency_id = NULL, regional = FALSE){
+getArthroCollections <- function(token, start_year, end_year, arthropod, agency_id = NULL){
 
    valid_arthopods = c("tick", "mosquito")
 

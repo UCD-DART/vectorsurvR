@@ -5,18 +5,20 @@
 #' @param start_year Start year of data
 #' @param end_year  End year of data
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick'
-#' @param agency_id Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code
+#' @param regional Specify wether data should return regional information where the collection was found. Default is FALSE.
+#' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids
 #' @return A dataframe of collections
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
 #' @importFrom stringr str_replace str_replace_all
+#' @importFrom tidygeocoder
 #' @export
 #' @examples
 #' \dontrun{
 #' token = getToken()
-#' collections = getArthroCollections(token, 2021, 2022, 'mosquito', 55)}
+#' collections = getArthroCollections(token, 2021, 2022, 'mosquito',55, TRUE)}
 
-getArthroCollections <- function(token, start_year, end_year, arthropod, agency_id = NULL){
+getArthroCollections <- function(token, start_year, end_year, arthropod, agency_id = NULL, regional = FALSE){
 
    valid_arthopods = c("tick", "mosquito")
 
@@ -43,6 +45,17 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     "Content-Type" = "application/json"
   )
 
+  # Handle multiple agency_ids
+  if (!is.null(agency_id) & length(agency_id) > 1) {
+    # If multiple agencies are provided, iterate over them, retrieve data, and merge
+    collections_list <- lapply(agency_id, function(aid) {
+      getArthroCollections(token, start_year, end_year, arthropod, agency_id = aid)
+    })
+    # Merge all the data together into a single dataframe
+    merged_collections <- bind_rows(collections_list)
+    return(merged_collections)
+  }
+
   if(arthropod=='mosquito'){
     url <- "https://api.vectorsurv.org/v1/arthropod/collection"
 
@@ -54,6 +67,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         `populate[]` = "arthropods",
         `populate[]` = "agency",
         `populate[]` = "trap",
+        `populate[]` = "location",
         pageSize = "1000",
         page = as.character(i),
         `query[surv_year][$between][0]` = start_year,

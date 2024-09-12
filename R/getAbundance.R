@@ -16,7 +16,7 @@
 #'              trap_list = list('GRVD', 'CO2'),
 #'              species_separate = FALSE)
 #' @export
-#' @importFrom dplyr summarise summarize filter group_by distinct_at vars arrange mutate desc
+#' @importFrom dplyr summarise summarize filter group_by distinct_at vars arrange mutate desc bind_rows
 #' @importFrom tidyr pivot_wider pivot_longer
 #' @importFrom lubridate year month epiweek today
 #' @importFrom utils tail

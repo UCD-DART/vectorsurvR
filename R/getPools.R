@@ -5,10 +5,9 @@
 #' @param start_year  Beginning of year range
 #' @param end_year End of year range
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick', 'nontick'
-#' @param agency_id Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code
+#' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids
 #' @keywords pools
 #' @return Dataframe of pools data
-#'
 #' @examples
 #' \dontrun{
 #' token = getToken()
@@ -36,7 +35,16 @@ getPools<- function(token, start_year, end_year, arthropod, agency_id=NULL){
   if (any(!(arthropod %in% valid_arthopods))) {
     stop("Invaid arthropod type selected. Choose from: 'mosquito', 'tick', 'nontick'")
   }
-
+  # Handle multiple agency_ids
+  if (!is.null(agency_id) & length(agency_id) > 1) {
+    # If multiple agencies are provided, iterate over them, retrieve data, and merge
+    pools_list <- lapply(agency_id, function(aid) {
+      getPools(token, start_year, end_year, arthropod, agency_id = aid)
+    })
+    # Merge all the data together into a single dataframe
+    merged_pools <- bind_rows(pools_list)
+    return(merged_pools)
+  }
 
 
   url <- "https://api.vectorsurv.org/v1/arthropod/pool"

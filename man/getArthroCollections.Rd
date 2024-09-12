@@ -15,7 +15,7 @@ getArthroCollections(token, start_year, end_year, arthropod, agency_id = NULL)
 
 \item{arthropod}{Specify arthropod type from: 'mosquito', 'tick'}
 
-\item{agency_id}{Filter on agency id, default to NULL for all available agencies, otherwise specify a single agency by code}
+\item{agency_ids}{Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids}
 }
 \value{
 A dataframe of collections
@@ -26,5 +26,5 @@ A dataframe of collections
 \examples{
 \dontrun{
 token = getToken()
-collections = getArthroCollections(token, 2021, 2022, 'mosquito', 55)}
+collections = getArthroCollections(token, 2021, 2022, 'mosquito',55, TRUE)}
 }

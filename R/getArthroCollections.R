@@ -10,7 +10,7 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
 #' @importFrom stringr str_replace str_replace_all
-#' @importFrom tidygeocoder
+#' @importFrom dplyr bind_rows
 #' @export
 #' @examples
 #' \dontrun{

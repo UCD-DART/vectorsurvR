@@ -4,7 +4,7 @@
 \alias{getArthroCollections}
 \title{Get arthropod collections data}
 \usage{
-getArthroCollections(token, start_year, end_year, arthropod, agency_id = NULL)
+getArthroCollections(token, start_year, end_year, arthropod, agency_ids = NULL)
 }
 \arguments{
 \item{token}{A valid access token returned from `getToken()`}

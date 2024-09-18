@@ -4,7 +4,7 @@
 \alias{getPools}
 \title{Get Pools data}
 \usage{
-getPools(token, start_year, end_year, arthropod, agency_id = NULL)
+getPools(token, start_year, end_year, arthropod, agency_ids = NULL)
 }
 \arguments{
 \item{token}{access token retrived from `getToken()`}

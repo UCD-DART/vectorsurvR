@@ -17,7 +17,7 @@
 
 
 
-getPools<- function(token, start_year, end_year, arthropod, agency_id=NULL){
+getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
   valid_arthopods = c("tick", "mosquito", "nontick")
   if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
@@ -36,10 +36,10 @@ getPools<- function(token, start_year, end_year, arthropod, agency_id=NULL){
     stop("Invaid arthropod type selected. Choose from: 'mosquito', 'tick', 'nontick'")
   }
   # Handle multiple agency_ids
-  if (!is.null(agency_id) & length(agency_id) > 1) {
+  if (!is.null(agency_ids) & length(agency_ids) > 1) {
     # If multiple agencies are provided, iterate over them, retrieve data, and merge
-    pools_list <- lapply(agency_id, function(aid) {
-      getPools(token, start_year, end_year, arthropod, agency_id = aid)
+    pools_list <- lapply(agency_ids, function(aid) {
+      getPools(token, start_year, end_year, arthropod, agency_ids = aid)
     })
     # Merge all the data together into a single dataframe
     merged_pools <- bind_rows(pools_list)

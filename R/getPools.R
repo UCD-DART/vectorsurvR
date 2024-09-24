@@ -66,6 +66,7 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
       `populate[]` = "trap",
       `populate[]` = "sex",
       `populate[]` = "species",
+      `populate[]` = "site",
 
 
       pageSize = "1000",
@@ -104,14 +105,22 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
     i=i+1
   }
+
+  if(nrow(pools)<=0){
+    return(data.frame())
+  }
+
   #Prevents conflicting data types within $test list
   pools$test=lapply(pools$test, as.data.frame)
   pools = pools%>%
     unnest(test, keep_empty = T, names_sep = "_")
   colnames(pools) =  str_replace(colnames(pools), "test_","")%>%
     str_replace_all(pattern = "\\.",replacement = "_")
-  colnames(pools)[c(1,5,13)] = c("pool_id","pool_comments","test_id")
-
+  colnames(pools)[c(1,5,11)] = c("pool_id","pool_comments","test_id")
+  pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,primary_source,collection,pool_comments,
+                 surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,num_count,test_id,value,test_date,
+                 method_name,method_acronym,target_acronym,target_vector,
+                 target_icd_10,status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)
   return(pools)
 
 }

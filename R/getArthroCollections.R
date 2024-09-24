@@ -50,6 +50,8 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     collections_list <- lapply(agency_ids, function(aid) {
       getArthroCollections(token, start_year, end_year, arthropod, agency_ids = aid)
     })
+
+
     # Merge all the data together into a single dataframe
     merged_collections <- bind_rows(collections_list)
     return(merged_collections)
@@ -99,6 +101,9 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       })
 
       i=i+1
+    }
+    if(nrow(collections)<=0){
+      return(data.frame())
     }
     #Prevents conflicting data types within $arthropods list
     collections$arthropods=lapply(collections$arthropods, as.data.frame)
@@ -166,6 +171,9 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
       i=i+1
     }
+    if(nrow(collections)<=0){
+      return(data.frame())
+    }
     collections$ticks=lapply(collections$ticks, as.data.frame)
 
     collections =
@@ -175,6 +183,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       str_replace_all(pattern = "\\.",replacement = "_")
 
     colnames(collections)[1] = 'collection_id'
+
     collections = collections %>%
       select(collection_id,collection_num, collection_date_start,collection_date_end,
              agency_id, agency_code, agency_name, surv_year,

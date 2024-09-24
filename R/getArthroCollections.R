@@ -10,7 +10,7 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
 #' @importFrom stringr str_replace str_replace_all
-#' @importFrom dplyr bind_rows
+#' @importFrom dplyr bind_rows select
 #' @export
 #' @examples
 #' \dontrun{
@@ -63,15 +63,17 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     i = 1
     while(i>0){
       params <- list(
+
         `populate[]` = "arthropods",
         `populate[]` = "agency",
         `populate[]` = "trap",
-        `populate[]` = "location",
+        `populate[]` = "site",
+
         pageSize = "1000",
         page = as.character(i),
         `query[surv_year][$between][0]` = start_year,
         `query[surv_year][$between][1]` = end_year,
-        `query[agency][0]` = agency_id
+        `query[agency][0]` = agency_ids
 
       )
 
@@ -107,8 +109,18 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
     colnames(collections) =  str_replace(colnames(collections), "arthropods_","")%>%
       str_replace_all(pattern = "\\.",replacement = "_")
-
     colnames(collections)[1] = 'collection_id'
+
+    #remove unwanted/redundant columns
+    collections = collections %>%
+      select(collection_id,collection_num, collection_date,
+             agency_id, agency_code, agency_name, surv_year,
+             comments,identified_by,species_display_name,
+             sex_name,sex_type,trap_acronym, num_trap,
+             trap_nights,trap_problem_bit,num_count,
+             site_id, site_code, site_name,add_date,
+             deactive_date, updated)
+
 
 
     return(collections)
@@ -125,11 +137,12 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         `populate[]` = "ticks",
         `populate[]` = "sample_method",
         `populate[]` = "trap",
+        `populate[]` = "site",
         pageSize = "1000",
         page = as.character(i),
         `query[surv_year][$between][0]` = start_year,
         `query[surv_year][$between][1]` = end_year,
-        `query[agency][0]` = agency_id
+        `query[agency][0]` = agency_ids
 
       )
       url_with_params <- modify_url(url, query = params)
@@ -158,11 +171,17 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     collections =
       collections %>%
       unnest(ticks, keep_empty = T,names_sep = "_" )
+    colnames(collections) =  str_replace(colnames(collections), "ticks_","")%>%
+      str_replace_all(pattern = "\\.",replacement = "_")
 
-    colnames(collections) =  str_replace_all(colnames(collections),
-                                             pattern = "\\.",
-                                             replacement = "_")
     colnames(collections)[1] = 'collection_id'
+    collections = collections %>%
+      select(collection_id,collection_num, collection_date_start,collection_date_end,
+             agency_id, agency_code, agency_name, surv_year,
+             comments,identified_by,species_display_name,
+             sex_name,sex_type,trap_acronym,bloodfed, attached,type, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,
+             site_id, site_code, site_name,add_date,
+             deactive_date, updated)
 
     return(collections)
   }

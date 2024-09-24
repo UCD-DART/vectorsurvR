@@ -72,7 +72,7 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
       page= as.character(i),
       `query[surv_year][$between][0]` = start_year,
       `query[surv_year][$between][1]` = end_year,
-      `query[agency][0]` = agency_id
+      `query[agency][0]` = agency_ids
 
 
     )

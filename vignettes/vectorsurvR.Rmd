@@ -59,7 +59,7 @@ library(vectorsurvR)
 
 *Arguments*
 
-```{r, results='hide', eval=F}
+```{r, results='hide'}
 
 token = getToken()
 
@@ -73,19 +73,19 @@ token = getToken()
 
 *Usage*
 
-`getArthroCollections(token,start_year, end_year, arthropod, agency_id = NULL)`
+`getArthroCollections(token,start_year, end_year, arthropod, agency_ids = NULL)`
 
 *Arguments*
 
 - token: access token retrieved from `getToken()`
 - start_year: Beginning of year range 
 - end_year: End of year range
-- arthropod: Type of collections to retrieve: 'tick', 'mosquito'
-- agency_id: Default to NULL returns data for all available agencies, specifying a single agency id will return data just for that agency. This parameter is best used by accounts with access to multiple agencies. 
+- arthropod: Type of pools to retrieve: 'tick' , 'mosquito'
+- agency_ids: Default to NULL returns data for all available agencies, specifying a vector of agency ids will return data for specific agencies. This parameter is best used by accounts with access to multiple agencies. 
 
-```{r, eval=F}
+```{r}
 #Example
-collections = getArthroCollections(token, 2022,2023, 'mosquito')
+collections = getArthroCollections(token, 2022,2023, 'mosquito',55)
 ```
 
 
@@ -93,20 +93,20 @@ collections = getArthroCollections(token, 2022,2023, 'mosquito')
 
 *Description*
 
-`getPools()` similar to `getArthroCollections()` obtains pools on a year range (start_year, end_year). It prompts the user for their Gateway username and password before retrieving the associated data. `getPools()` retrieve data for both mosquito and tick pools. 
+`getPools()` similar to `getArthroCollections()` obtains pools on a year range (start_year, end_year) after supplying a valid token retrieved from getToken(). `getPools()` can retrieve data for both mosquito and tick pools. 
 
 *Usage*
 
-`getPools(token, start_year, end_year, arthropod, agency_id = NULL)`
+`getPools(token, start_year, end_year, arthropod, agency_ids = NULL)`
 *Arguments*
 
 - token: access token retrieved from `getToken()`
 - start_year: Beginning of year range 
 - end_year: End of year range
-- arthropod: Type of pools to retrieve: 'tick' , 'mosquito', 'nontick'
-- agency_id: Default to NULL returns data for all available agencies, specifying a single agency id will return data just for that agency. This parameter is best used by accounts with access to multiple agencies. 
+- arthropod: Type of collections to retrieve: 'tick' , 'mosquito'
+- agency_ids: Default to NULL returns data for all available agencies, specifying a vector of agency ids will return data for specific agencies. This parameter is best used by accounts with access to multiple agencies. 
 
-```{r, eval=F}
+```{r}
 #Example
 pools = getPools(token, 2022,2023, 'mosquito')
 ```
@@ -119,7 +119,7 @@ You can save retrieved data as a .csv file in your current directory using `writ
 That same data can be retrieved using `read.csv()`. Writing data to a .csv can make the rendering process more efficient when generating reports in R. We recommend that you write the data pulled from our API into a csv and then load that data when generating reports. 
 
 
-```{r, eval=F}
+```{r}
 #creates a file named "collections_18_23.csv" in your current directory
 write.csv(x = collections, file = "collections_22_23.csv")
 
@@ -141,18 +141,18 @@ Data can be subset to contain columns of interest. Subsetting can also be used t
 #Subset using column names or index number
 
 
-colnames(sample_collections) #displays column names and associated index
+colnames(collections) #displays column names and associated index
 
 
 
 #Subseting by name
-head(sample_collections[c("collection_date", "species_display_name", "num_count")])
+head(collections[c("collection_date", "species_display_name", "num_count")])
 
 #by index
-head(sample_collections[c(2, 10, 8)])
+head(collections[c(3, 23, 17)])
 
 #to save a subset
-collections_subset = sample_collections[c(2, 10, 8)]
+collections_subset = collections[c(3, 23, 17)]
 ```
 
 ### Filtering and subsetting in 'dplyr' 
@@ -177,13 +177,12 @@ Below are more examples for filtering data.
 ```{r}
 
 #filtering with dplyr 'filter'
-collections_pip = sample_collections %>%
+collections_pip = collections %>%
   filter(species_display_name == "Cx pipiens")
 
 #filtering multiple arguments using '%in%'
-collections_pip_tar = sample_collections %>%
-  filter(species_display_name %in% c("Cx pipiens", "Cx tarsalis"),
-         site %in% c(119819, 102832)) #filters site codes
+collections_pip_tar = collections %>%
+  filter(species_display_name %in% c("Cx pipiens", "Cx tarsalis"))
 
 ```
 
@@ -194,7 +193,7 @@ In addition to filtering and sub-setting, data can be group by variables and sum
 ```{r}
 #groups by species and collection date and sums the number counted
 
-sample_collections %>%
+collections %>%
   group_by(collection_date, species_display_name) %>%
   summarise(sum_count = sum(num_count, na.rm = T)) %>%
   head()
@@ -202,7 +201,7 @@ sample_collections %>%
 
 #groups by species and collection date and takes the average the number counted
 
-sample_collections %>%
+collections %>%
   group_by(collection_date, species_display_name) %>%
   summarise(avg_count = mean(num_count, na.rm = T)) %>%
   head()
@@ -216,11 +215,10 @@ Data can be manipulated into long and wide (spreadsheet) forms using `pivot_wide
 library(tidyr)
 
 collections_wide = pivot_wider(
-  sample_collections,
-  names_from = c("species_display_name","sex_type"),
+  collections,
+  names_from = c("species_display_name","sex_name"),
   values_from = "num_count"
 )
-head(collections_wide)
 ```
 
 
@@ -251,7 +249,7 @@ head(collections_wide)
 
 ```{r}
 getAbundance(
-  sample_collections,
+  collections,
   interval = "Biweek",
   species_list = c("Cx tarsalis", "Cx pipiens"),
   trap_list = "CO2",
@@ -286,11 +284,11 @@ getAbundance(
 
 
 ```{r}
+collections_18_23 = getArthroCollections(token, 2018,2023, 'mosquito')
 
-
-getAbundanceAnomaly(sample_collections,
+getAbundanceAnomaly(collections_18_23,
                     interval = "Biweek",
-                    target_year = 2017,
+                    target_year = 2023,
                     species_list = c("Cx tarsalis", "Cx pipiens"),
                     trap_list = "CO2",
                     species_separate = FALSE) 
@@ -322,7 +320,7 @@ getAbundanceAnomaly(sample_collections,
 
 
 ```{r}
-IR = getInfectionRate(sample_pools, 
+IR = getInfectionRate(pools, 
                       interval = "Week",
                       target_disease = "WNV",
                       pt_estimate = "mle", 
@@ -362,9 +360,10 @@ IR
 
 
 ```{r}
+pools = getPools(token,2023,2023, 'mosquito', 55)
+collections = getArthroCollections(token,2023,2023, 'mosquito')
 
-
-getVectorIndex(sample_collections, sample_pools, interval = "Biweek",
+getVectorIndex(collections, pools, interval = "Biweek",
                            
                            target_disease = "WNV", pt_estimate = "bc-mle",
                            species_list=c("Cx tarsalis"), 
@@ -393,7 +392,7 @@ getVectorIndex(sample_collections, sample_pools, interval = "Biweek",
 
 ```{r}
 getPoolsComparisionTable(
-  sample_pools,
+  pools,
   interval = "Week",
   target_disease = "WNV",
   species_separate = T
@@ -411,7 +410,7 @@ Professional looking tables can be produced using the 'kable' and 'kableExtra' p
 library(kableExtra)
 
 AbAnOutput = getAbundance(
-  sample_collections,
+  collections,
   interval = "Biweek",
   
   species_list = c("Cx tarsalis", "Cx pipiens"),
@@ -457,10 +456,10 @@ AbAnOutput %>%
 library(ggplot2)
 library(lubridate)
 #creates a month column and translates numerics
-sample_collections$month = as.factor(month(sample_collections$collection_date))
+collections$month = as.factor(month(collections$collection_date))
 
 
-collections_sums = sample_collections %>%
+collections_sums = collections %>%
   filter(
     species_display_name %in% c(
       "Cx tarsalis",
@@ -521,12 +520,12 @@ When plotting with libraries in R, it is easiest when the data is prepared in lo
 ```{r}
 
 
-
+collections = getArthroCollections(token, 2018, 2023, 'mosquito')
 
 AbAnOut = getAbundanceAnomaly(
-  sample_collections,
+  collections,
   interval = "Biweek",
-  target_year = 2020,
+  target_year = 2023,
   species_list = c("Cx tarsalis", "Cx pipiens"),
   species_separate = TRUE
 )
@@ -590,14 +589,15 @@ AbAnOut_L %>%
 
 ```{r}
 IR = getInfectionRate(
-sample_pools, interval = "Week",
+  pools,
+  interval = "Week",
   target_disease = "WNV",
   pt_estimate = "mle",
   species_list = c("Cx pipiens"),
   trap_list = c("CO2", "GRVD")
 )
 
-plotInfectionRate(InfRtOutput = IR, year = 2020)
+plotInfectionRate(InfRtOutput = IR, year = 2023)
 
 ```
 
@@ -607,20 +607,16 @@ plotInfectionRate(InfRtOutput = IR, year = 2020)
 We can highlight rows and columns, add headers, and customize footnotes. For more information please [Click Here](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html#Grouped_Columns__Rows) 
 
 ```{r}
+collections = getArthroCollections(token, 2021, 2023, 'mosquito')
 
-
-
-sample_collections %>% 
-  group_by(surv_year, trap_acronym) %>%
-summarise(traps_deployed = sum(num_trap, na.rm=TRUE))%>%
-  pivot_wider(names_from = "surv_year", values_from ="traps_deployed", values_fill = 0 )%>%
+table(collections$trap_acronym, collections$surv_year) %>%
   kbl(align = "c") %>%
   kable_paper(
     full_width = F,
     html_font = "arial",
     lightable_options = "striped",
   ) %>%
-  add_header_above(c("Trap Type", "Years" = 5)) %>%
+  add_header_above(c("Trap Type", "Years" = 3)) %>%
   footnote(general = "Table X: Traps deployed by year", general_title = "") %>%
   row_spec(c(3, 9, 10), background = "yellow") %>%
   column_spec(c(4), background = "orange")
@@ -628,8 +624,4 @@ summarise(traps_deployed = sum(num_trap, na.rm=TRUE))%>%
 
 
 
-
-```{r}
-
-```
 

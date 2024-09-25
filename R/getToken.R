@@ -37,7 +37,7 @@ getToken = function(){
     agencies = c()
    for (i in 1:length(response_content$agencies)){
 
-     agencies = rbind(agencies,paste("Id:",response_content$agencies[[i]]$id,"Name:",response_content$agencies[[i]]$name, sep=" "))
+     agencies = rbind(agencies,paste("Agency Id:",response_content$agencies[[i]]$id,"| Agency Name:",response_content$agencies[[i]]$name, sep=" "))
 
    }
 

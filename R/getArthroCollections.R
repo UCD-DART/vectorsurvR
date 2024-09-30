@@ -69,6 +69,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         `populate[]` = "arthropods",
         `populate[]` = "agency",
         `populate[]` = "trap",
+        `populate[]` = "location",
         `populate[]` = "site",
 
         pageSize = "1000",
@@ -112,6 +113,10 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       collections%>%
       unnest(arthropods, keep_empty = T,names_sep ="_" )
 
+    # separate collection location coordinates
+    collections$collection_longitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,1]
+    collections$collection_latitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,2]
+
     colnames(collections) =  str_replace(colnames(collections), "arthropods_","")%>%
       str_replace_all(pattern = "\\.",replacement = "_")
     colnames(collections)[1] = 'collection_id'
@@ -123,7 +128,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym, num_trap,
              trap_nights,trap_problem_bit,num_count,
-             site_id, site_code, site_name,add_date,
+             site_id, site_code, site_name,collection_longitude,collection_latitude,add_date,
              deactive_date, updated)
 
 
@@ -142,6 +147,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         `populate[]` = "ticks",
         `populate[]` = "sample_method",
         `populate[]` = "trap",
+        `populate[]` = "location",
         `populate[]` = "site",
         pageSize = "1000",
         page = as.character(i),
@@ -181,6 +187,9 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       unnest(ticks, keep_empty = T,names_sep = "_" )
     colnames(collections) =  str_replace(colnames(collections), "ticks_","")%>%
       str_replace_all(pattern = "\\.",replacement = "_")
+    collections$collection_longitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,1]
+    collections$collection_latitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,2]
+
 
     colnames(collections)[1] = 'collection_id'
 
@@ -189,7 +198,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym,bloodfed, attached,type, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,
-             site_id, site_code, site_name,add_date,
+             site_id, site_code, site_name,collection_longitude,,collection_latitudeadd_date,
              deactive_date, updated)
 
     return(collections)

@@ -67,6 +67,7 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
       `populate[]` = "sex",
       `populate[]` = "species",
       `populate[]` = "site",
+      `populate[]` = "location",
 
 
       pageSize = "1000",
@@ -117,7 +118,11 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
   colnames(pools) =  str_replace(colnames(pools), "test_","")%>%
     str_replace_all(pattern = "\\.",replacement = "_")
   colnames(pools)[c(1,5,11)] = c("pool_id","pool_comments","test_id")
-  pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,primary_source,collection,pool_comments,
+
+  pools$pool_longitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,1]
+  pools$pool_latitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,2]
+
+  pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,primary_source,collection,pool_comments,
                  surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,num_count,test_id,value,test_date,
                  method_name,method_acronym,target_acronym,target_vector,
                  target_icd_10,status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)

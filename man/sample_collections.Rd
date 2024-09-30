@@ -10,7 +10,7 @@ A data frame with 2500 rows and 13 variables:
   \item{\code{collection_id}}{double Collection identification number}
   \item{\code{collection_date}}{character The date the trap was picked up for collection}
   \item{\code{num_trap}}{integer The number of unique traps in operation at one site}
-  \item{\code{site}}{integer Identifying code of site}
+  \item{\code{site_code}}{integer Identifying code of site}
   \item{\code{surv_year}}{double Surveillance year of collection}
   \item{\code{trap_nights}}{integer The number of nights a trap was in the field}
   \item{\code{trap_problem_bit}}{logical If these was an issue with the trap}

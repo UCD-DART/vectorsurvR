@@ -198,7 +198,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym,bloodfed, attached,type, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,
-             site_id, site_code, site_name,collection_longitude,,collection_latitudeadd_date,
+             site_id, site_code, site_name,collection_longitude,collection_latitude,add_date,
              deactive_date, updated)
 
     return(collections)

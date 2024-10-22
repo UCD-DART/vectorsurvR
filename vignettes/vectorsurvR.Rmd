@@ -605,7 +605,7 @@ plotInfectionRate(InfRtOutput = IR, year = 2020)
 
 ## Additional Table Examples
 
-We can highlight rows and columns, add headers, and customize footnotes. For more information please [Click Here](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html#Grouped_Columns__Rows) 
+We can highlight rows and columns, add headers, and customize footnotes. For more information please [Click Here](  https://CRAN.R-project.org/package=kableExtra) 
 
 ```{r}
 

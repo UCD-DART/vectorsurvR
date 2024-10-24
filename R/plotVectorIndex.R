@@ -28,13 +28,13 @@ plotVectorIndex = function(VIOutput, year){
   interval_name = colnames(plot_data)[1]
   colnames(plot_data)[1]="INTERVAL"
   plot_data %>%
-    ggplot(aes(x = INTERVAL, y = Point_Estimate))+
+    ggplot(aes(x = INTERVAL, y = VectorIndex))+
     geom_point( color="navyblue")+
     geom_path()+
-    geom_line(aes(INTERVAL, Lower_CI), color = "steelblue", size = 0.1) +
-    geom_line(aes(INTERVAL, Upper_CI), color = "steelblue", size = 0.1) +
-    geom_ribbon(aes(ymin=Lower_CI, ymax=Upper_CI), alpha=0.2, fill = "steelblue2", color=NA) +
-    labs(x=interval_name, y="Point Estimate (MLE and 95% CI)")+
+    geom_line(aes(INTERVAL, Lower_CI*Abundance), color = "steelblue", size = 0.1) +
+    geom_line(aes(INTERVAL, Upper_CI*Abundance), color = "steelblue", size = 0.1) +
+    geom_ribbon(aes(ymin=Lower_CI*Abundance, ymax=Upper_CI*Abundance), alpha=0.2, fill = "steelblue2", color=NA) +
+    labs(x=interval_name, y="Vector Index (95% CI)")+
     ggtitle(paste(year,"WNV Vector Index"))->VI_plot
 
   return(VI_plot)

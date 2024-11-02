@@ -12,7 +12,8 @@ getVectorIndex(
   pt_estimate,
   scale = 1000,
   species_list = NULL,
-  trap_list = NULL
+  trap_list = NULL,
+  wide = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ getVectorIndex(
 \item{species_list}{Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.}
 
 \item{trap_list}{Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.}
+
+\item{wide}{Should the data be returned in wide/spreadsheet format}
 }
 \value{
 Dataframe containing the vector index calculation
@@ -39,5 +42,5 @@ Dataframe containing the vector index calculation
 `getVectorIndex()`requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
 }
 \examples{
-getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle" )
+getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle", wide = FALSE )
 }

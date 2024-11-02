@@ -7,7 +7,7 @@ utils::globalVariables(c("test","Confirmed","Negative","Positive","arthropods","
                          "pool_num", "primary_source", "sample_method_name", "sample_method_value",
                          "sex_name", "site_code", "site_id", "site_name","collection_latitude","collection_longitude","pool_latitude","pool_longitude", "species_full_name", "target_icd_10",
                          "target_vector", "temperature", "test_agency_code", "test_agency_name",
-                         "test_agency_state_acronym", "test_date", "test_id", "trap_name", "trap_presence",
+                         "test_agency_state_acronym", "test_date", "test_id","Vector_Index" ,"trap_name", "trap_presence",
                          "type", "updated", "value", "wind_speed"))
 
 

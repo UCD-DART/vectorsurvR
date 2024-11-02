@@ -8,8 +8,10 @@
 #' @param scale Constant to multiply infection rate by
 #' @param species_list Species filter for calculating infection rate species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
 #' @param trap_list Trap filter for calculating infection rate. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.
+#' @param wide Should the data be returned in wide/spreadsheet format
 #' @keywords pools infection rate
 #' @return Dataframe of infection rate calculation
+#' @importFrom tidyr pivot_wider
 #' @examples
 #' getInfectionRate(sample_pools,
 #'                  interval = "Biweek",
@@ -17,7 +19,8 @@
 #'                  pt_estimate = "mle",
 #'                  scale = 1000,
 #'                  species_list = list("Cx pipiens"),
-#'                  trap_list = list("CO2"))
+#'                  trap_list = list("CO2"),
+#'                  wide = FALSE)
 #' @export
 
 
@@ -31,7 +34,7 @@
 #species_list, trap_list filter the data according to abbreviated scientific name (Cx pipiens etc) and trap acronym (NJLT, CO2, GRVD...)
 #If species_list, trap_list are left as NULL, the default assumes "All Options Selected"
 
-getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000, species_list = NULL, trap_list = NULL) {
+getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000, species_list = NULL, trap_list = NULL, wide = FALSE) {
 
   if (nrow(pools) <= 0) {
     stop("Pools data is empty")
@@ -214,6 +217,11 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
   colnames(IR) <- c("surv_year", interval, "Disease", "Point_Estimate", "Lower_CI", "Upper_CI", "Species", "Trap_Type")
   IR <- as.data.frame(IR)
   IR[c(2, 4:6)] <- sapply(IR[c(2, 4:6)], as.numeric)
+
+if(wide==TRUE){
+  IR %>%
+    pivot_wider(values_from = Point_Estimate, names_from = surv_year, names_prefix = "IR_Estimate_")->IR
+}
 
   return(IR)
 }

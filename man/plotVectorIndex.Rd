@@ -4,18 +4,16 @@
 \alias{plotVectorIndex}
 \title{Plot Vector Index}
 \usage{
-plotVectorIndex(VIOutput, year)
+plotVectorIndex(VIOutput)
 }
 \arguments{
 \item{VIOutput}{Output from returned `getVectorIndex()`}
-
-\item{year}{Year to plot vector index on}
 }
 \value{
 ggplot object
 }
 \description{
-plotVectorIndex() plots the output returned from `getVectorIndex()` with confidence intervals using ggplot
+plotVectorIndex() plots the output returned from `getVectorIndex()` using ggplot
 }
 \examples{
 VI = getVectorIndex(sample_collections,sample_pools,
@@ -23,5 +21,5 @@ VI = getVectorIndex(sample_collections,sample_pools,
                       target_disease = "WNV",
                       pt_estimate = "mle", species_list = c("Cx pipiens"),
                       trap_list = c("CO2","GRVD") )
-plotVectorIndex(VIOutput = VI, year = 2017)
+plotVectorIndex(VIOutput = VI)
 }

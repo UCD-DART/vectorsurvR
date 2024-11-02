@@ -5,7 +5,7 @@
 checkVI <- function(VI) {
   expect_true(!is.null(VI))
   expect_s3_class(VI, "data.frame")
-  expect_contains(colnames(VI), c("surv_year", "Disease","Count", "Trap_Events", "Abundance", "Point_Estimate", "Lower_CI", "Upper_CI"))
+  expect_contains(colnames(VI), c("surv_year", "Disease","Count", "Trap_Events", "Abundance", "IR_Estimate", "Lower_CI", "Upper_CI","Trap_Type"))
 }
 
 

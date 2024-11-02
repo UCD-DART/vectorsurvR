@@ -10,8 +10,10 @@
 #' @param scale Constant to multiply infection rate, default is 1000
 #' @param species_list Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
 #' @param trap_list Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.
+#' @param wide Should the data be returned in wide/spreadsheet format
+
 #' @examples
-#' getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle" )
+#' getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle", wide = FALSE )
 #' @export
 #' @return Dataframe containing the vector index calculation
 
@@ -19,7 +21,8 @@ getVectorIndex  = function(collections, pools, interval,
                            target_disease,pt_estimate,
                            scale = 1000,
                            species_list=NULL,
-                           trap_list =  NULL){
+                           trap_list =  NULL,
+                           wide=FALSE){
 
   if (nrow(pools) <= 0) {
     stop("Pools data is empty")
@@ -58,15 +61,21 @@ getVectorIndex  = function(collections, pools, interval,
   }
 
 
-  IR = getInfectionRate(pools, interval, target_disease, pt_estimate, scale, species_list, trap_list)
+  IR = getInfectionRate(pools, interval, target_disease, pt_estimate, scale, species_list, trap_list, wide = FALSE)
+
   AB = getAbundance(collections,interval,
                     species_list,
                     trap_list,
                     species_separate=FALSE)
 
  VI = merge(AB,IR, by = c(interval, "surv_year"))
- VI$VectorIndex = VI$Abundance*VI$Point_Estimate
+ VI$Vector_Index = VI$Abundance*VI$Point_Estimate
+ colnames(VI)[which(names(VI) == "Point_Estimate")] <- "IR_Estimate"
+ if(wide==TRUE){
+   IR %>%
+     pivot_wider(values_from = Vector_Index, names_from = surv_year, names_prefix = "Vector_Index_")->VI
 
+ }
   return(VI)
 
 }

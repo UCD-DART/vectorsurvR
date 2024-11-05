@@ -1,5 +1,5 @@
 #' @title Plot infection rate
-#' @description plotInfectionRate() plots the output returned from `getInfectionRate()` with confidence intervals using ggplot
+#' @description plotInfectionRate() plots the output returned from `getInfectionRate()` with confidence intervals using ggplot. Note the output must not be in wide format.
 #' @param InfRtOutput Output from returned `getInfectionRate()`
 #' @param year Year to plot infection rate on
 #' @return ggplot object
@@ -20,6 +20,9 @@
 
 plotInfectionRate = function(InfRtOutput, year){
 
+  if(!("surv_year" %in% colnames(InfRtOutput))){
+    stop("Please ensure infection rate output is in long format, NOT wide format")
+  }
   if(!(year %in% unique(InfRtOutput$surv_year))){
     stop("Year not present in output")
   }

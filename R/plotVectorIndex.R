@@ -20,7 +20,9 @@
 plotVectorIndex = function(VIOutput){
 
 
-
+  if(!("surv_year" %in% colnames(VIOutput))){
+    stop("Please ensure vector index output is in long format, NOT wide format")
+  }
   interval_name = colnames(VIOutput)[1]
   colnames(VIOutput)[1]="INTERVAL"
   VIOutput %>%

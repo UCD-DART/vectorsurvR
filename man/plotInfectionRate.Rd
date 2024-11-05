@@ -15,7 +15,7 @@ plotInfectionRate(InfRtOutput, year)
 ggplot object
 }
 \description{
-plotInfectionRate() plots the output returned from `getInfectionRate()` with confidence intervals using ggplot
+plotInfectionRate() plots the output returned from `getInfectionRate()` with confidence intervals using ggplot. Note the output must not be in wide format.
 }
 \examples{
 IR = getInfectionRate(sample_pools,

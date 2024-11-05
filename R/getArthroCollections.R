@@ -10,7 +10,7 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
 #' @importFrom stringr str_replace str_replace_all
-#' @importFrom dplyr bind_rows select
+#' @importFrom dplyr bind_rows select if_else pull coalesce inner_join left_join
 #' @export
 #' @examples
 #' \dontrun{
@@ -19,9 +19,11 @@
 
 getArthroCollections <- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
-   valid_arthopods = c("tick", "mosquito")
 
-   if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
+
+  valid_arthopods = c("tick", "mosquito")
+
+  if(!(is.numeric(start_year)) | !(is.numeric(end_year))){
     stop("Incorrect date format, start_year and end_year must be numeric")
   }
   if(end_year<start_year){
@@ -35,9 +37,9 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
   }
 
 
- if (any(!(arthropod %in% valid_arthopods))) {
-     stop("Invaid arthropod type selected. Choose from: 'mosquito', 'tick', 'nontick'")
- }
+  if (any(!(arthropod %in% valid_arthopods))) {
+    stop("Invaid arthropod type selected. Choose from: 'mosquito', 'tick', 'nontick'")
+  }
 
   headers <- c(
     Authorization = paste("Bearer", token),
@@ -113,13 +115,41 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       collections%>%
       unnest(arthropods, keep_empty = T,names_sep ="_" )
 
-    # separate collection location coordinates
-    collections$collection_longitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,1]
-    collections$collection_latitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,2]
+
 
     colnames(collections) =  str_replace(colnames(collections), "arthropods_","")%>%
       str_replace_all(pattern = "\\.",replacement = "_")
     colnames(collections)[1] = 'collection_id'
+
+    # separate collection location coordinates
+    collections$collection_longitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,1]
+    collections$collection_latitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,2]
+    #regional
+
+    sites = getSites(token)
+    sites_zip = sites[c("id", "city", "postal_code", "region")] #selects the columns with relevant information, this can be changed of course
+    regions = getRegions(token)
+    colnames(sites_zip)[1] = "site_id" #rename for join function
+
+    col_site = inner_join(collections, sites_zip, by = 'site_id') #join site information to collections
+    regions_county = regions[c("id","parent","type","geoid", "namelsad")] #select id and county name
+    colnames(regions_county)[1] = "region" #rename for join function
+    collections = inner_join(col_site, regions_county, by = "region")
+
+    collections=collections %>%
+      mutate(namelsad = if_else(!(type %in% c("state","county")),
+                                # For geoid > 5, join and update 'namelsad'
+                                left_join( regions %>% select(id, namelsad), by = c("parent" = "id")) %>%
+                                  mutate(namelsad = coalesce(namelsad.y, namelsad.x)) %>%
+                                  pull(namelsad),
+                                # For geoid <= 5, keep the original 'namelsad'
+                                namelsad))
+
+
+    colnames(collections)[which(names(collections) == "namelsad")] <- "county"
+
+
+
 
     #remove unwanted/redundant columns
     collections = collections %>%
@@ -128,7 +158,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym, num_trap,
              trap_nights,trap_problem_bit,num_count,
-             site_id, site_code, site_name,collection_longitude,collection_latitude,add_date,
+             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county, add_date,
              deactive_date, updated)
 
 
@@ -193,16 +223,37 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
     colnames(collections)[1] = 'collection_id'
 
+    sites = getSites(token)
+    sites_zip = sites[c("id", "city", "postal_code", "region")] #selects the columns with relevant information, this can be changed of course
+    regions = getRegions(token)
+    colnames(sites_zip)[1] = "site_id" #rename for join function
+
+    col_site = inner_join(collections, sites_zip, by = 'site_id') #join site information to collections
+    regions_county = regions[c("id","parent","type","geoid", "namelsad")] #select id and county name
+    colnames(regions_county)[1] = "region" #rename for join function
+    collections = inner_join(col_site, regions_county, by = "region")
+    collections=collections %>%
+      mutate(namelsad = if_else(!(`type.y` %in% c("state","county")),
+                                # For geoid > 5, join and update 'namelsad'
+                                left_join( regions %>% select(id, namelsad), by = c("parent" = "id")) %>%
+                                  mutate(namelsad = coalesce(namelsad.y, namelsad.x)) %>%
+                                  pull(namelsad),
+                                # For geoid <= 5, keep the original 'namelsad'
+                                namelsad))
+
+
+    colnames(collections)[which(names(collections) == "namelsad")] <- "county"
+    #
+
     collections = collections %>%
       select(collection_id,collection_num, collection_date_start,collection_date_end,
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
-             sex_name,sex_type,trap_acronym,bloodfed, attached,type, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,
-             site_id, site_code, site_name,collection_longitude,collection_latitude,add_date,
+             sex_name,sex_type,trap_acronym,bloodfed, attached, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,
+             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,add_date,
              deactive_date, updated)
 
     return(collections)
   }
-
 }
 

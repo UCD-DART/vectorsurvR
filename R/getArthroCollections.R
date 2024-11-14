@@ -139,7 +139,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     collections=collections %>%
       mutate(namelsad = if_else(!(type %in% c("state","county")),
                                 # For geoid > 5, join and update 'namelsad'
-                                left_join( regions %>% select(id, namelsad), by = c("parent" = "id")) %>%
+                                left_join(., regions %>% select(id, namelsad), by = c("parent" = "id")) %>%
                                   mutate(namelsad = coalesce(namelsad.y, namelsad.x)) %>%
                                   pull(namelsad),
                                 # For geoid <= 5, keep the original 'namelsad'
@@ -158,7 +158,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym, num_trap,
              trap_nights,trap_problem_bit,num_count,
-             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county, add_date,
+             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,geoid, add_date,
              deactive_date, updated)
 
 
@@ -250,7 +250,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym,bloodfed, attached, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,
-             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,add_date,
+             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,geoid, add_date,
              deactive_date, updated)
 
     return(collections)

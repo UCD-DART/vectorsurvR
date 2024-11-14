@@ -2,6 +2,7 @@
 #'
 #' @description `processAbunAnom()` processes the output returned from `getAbundanceAnomaly()` into a long form suitable for plotting using 'ggplot'
 #' @param AbAnomOutput output from `getAbunAnom()`
+#' @export
 #' @examples
 #' AbAnOut = getAbundanceAnomaly(sample_collections,
 #'                              interval = "Biweek",
@@ -9,8 +10,7 @@
 #'                              species_list = c("Cx tarsalis", "Cx pipiens"),
 #'                              species_separate = TRUE)
 #' AbAnOut_L = processAbunAnom(AbAnOut)
-#' @export
-#' @return Abundance anomaly output processed into long form
+#' @return Abundance anomaly output processed into long form, used for plotting functions
 
 
 
@@ -19,8 +19,8 @@
 
 processAbunAnom = function(AbAnomOutput){
 
-  colnames(AbAnomOutput)[grep("Abundance",colnames(AbAnomOutput), value=F)]=paste(AbAnomOutput$surv_year,"Abundance", sep="_")
-
+  #colnames(AbAnomOutput)[grep("Abundance",colnames(AbAnomOutput), value=F)]=paste(AbAnomOutput$surv_year,"Abundance", sep="_")
+  ab_name=list()
   ab_name = grep("Abundance",colnames(AbAnomOutput), value=T)
 
   AbAnomOutput_L = AbAnomOutput %>%

@@ -38,7 +38,8 @@ plotInfectionRate = function(InfRtOutput, year){
     geom_line(aes(INTERVAL, Upper_CI), color = "steelblue", size = 0.1) +
     geom_ribbon(aes(ymin=Lower_CI, ymax=Upper_CI), alpha=0.2, fill = "steelblue2", color=NA) +
     labs(x=interval_name, y="Point Estimate (MLE and 95% CI)")+
-    ggtitle(paste(year,"WNV Infection Rate"))->IR_plot
+    ggtitle(paste(year,"WNV Infection Rate"))+
+    scale_color_brewer(palette = "Set1")->IR_plot
 
   return(IR_plot)
 

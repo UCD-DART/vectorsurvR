@@ -8,7 +8,7 @@ utils::globalVariables(c("test","Confirmed","Negative","Positive","arthropods","
                          "sex_name", "site_code", "site_id", "site_name","collection_latitude","collection_longitude","pool_latitude","pool_longitude", "species_full_name", "target_icd_10",
                          "target_vector", "temperature", "test_agency_code", "test_agency_name",
                          "test_agency_state_acrnym", "test_date", "test_id","Vector_Index" ,"trap_name", "trap_presence",
-                         "type", "updated", "value", "wind_speed","city","id", "test_agency_state_acronym","county","namelsad","namelsad.x" ,"postal_code","type.y","namelsad.y"))
+                         "type", "updated", "value", "wind_speed","city",".","geoid","id", "test_agency_state_acronym","county","namelsad","namelsad.x" ,"postal_code","type.y","namelsad.y","Abundance_Calculation","Abundance_Type"))
 
 
 

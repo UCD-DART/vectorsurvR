@@ -31,7 +31,8 @@ plotVectorIndex = function(VIOutput){
     geom_path()+
 
     labs(x=interval_name, y="Vector Index", color = "Year")+
-    ggtitle("WNV Vector Index")->VI_plot
+    ggtitle("WNV Vector Index")+
+  scale_color_brewer(palette = "Set1")->VI_plot
 
   return(VI_plot)
 

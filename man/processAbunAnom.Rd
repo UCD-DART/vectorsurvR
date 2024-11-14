@@ -10,7 +10,7 @@ processAbunAnom(AbAnomOutput)
 \item{AbAnomOutput}{output from `getAbunAnom()`}
 }
 \value{
-Abundance anomaly output processed into long form
+Abundance anomaly output processed into long form, used for plotting functions
 }
 \description{
 `processAbunAnom()` processes the output returned from `getAbundanceAnomaly()` into a long form suitable for plotting using 'ggplot'

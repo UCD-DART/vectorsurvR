@@ -108,13 +108,13 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     if(nrow(collections)<=0){
       return(data.frame())
     }
+
+
     #Prevents conflicting data types within $arthropods list
     collections$arthropods=lapply(collections$arthropods, as.data.frame)
-
     collections =
       collections%>%
       unnest(arthropods, keep_empty = T,names_sep ="_" )
-
 
 
     colnames(collections) =  str_replace(colnames(collections), "arthropods_","")%>%
@@ -131,15 +131,15 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     regions = getRegions(token)
     colnames(sites_zip)[1] = "site_id" #rename for join function
 
-    col_site = inner_join(collections, sites_zip, by = 'site_id') #join site information to collections
+    col_site = left_join(collections, sites_zip, by = 'site_id') #join site information to collections
     regions_county = regions[c("id","parent","type","geoid", "namelsad")] #select id and county name
     colnames(regions_county)[1] = "region" #rename for join function
-    collections = inner_join(col_site, regions_county, by = "region")
+    collections = left_join(col_site, regions_county, by = "region")
 
     collections=collections %>%
       mutate(namelsad = if_else(!(type %in% c("state","county")),
                                 # For geoid > 5, join and update 'namelsad'
-                                left_join(., regions %>% select(id, namelsad), by = c("parent" = "id")) %>%
+                                left_join(., regions %>% dplyr::select(id, namelsad), by = c("parent" = "id")) %>%
                                   mutate(namelsad = coalesce(namelsad.y, namelsad.x)) %>%
                                   pull(namelsad),
                                 # For geoid <= 5, keep the original 'namelsad'
@@ -228,10 +228,10 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     regions = getRegions(token)
     colnames(sites_zip)[1] = "site_id" #rename for join function
 
-    col_site = inner_join(collections, sites_zip, by = 'site_id') #join site information to collections
+    col_site = left_join(collections, sites_zip, by = 'site_id') #join site information to collections
     regions_county = regions[c("id","parent","type","geoid", "namelsad")] #select id and county name
     colnames(regions_county)[1] = "region" #rename for join function
-    collections = inner_join(col_site, regions_county, by = "region")
+    collections = left_join(col_site, regions_county, by = "region")
     collections=collections %>%
       mutate(namelsad = if_else(!(`type.y` %in% c("state","county")),
                                 # For geoid > 5, join and update 'namelsad'
@@ -246,7 +246,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     #
 
     collections = collections %>%
-      select(collection_id,collection_num, collection_date_start,collection_date_end,
+      dplyr::select(collection_id,collection_num, collection_date_start,collection_date_end,
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym,bloodfed, attached, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,

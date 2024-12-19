@@ -1,11 +1,10 @@
+# vectorsurvR Package Documentation and User Guide
 
-
-## vectorsurvR Package Documentation and User Guide
+[![](https://cranlogs.r-pkg.org/badges/vectorsurvR)](https://cran.rstudio.com/web/packages/vectorsurvR/index.html)
 
 VectorSurv provides public health agencies the tools to manage, visualize and analyze the spread of vector-borne diseases and make informed decisions to protect public health.
  
 The 'vectorsurvR' package is intended for users of [VectorSurv](https://vectorsurv.org/), a public health vector borne disease surveillance system. The package contains functions tailored to data retrieved from the VectorSurv database. A valid VectorSurv username and password is required for data retrieval. Those without agency access can use sample datasets in place of real data. This documentation covers the functions in 'vectorsurvR' and introduces users to methods of R programming. The purpose of this documentation is to introduce and guide users with limited programming experience. 
-
 
 ```{r setup, include = TRUE}
 
@@ -20,9 +19,6 @@ devtools::install_github("UCD-DART/vectorsurvR")
 library(vectorsurvR)
 
 ```
-
-
-
 ## Data Retrieval 
 
 **getToken()**

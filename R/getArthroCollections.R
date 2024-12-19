@@ -71,6 +71,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         `populate[]` = "arthropods",
         `populate[]` = "agency",
         `populate[]` = "trap",
+        `populate[]` = "lures",
         `populate[]` = "location",
         `populate[]` = "site",
 
@@ -116,10 +117,14 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       collections%>%
       unnest(arthropods, keep_empty = T,names_sep ="_" )
 
+    collections =
+      collections%>%
+      unnest(lures, keep_empty = T,names_sep ="_" )
 
     colnames(collections) =  str_replace(colnames(collections), "arthropods_","")%>%
       str_replace_all(pattern = "\\.",replacement = "_")
     colnames(collections)[1] = 'collection_id'
+    collections = collections %>%  filter(!species_display_name%in%c("V pensylvanica","D variabilis" ,"D occidentalis","I pacificus","Dermacentor","V germanica"))
 
     # separate collection location coordinates
     collections$collection_longitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,1]
@@ -150,13 +155,12 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
 
 
-
     #remove unwanted/redundant columns
     collections = collections %>%
       select(collection_id,collection_num, collection_date,
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
-             sex_name,sex_type,trap_acronym, num_trap,
+             sex_name,sex_type,trap_acronym, lures_code, lures_description, lures_weight,num_trap,
              trap_nights,trap_problem_bit,num_count,
              site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,geoid, add_date,
              deactive_date, updated)
@@ -215,7 +219,8 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     collections =
       collections %>%
       unnest(ticks, keep_empty = T,names_sep = "_" )
-    colnames(collections) =  str_replace(colnames(collections), "ticks_","")%>%
+
+        colnames(collections) =  str_replace(colnames(collections), "ticks_","")%>%
       str_replace_all(pattern = "\\.",replacement = "_")
     collections$collection_longitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,1]
     collections$collection_latitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,2]
@@ -246,7 +251,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     #
 
     collections = collections %>%
-      dplyr::select(collection_id,collection_num, collection_date_start,collection_date_end,
+            select(collection_id,collection_num, collection_date_start,collection_date_end,
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
              sex_name,sex_type,trap_acronym,bloodfed, attached, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,

@@ -8,9 +8,10 @@ getAbundanceAnomaly(
   collections,
   interval,
   target_year,
-  species_list = NULL,
-  trap_list = NULL,
-  species_separate = FALSE
+  species = NULL,
+  trap = NULL,
+  sex = "female",
+  separate_by = NULL
 )
 }
 \arguments{
@@ -20,11 +21,13 @@ getAbundanceAnomaly(
 
 \item{target_year}{Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)}
 
-\item{species_list}{Species filter for calculating abundance. Species_display_name is the accepted notation.To see a list of species present in your data run `unique(collections$species_display_name)`. If species is unspecified, the default NULL will return data for all species in data}
+\item{species}{An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.}
 
-\item{trap_list}{Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(collections$trap_acronym)` to see trap types present in your data. If trap_list is unspecified,the default NULL will return data for all trap types}
+\item{trap}{An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.}
 
-\item{species_separate}{Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time description}
+\item{sex}{An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.}
+
+\item{separate_by}{Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.}
 }
 \value{
 Abundance anomaly calculation
@@ -33,7 +36,7 @@ Abundance anomaly calculation
 `getAbundanceAnomaly(...) `requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
 }
 \examples{
-getAbundanceAnomaly(sample_collections,"Biweek",target_year=2020, species_list="Cx pipiens")
+getAbundanceAnomaly(sample_collections,"Biweek",target_year=2020, species="Cx pipiens")
 
 }
 \keyword{abundance}

@@ -10,8 +10,10 @@ getInfectionRate(
   target_disease,
   pt_estimate,
   scale = 1000,
-  species_list = NULL,
-  trap_list = NULL,
+  species = NULL,
+  trap = NULL,
+  sex = "female",
+  separate_by = NULL,
   wide = FALSE
 )
 }
@@ -26,9 +28,13 @@ getInfectionRate(
 
 \item{scale}{Constant to multiply infection rate by}
 
-\item{species_list}{Species filter for calculating infection rate species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.}
+\item{species}{An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.}
 
-\item{trap_list}{Trap filter for calculating infection rate. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.}
+\item{trap}{An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.}
+
+\item{sex}{An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.}
+
+\item{separate_by}{Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.}
 
 \item{wide}{Should the data be returned in wide/spreadsheet format}
 }
@@ -37,16 +43,6 @@ Dataframe of infection rate calculation
 }
 \description{
 `getInfectionRate()` requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
-}
-\examples{
-getInfectionRate(sample_pools,
-                 interval = "Biweek",
-                 target_disease = "WNV",
-                 pt_estimate = "mle",
-                 scale = 1000,
-                 species_list = list("Cx pipiens"),
-                 trap_list = list("CO2"),
-                 wide = FALSE)
 }
 \keyword{infection}
 \keyword{pools}

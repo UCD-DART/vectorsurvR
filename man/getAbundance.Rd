@@ -7,9 +7,10 @@
 getAbundance(
   collections,
   interval,
-  species_list = NULL,
-  trap_list = NULL,
-  species_separate = FALSE
+  species = NULL,
+  trap = NULL,
+  sex = "female",
+  separate_by = NULL
 )
 }
 \arguments{
@@ -17,14 +18,16 @@ getAbundance(
 
 \item{interval}{Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month.}
 
-\item{species_list}{Species filter for calculating abundance. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.}
+\item{species}{An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.}
 
-\item{trap_list}{Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap_list is unspecified, the default NULL will return data for all trap types.}
+\item{trap}{An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.}
 
-\item{species_separate}{Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time.}
+\item{sex}{An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.}
+
+\item{separate_by}{Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.}
 }
 \value{
-A dataframe of abundance calculations
+A dataframe of abundance calculations.
 }
 \description{
 Calculates abundance
@@ -33,7 +36,8 @@ Calculates abundance
 
 getAbundance(sample_collections,
              interval = 'Week',
-             species_list = list('Cx pipiens'),
-             trap_list = list('GRVD', 'CO2'),
-             species_separate = FALSE)
+             species = list('Cx pipiens'),
+             trap = list('GRVD', 'CO2'),
+             sex = list("female"),
+             separate_by  = "species")
 }

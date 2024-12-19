@@ -7,7 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -24,7 +23,7 @@ knitr::opts_chunk$set(
 
 VectorSurv provides public health agencies the tools to manage, visualize and analyze the spread of vector-borne diseases and make informed decisions to protect public health.
  
-The 'vectorsurvR' package is intended for users of [VectorSurv](https://vectorsurv.org), a public health vector borne disease surveillance system. The package contains functions tailored to data retrieved from the VectorSurv database. A valid VectorSurv username and password is required for data retrieval. Those without agency access can use sample datasets in place of real data. This documentation covers the functions in 'vectorsurvR' and introduces users to methods of R programming. The purpose of this documentation is to introduce and guide users with limited programming experience. 
+The 'vectorsurvR' package is intended for users of [VectorSurv](https://vectorsurv.org/), a public health vector borne disease surveillance system. The package contains functions tailored to data retrieved from the VectorSurv database. A valid VectorSurv username and password is required for data retrieval. Those without agency access can use sample datasets in place of real data. This documentation covers the functions in 'vectorsurvR' and introduces users to methods of R programming. The purpose of this documentation is to introduce and guide users with limited programming experience. 
 
 To install package from CRAN (recommended) run:
 
@@ -39,6 +38,7 @@ Then load the package for use.
 
 ```{r include=FALSE}
 ##Load package
+
 library(vectorsurvR)
 
 ```
@@ -144,10 +144,7 @@ Data can be subset to contain columns of interest. Subsetting can also be used t
 ```{r}
 #Subset using column names or index number
 
-
 colnames(sample_collections) #displays column names and associated index
-
-
 
 #Subseting by name
 head(sample_collections[c("collection_date", "species_display_name", "num_count")])
@@ -192,7 +189,7 @@ collections_pip_tar = sample_collections %>%
 
 ### Grouping and Summarising 
 
-In addition to filtering and sub-setting, data can be group by variables and summarised.
+In addition to filtering and sub-setting, data can be group by variables and summarized.
 
 ```{r}
 #groups by species and collection date and sums the number counted
@@ -240,24 +237,24 @@ collections_wide = pivot_wider(
 
 *Usage*
 
-`getAbundance(collections,interval, species_list = NULL, trap_list = NULL, species_separate = FALSE)`
+`getAbundance(collections,interval, species = NULL, trap = NULL, separate_by = NULL)`
 
 *Arguments*
 
 - collections: Mosquito collections data retrieved from `getArthroCollections(...)` 
 - interval: Calculation interval for abundance, accepts "collection_date","Biweek","Week", and "Month.
-- species_list: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(collections$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
-- trap_list: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(collections$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.
-- species_separate: Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time.
+- species: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(collections$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
+- trap: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(collections$trap_acronym)` to see trap types present in your data. If trap is unspecified, the default `NULL` will return data for all trap types.
+- separate_by:Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate calculation
 
 
 ```{r}
 getAbundance(
   sample_collections,
   interval = "Biweek",
-  species_list = c("Cx tarsalis", "Cx pipiens"),
-  trap_list = "CO2",
-  species_separate = FALSE
+  species = c("Cx tarsalis", "Cx pipiens"),
+  trap = "CO2",
+  separate_by = NULL
 )
 
 ```
@@ -275,16 +272,16 @@ getAbundance(
 
 *Usage*
 
-`getAbundanceAnomaly(collections,interval,target_year, species_list = NULL, trap_list = NULL, species_separate = FALSE)`
+`getAbundanceAnomaly(collections,interval,target_year, species = NULL, trap = NULL, separate_by = NULL)`
 
 *Arguments*
 
 - collections: Collections data retrieved from `getArthroCollections(...) `
 - interval: Calculation interval for abundance, accepts "collection_date","Biweek","Week", and "Month.
 - target_year: Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year).
-- species_list: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(collections$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
-- trap_list: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(collections$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.
-- species_separate: Should the species in species_list have abundance calculated separately? Setting to FALSE calculates the combined abundance. The same result can be performed by calculating on one species at the time.
+- species: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(collections$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
+- trap: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(collections$trap_acronym)` to see trap types present in your data. If trap is unspecified, the default `NULL` will return data for all trap types.
+- separate_by:Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate calculation
 
 
 ```{r}
@@ -292,9 +289,9 @@ getAbundance(
 getAbundanceAnomaly(sample_collections,
                     interval = "Biweek",
                     target_year = 2020,
-                    species_list = c("Cx tarsalis", "Cx pipiens"),
-                    trap_list = "CO2",
-                    species_separate = FALSE) 
+                    species = c("Cx tarsalis", "Cx pipiens"),
+                    trap = "CO2",
+                    separate_by  = "species") 
 ```
 
 ### Infection Rate
@@ -307,7 +304,7 @@ getAbundanceAnomaly(sample_collections,
 
 *Usage*
 
-`getInfectionRate(pools,interval, target_year, target_disease,pt_estimate, scale = 1000, species_list = c(NULL), trap_list = c(NULL))`
+`getInfectionRate(pools,interval, target_year, target_disease,pt_estimate, scale = 1000, species = c(NULL), trap = c(NULL))`
 
 *Arguments*
 
@@ -317,20 +314,24 @@ getAbundanceAnomaly(sample_collections,
 - target_disease: The disease to calculate infection rate for--i.e. "WNV". Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`.
 - pt_estimate: The estimation type for infection rate. Options include: "mle","bc-"mle", "mir"
 - scale: Constant to multiply result
-- species_list: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
-- trap_list: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.
+- species: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
+- trap: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap is unspecified, the default `NULL` will return data for all trap types.
+- wide: T/F Should the data be returned in wide/spreadsheet format
 
 
 
 ```{r}
-IR = getInfectionRate(sample_pools, 
+getInfectionRate(sample_pools, 
                       interval = "Week",
                       target_disease = "WNV",
                       pt_estimate = "mle", 
                       scale = 1000,
-                      species_list = c("Cx pipiens"),
-                      trap_list = c("CO2","GRVD") )
-IR
+                      species = c("Cx pipiens", "Cx tarsalis"),
+                      trap = c("CO2"),
+                      separate_by="species", wide = FALSE )
+
+
+
 ```
 
 ### Vector Index
@@ -345,7 +346,7 @@ IR
 
 *Usage*
 
-`getVectorIndex(collections, pools, interval,               ,                           target_disease,                           pt_estimate,species_list=NULL, trap_list = NULL)`
+`getVectorIndex(collections, pools, interval,               ,                           target_disease,                           pt_estimate,species=NULL, trap = NULL,)`
 
 *Arguments*
 - collections: collections data retrieved from `getArthroCollections(...)`
@@ -358,20 +359,21 @@ IR
 - target_disease: The disease to calculate infection rate. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`.
 
 - pt_estimate: The estimation type for infection rate. Options include: "mle","bc-"mle", "mir".
-- species_list: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
-- trap_list: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.
+- species: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
+- trap: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap is unspecified, the default `NULL` will return data for all trap types.
+- separate_by:Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate calculation
+- wide: T/F Should the data be returned in wide/spreadsheet format
 
 
 ```{r}
-
-
-getVectorIndex(sample_collections, sample_pools, interval = "Biweek",
-                           
-                           target_disease = "WNV", pt_estimate = "bc-mle",
-                           species_list=c("Cx tarsalis"), 
-                           
-                           trap_list =  c("CO2"))
-
+getVectorIndex(sample_collections, 
+               sample_pools,
+               interval = "Biweek",
+               target_disease = "WNV",
+               pt_estimate = "bc-mle",
+               species = c("Cx tarsalis"), 
+               trap =  c("CO2"),
+               wide = FALSE)
 ```
 
 ## Tables
@@ -415,16 +417,16 @@ AbAnOutput = getAbundance(
   sample_collections,
   interval = "Biweek",
   
-  species_list = c("Cx tarsalis", "Cx pipiens"),
-  trap_list = "CO2",
-  species_separate = FALSE
-)
+  species = c("Cx tarsalis", "Cx pipiens"),
+  trap = "CO2",
+  separate_by = "species")
+
 head(AbAnOutput)
 
 #kable table where column names, font_size, style and much more can be customized
 
 AbAnOutput %>%
-  kbl(col.names = c("Disease Year", "Biweek", "Count", "Trap Events", "Abundance")) %>%
+  kbl() %>%
   kable_styling(
     bootstrap_options = "striped",
     font_size = 14,
@@ -442,7 +444,7 @@ Interactive html only tables can be produced using the 'DT' package. 'DT' tables
 library(DT)
 
 AbAnOutput %>%
-  datatable(colnames =  c("Disease Year", "Biweek", "Count", "Trap Events", "Abundance"))
+  datatable(colnames =  c("Disease Year", "Biweek", "Count", "Species","Trap Type","Trap Events", "Abundance"))
 ```
 
 
@@ -527,13 +529,12 @@ AbAnOut = getAbundanceAnomaly(
   sample_collections,
   interval = "Biweek",
   target_year = 2020,
-  species_list = c("Cx tarsalis", "Cx pipiens"),
-  species_separate = TRUE
+  species = c("Cx tarsalis", "Cx pipiens"),
+  separate_by  = "species"
 )
 
 
 
-AbAnOut_L = processAbunAnom(AbAnOut)
 ```
 
 
@@ -543,33 +544,25 @@ We can take the output of `processAbunAnom()` and create a plot comparing the ta
 ```{r}
 
 
-AbAnOut_L %>%  filter(Abundance_Type %in% c("2020_Abundance",
-                                            "Five_Year_Avg")) %>%
-  ggplot(aes(x = Biweek,
-             y = Abundance_Calculation,
-             color = Abundance_Type)) +
-  geom_point() +
-  geom_line() +
-  facet_wrap( ~ species_display_name) +
-  labs(title = "2020 Abundance Anomaly", y = "")
+
 
 ```
 
 We can also create a plot which displays the percent change from the five year average.
 
 ```{r}
-AbAnOut_L %>%
-  filter(Abundance_Type == "Delta") %>%
-  mutate(Change = ifelse(Abundance_Calculation > 0, "Increase", "Decrease")) %>%
-  ggplot(aes(x = Biweek,
-             y = Abundance_Calculation,
-             fill = Change)) +
-  geom_bar(stat = "identity") +
-  facet_wrap( ~ species_display_name) +
-  labs(x = "Biweek",
-       y = "Percent Change",
-       title = "Relative Abundance 2023, % Change from 5-year average",
-       fill = "Relative Change")
+#AbAnOut_L %>%
+#  filter(AbundanceType == "Delta") %>%
+#  mutate(Change = ifelse(AbundanceCalculation > 0, #"Increase", "Decrease")) %>%
+#  ggplot(aes(x = Biweek,
+#             y = AbundanceCalculation,
+#             fill = Change)) +
+#  geom_bar(stat = "identity") +
+#  facet_wrap( ~ Species) +
+#  labs(x = "Biweek",
+#       y = "Percent Change",
+#       title = "Relative Abundance 2023, % Change from #5-year average",
+#       fill = "Relative Change")
 
 ```
 
@@ -594,15 +587,40 @@ IR = getInfectionRate(
   interval = "Week",
   target_disease = "WNV",
   pt_estimate = "mle",
-  species_list = c("Cx pipiens"),
-  trap_list = c("CO2", "GRVD")
+  trap = c("CO2")
 )
 
-plotInfectionRate(InfRtOutput = IR, year = 2020)
-
+#plotInfectionRate(InfRtOutput = IR, year = 2020)
 ```
 
+**plotVectorIndex()**
 
+*Description*
+
+`plotVectorIndex()` plots the output returned from `getVectorIndex()` for all years in the output data. 
+
+*Usage*
+
+`plotVectorIndex(VI)`
+
+*Arguments*
+
+- VI: Output from returned `getVectorIndex()`
+
+
+```{r}
+VI = getVectorIndex(
+  sample_collections,sample_pools,
+  interval = "Week",
+  target_disease = "WNV",
+  pt_estimate = "mle",
+  species = c("Cx pipiens"),
+  trap = c("CO2"), wide=FALSE
+)
+
+#plotVectorIndex(VIOutput = VI)
+
+```
 ## Additional Table Examples
 
 We can highlight rows and columns, add headers, and customize footnotes. For more information please [Click Here](  https://CRAN.R-project.org/package=kableExtra) 
@@ -618,10 +636,6 @@ table(sample_collections$trap_acronym, sample_collections$surv_year) %>%
   ) %>%
   add_header_above(c("Trap Type", "Years" = 5)) %>%
   footnote(general = "Table X: Traps deployed by year", general_title = "") %>%
-  row_spec(c(3, 9, 10), background = "yellow") %>%
-  column_spec(c(4), background = "orange")
+  row_spec(c(2, 3), background = "yellow") %>%
+  column_spec(c(3), background = "orange")
 ```
-
-
-
-

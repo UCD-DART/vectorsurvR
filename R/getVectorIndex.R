@@ -8,10 +8,13 @@
 #' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`
 #' @param pt_estimate The estimation type for infection rate. Options include: “mle”,“bc-”mle”, “mir”
 #' @param scale Constant to multiply infection rate, default is 1000
-#' @param species_list Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
-#' @param trap_list Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap_list is unspecified, the default `NULL` will return data for all trap types.
+#' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
+#' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
+#' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
+#' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
 #' @param wide Should the data be returned in wide/spreadsheet format
-
+#' @importFrom dplyr arrange select
+#' @importFrom stringr str_split str_c
 #' @examples
 #' getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle", wide = FALSE )
 #' @export
@@ -20,8 +23,10 @@
 getVectorIndex  = function(collections, pools, interval,
                            target_disease,pt_estimate,
                            scale = 1000,
-                           species_list=NULL,
-                           trap_list =  NULL,
+                           species=NULL,
+                           trap =  NULL,
+                           sex = NULL,
+                           separate_by = NULL,
                            wide=FALSE){
 
   if (nrow(pools) <= 0) {
@@ -61,21 +66,72 @@ getVectorIndex  = function(collections, pools, interval,
   }
 
 
-  IR = getInfectionRate(pools, interval, target_disease, pt_estimate, scale, species_list, trap_list, wide = FALSE)
-
+  IR = getInfectionRate(pools, interval, target_disease, pt_estimate, scale,
+                        species, trap, sex,separate_by, wide = FALSE)
   AB = getAbundance(collections,interval,
-                    species_list,
-                    trap_list,
-                    species_separate=FALSE)
+                    species,
+                    trap,
+                    sex,
+                    separate_by)
 
- VI = merge(AB,IR, by = c(interval, "surv_year"))
- VI$Vector_Index = VI$Abundance*VI$Point_Estimate
- colnames(VI)[which(names(VI) == "Point_Estimate")] <- "IR_Estimate"
- if(wide==TRUE){
-   IR %>%
-     pivot_wider(values_from = Vector_Index, names_from = surv_year, names_prefix = "Vector_Index_")->VI
+  grouping_vars <- c("Year", interval)
+  if (!is.null(separate_by)) {
+    if ("species" %in% separate_by) {
+      grouping_vars <- c(grouping_vars, "Species")
+    }
+    if ("agency" %in% separate_by) {
+      grouping_vars <- c(grouping_vars, "Agency")
 
+    }
+    if ("trap" %in% separate_by) {
+      grouping_vars <- c(grouping_vars, "Trap")
+
+    }
+
+  }
+ VI = merge(AB,IR, by = grouping_vars, all=T, sort = T, suffixes = c("_AB", "_IR"))
+ VI$VectorIndex = VI$Abundance*VI$InfectionRate
+ combine_two_vectors <- function(vec1, vec2) {
+   # Split the strings into character vectors
+   values1 <- if (!is.na(vec1)) str_split(vec1, ",")[[1]] else character(0)
+   values2 <- if (!is.na(vec2)) str_split(vec2, ",")[[1]] else character(0)
+
+   # Combine, deduplicate, sort, and collapse back into a string
+   combined <- unique(c(values1, values2)) %>% sort() %>% str_c(collapse = ",")
+   return(combined)
  }
+
+ combine_columns_rowwise <- function(data, col1, col2, new_col_name = "Combined") {
+
+   data %>%
+     mutate(!!new_col_name := apply(data[, c(col1, col2)], 1, function(row) {
+       combine_two_vectors(row[1], row[2])
+     }))
+ }
+ if (!"species" %in% separate_by) {
+     VI = combine_columns_rowwise(VI,"Species_AB","Species_IR",new_col_name = "Species" )
+   }
+   if (!"trap" %in% separate_by) {
+     VI = combine_columns_rowwise(VI,"Trap_AB","Trap_IR",new_col_name = "Trap" )
+
+   }
+   if (!"agency" %in% separate_by) {
+     VI = combine_columns_rowwise(VI,"Agency_AB","Agency_IR",new_col_name = "Agency" )
+
+   }
+
+
+ VI  = VI %>%
+   select(Year, interval, Agency, Species, Trap, TrapEvents,Count, Abundance,Disease,InfectionRate,VectorIndex)
+
+  if(wide==TRUE){
+   VI %>%
+     pivot_wider(values_from = VectorIndex, names_from = Year, names_prefix = "VectorIndex_")->VI
+
+  }
+
+
+
   return(VI)
 
 }

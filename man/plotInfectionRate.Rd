@@ -21,7 +21,8 @@ plotInfectionRate() plots the output returned from `getInfectionRate()` with con
 IR = getInfectionRate(sample_pools,
                       interval = "Week",
                       target_disease = "WNV",
-                      pt_estimate = "mle", species_list = c("Cx pipiens"),
-                      trap_list = c("CO2","GRVD") )
+                      pt_estimate = "mle",
+                      species = c("Cx pipiens"),
+                      trap = c("CO2","GRVD") )
 plotInfectionRate(InfRtOutput = IR, year = 2017)
 }

@@ -4,12 +4,7 @@
 \alias{getPoolsComparisionTable}
 \title{Get Pools Frequency Table}
 \usage{
-getPoolsComparisionTable(
-  pools,
-  interval,
-  target_disease,
-  species_separate = FALSE
-)
+getPoolsComparisionTable(pools, interval, target_disease, separate_by = NULL)
 }
 \arguments{
 \item{pools}{Pools data retrieved from `getPools()`}
@@ -19,7 +14,7 @@ getPoolsComparisionTable(
 \item{target_disease}{The disease to calculate infection rate for–i.e. “WNV”.
 Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`}
 
-\item{species_separate}{Should the pools comparison be split by species of each pool. Default is FALSE}
+\item{separate_by}{Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.}
 }
 \value{
 Frequency table of for pools data
@@ -32,5 +27,5 @@ species. The more years present in the data, the larger the table.
 getPoolsComparisionTable(sample_pools,
                          interval = "Biweek",
                          target_disease = "WNV",
-                          species_separate = TRUE)
+                          separate_by = "species")
 }

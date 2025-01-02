@@ -7,6 +7,7 @@
 \format{
 A data frame with 2500 rows and 10 variables:
 \describe{
+\item{\code{agency_code}}{character Four letter agency code}
   \item{\code{pool_id}}{integer Pool identification number}
   \item{\code{surv_year}}{integer Surveillance year of pool}
   \item{\code{site_code}}{integer Identifying code of site}

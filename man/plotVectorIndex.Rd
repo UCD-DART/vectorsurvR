@@ -19,7 +19,7 @@ plotVectorIndex() plots the output returned from `getVectorIndex()` using ggplot
 VI = getVectorIndex(sample_collections,sample_pools,
                       interval = "Week",
                       target_disease = "WNV",
-                      pt_estimate = "mle", species_list = c("Cx pipiens"),
-                      trap_list = c("CO2","GRVD") )
+                      pt_estimate = "mle", species = c("Cx pipiens"),
+                      trap = c("CO2","GRVD") )
 plotVectorIndex(VIOutput = VI)
 }

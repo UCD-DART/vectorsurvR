@@ -15,6 +15,7 @@
 #' @return Dataframe of infection rate calculation
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr select case_when
+#' @importFrom stats qnorm
 #' @export
 
 getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000,

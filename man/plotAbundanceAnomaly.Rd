@@ -16,6 +16,7 @@ ggplot object
 plotAbundanceAnomaly() plots the output returned from `getInfectionRate()` with confidence intervals using ggplot. Note the output must not be in wide format.
 }
 \examples{
-AbunAnomOutput = getAbundanceAnomaly(sample_collections,"Biweek",target_year=2020)
+AbunAnomOutput = getAbundanceAnomaly(sample_collections,"Biweek",
+target_year=2020, trap = "CO2", separate_by="species")
 plotAbundanceAnomaly(AbunAnomOutput)
 }

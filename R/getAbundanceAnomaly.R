@@ -42,7 +42,7 @@ getAbundanceAnomaly <- function(collections, interval, target_year,
 
   }
   if(any(!separate_by %in% separate_options)){
-    error("Check separate_by parameters. Accepted options are 'species', 'trap', and/or 'agency'")
+    stop("Check separate_by parameters. Accepted options are 'species', 'trap', and/or 'agency'")
   }
 
  #check for valid year input

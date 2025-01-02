@@ -33,7 +33,6 @@ A dataframe of abundance calculations.
 Calculates abundance
 }
 \examples{
-
 getAbundance(sample_collections,
              interval = 'Week',
              species = list('Cx pipiens'),

@@ -9,8 +9,8 @@
 #' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
 #' @return A dataframe of abundance calculations.
 #' @export
+#' @importFrom dplyr across all_of
 #' @examples
-#'
 #' getAbundance(sample_collections,
 #'              interval = 'Week',
 #'              species = list('Cx pipiens'),
@@ -49,7 +49,7 @@ getAbundance <- function(collections, interval, species = NULL, trap = NULL, sex
     stop("Insufficient collections data provided")
   }
   if(any(!separate_by %in% separate_options)){
-    error("Check separate_by parameters. Accepted options are 'species', 'trap', and/or 'agency'")
+    stop("Check separate_by parameters. Accepted options are 'species', 'trap', and/or 'agency'")
   }
 
   collections <- collections %>%

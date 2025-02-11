@@ -5,7 +5,7 @@
 #' @param start_year Start year of data
 #' @param end_year  End year of data
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick'
-#' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids
+#' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids, such as `agency_ids = c(55,56)`
 #' @return A dataframe of collections
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
@@ -15,7 +15,7 @@
 #' @examples
 #' \dontrun{
 #' token = getToken()
-#' collections = getArthroCollections(token, 2021, 2022, 'mosquito',55, TRUE)}
+#' collections = getArthroCollections(token, 2021, 2022, 'mosquito',c(55,56), TRUE)}
 
 getArthroCollections <- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
@@ -160,7 +160,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       select(collection_id,collection_num, collection_date,
              agency_id, agency_code, agency_name, surv_year,
              comments,identified_by,species_display_name,
-             sex_name,sex_type,trap_acronym, lures_code, lures_description, lures_weight,num_trap,
+             sex_name,sex_type,trap_acronym,lures_id, lures_code, lures_description, lures_weight,num_trap,
              trap_nights,trap_problem_bit,num_count,
              site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,geoid, add_date,
              deactive_date, updated)

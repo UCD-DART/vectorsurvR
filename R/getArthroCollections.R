@@ -124,7 +124,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     colnames(collections) =  str_replace(colnames(collections), "arthropods_","")%>%
       str_replace_all(pattern = "\\.",replacement = "_")
     colnames(collections)[1] = 'collection_id'
-    collections = collections %>%  filter(!species_display_name%in%c("V pensylvanica","D variabilis" ,"D occidentalis","I pacificus","Dermacentor","V germanica"))
+    collections = collections %>%  dplyr::filter(!species_display_name%in%c("V pensylvanica","D variabilis" ,"D occidentalis","I pacificus","Dermacentor","V germanica"))
 
     # separate collection location coordinates
     collections$collection_longitude <- do.call(rbind, lapply(collections$location_shape_coordinates, function(x) unlist(x)))[,1]

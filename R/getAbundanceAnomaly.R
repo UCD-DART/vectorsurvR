@@ -3,19 +3,23 @@
 #' @param collections Collections data retrieved from `getArthroCollections()`
 #' @param interval Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month
 #' @param target_year Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)
+#' @param species An optional vector for filtering agency by values in agency_code.
 #' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
 #' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
+#' @param trapnight_min Minimum trap night restriction for calculation. Default is 1.
+#' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
 #' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
 #' @keywords abundance
 #' @importFrom utils head
+#' @importFrom dplyr summarise summarize filter group_by distinct_at vars arrange mutate desc bind_rows rename
 #' @export
 #' @return Abundance anomaly calculation
 #' @examples
 #' getAbundanceAnomaly(sample_collections,"Biweek",target_year=2020, species="Cx pipiens")
 #'
-getAbundanceAnomaly <- function(collections, interval, target_year,
-                               species = NULL, trap = NULL, sex="female", separate_by=NULL){
+getAbundanceAnomaly <- function(collections, interval, target_year, agency = NULL,
+                               species = NULL, trap = NULL, sex="female",trapnight_min=1,trapnight_max=NULL, separate_by=NULL){
 
 
   if(nrow(collections)<=0){
@@ -25,6 +29,7 @@ getAbundanceAnomaly <- function(collections, interval, target_year,
 
   col_columns =c("collection_id",
                  "collection_date",
+                 "agency_code",
                  "num_trap",
                  "trap_nights",
                  "trap_problem_bit",
@@ -60,7 +65,7 @@ getAbundanceAnomaly <- function(collections, interval, target_year,
     dplyr::filter(surv_year %in% calculation_years)
 
 
-ab_data = getAbundance(collections,interval, species, trap,sex, separate_by)
+ab_data = getAbundance(collections,interval, agency, species, trap,sex,trapnight_min,trapnight_max, separate_by)
 
   colnames(ab_data)[3] ="INTERVAL"
   grouping_vars <- c("INTERVAL")
@@ -80,23 +85,12 @@ ab_data = getAbundance(collections,interval, species, trap,sex, separate_by)
   }
 
     ab_data %>%
-      group_by(across(all_of(grouping_vars))) %>%
+      dplyr::group_by(across(all_of(grouping_vars))) %>%
       dplyr::filter(Year != target_year )%>%
-      summarise(FiveYearAvg =  mean(Abundance), YearsInAverage = paste(sort(unique(Year)), collapse = ",")) -> yr_int_average
+      dplyr::summarize(FiveYearAvg =  mean(Abundance), YearsInAverage = paste(sort(unique(Year)), collapse = ",")) -> yr_int_average
     ab_data_yr = ab_data %>% dplyr::filter(Year == target_year)
 
     ab_av <- merge(ab_data_yr, yr_int_average, by=grouping_vars)
-
-  # else{
-  #   ab_data %>%
-  #     group_by(INTERVAL) %>%
-  #     dplyr::filter(surv_year != target_year )%>%
-  #     summarise(Five_Year_Avg =  mean(Abundance), Years_In_Average = paste(sort(unique(surv_year)), collapse = ","))  -> yr_int_average
-  #
-  #   ab_data_yr = ab_data %>% dplyr::filter(surv_year == target_year)
-  #
-  #   ab_av <- merge(ab_data_yr, yr_int_average, by="INTERVAL")
-  # }
 
 
   ab_av$Delta = round((ab_av$Abundance - ab_av$FiveYearAvg)/ab_av$FiveYearAvg,4)*100

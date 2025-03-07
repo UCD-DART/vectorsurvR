@@ -65,6 +65,7 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
       `populate[]` = "status",
       `populate[]` = "trap",
       `populate[]` = "sex",
+      `populate[]` = "lures",
       `populate[]` = "species",
       `populate[]` = "site",
       `populate[]` = "location",
@@ -144,11 +145,24 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
 
   colnames(pools)[which(names(pools) == "namelsad")] <- "county"
+  if(arthropod=="mosquito"){
 
+    pools =
+      pools%>%
+      unnest(lures, keep_empty = T,names_sep ="_" )
   pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,primary_source,collection,pool_comments,
-                 surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,num_count,test_id,value,test_date,
+                 surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,lures_id, lures_code, lures_description, lures_weight,num_count,test_id,value,test_date,
                  method_name,method_acronym,target_acronym,target_vector,
                  target_icd_10,status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)
+
+  }
+  if(arthropod!="mosquito"){
+    pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,primary_source,collection,pool_comments,
+                         surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,num_count,test_id,value,test_date,
+                         method_name,method_acronym,target_acronym,target_vector,
+                         target_icd_10,status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)
+  }
+
   return(pools)
 
 }

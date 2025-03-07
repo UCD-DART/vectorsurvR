@@ -446,3 +446,18 @@ AbAnOutput %>%
   datatable(colnames =  c("Disease Year", "Biweek", "Count", "Species","Trap Type","Trap Events", "Abundance"))
 ```
 
+```{r}
+
+table(vectorsurvR:::testing_collections$trap_acronym, vectorsurvR:::testing_collections$surv_year) %>%
+  kbl(align = "c") %>%
+  kable_paper(
+    full_width = F,
+    html_font = "arial",
+    lightable_options = "striped",
+  ) %>%
+  add_header_above(c("Trap Type", "Years" = 6)) %>%
+  footnote(general = "Table 3: Traps deployed by year", general_title = "") %>%
+  row_spec(c(3, 9, 10), background = "yellow") %>%
+  column_spec(c(4), background = "orange")
+```
+

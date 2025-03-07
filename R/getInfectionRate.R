@@ -6,6 +6,7 @@
 #' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`
 #' @param pt_estimate The estimation type for infection rate. Options include: “mle”,“bc-mle”, “mir”
 #' @param scale Constant to multiply infection rate by
+#' @param agency An optional vector for filtering agency by character code
 #' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
 #' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
@@ -19,13 +20,14 @@
 #' @export
 
 getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000,
-                             species = NULL, trap = NULL, sex = "female", separate_by = NULL, wide = FALSE) {
+                             species = NULL, trap = NULL, sex = "female",  separate_by = NULL, wide = FALSE) {
 
   if (nrow(pools) <= 0) {
     stop("Pools data is empty")
   }
 
-  pools_columns <- c("pool_id", "collection_date", "surv_year", "num_count", "sex_type",
+
+  pools_columns <- c("pool_id", "collection_date", "agency_code","surv_year", "num_count", "sex_type",
                      "species_display_name", "trap_acronym", "target_acronym", "status_name")
 
   if (!all(pools_columns %in% colnames(pools))) {
@@ -179,7 +181,7 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
 
   # Apply infection rate calculation based on the chosen pt_estimate method
        results <- pools %>%
-         dplyr::filter(
+         dplyr::filter(agency_code %in% agency,
            species_display_name %in% species,
            trap_acronym %in% trap,
            sex_type %in% sex,

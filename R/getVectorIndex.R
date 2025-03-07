@@ -8,9 +8,12 @@
 #' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`
 #' @param pt_estimate The estimation type for infection rate. Options include: “mle”,“bc-”mle”, “mir”
 #' @param scale Constant to multiply infection rate, default is 1000
+#' @param agency An optional vector for filtering agency by character code
 #' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
 #' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
+#' @param trapnight_min Minimum trap night restriction for calculation. Default is 1.
+#' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
 #' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
 #' @param wide Should the data be returned in wide/spreadsheet format
 #' @importFrom dplyr arrange select
@@ -23,9 +26,12 @@
 getVectorIndex  = function(collections, pools, interval,
                            target_disease,pt_estimate,
                            scale = 1000,
+                           agency = NULL,
                            species=NULL,
                            trap =  NULL,
                            sex = NULL,
+                           trapnight_min = 1,
+                           trapnight_max=NULL,
                            separate_by = NULL,
                            wide=FALSE){
 
@@ -34,7 +40,7 @@ getVectorIndex  = function(collections, pools, interval,
 
   }
 
-  pools_columns <- c("pool_id", "collection_date", "surv_year", "num_count", "sex_type", "species_display_name", "trap_acronym", "target_acronym", "status_name")
+  pools_columns <- c("pool_id", "agency_code","collection_date", "surv_year", "num_count", "sex_type", "species_display_name", "trap_acronym", "target_acronym", "status_name")
 
   if (any(!(pools_columns %in% colnames(pools)))) {
     stop("Insufficent pools data")
@@ -51,6 +57,7 @@ getVectorIndex  = function(collections, pools, interval,
                          "trap_problem_bit",
                          "num_count",
                          "sex_type",
+                         "agency_code",
                          "species_display_name",
                          "trap_acronym")
 
@@ -66,12 +73,15 @@ getVectorIndex  = function(collections, pools, interval,
   }
 
 
-  IR = getInfectionRate(pools, interval, target_disease, pt_estimate, scale,
-                        species, trap, sex,separate_by, wide = FALSE)
+  IR = getInfectionRate(pools, interval, agency, target_disease, pt_estimate, scale,
+                        species, trap, sex, separate_by, wide = FALSE)
   AB = getAbundance(collections,interval,
+                    agency,
                     species,
                     trap,
                     sex,
+                    trapnight_min,
+                    trapnight_max,
                     separate_by)
 
   grouping_vars <- c("Year", interval)

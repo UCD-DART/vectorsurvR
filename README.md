@@ -1,6 +1,6 @@
 # vectorsurvR Package Documentation and User Guide
 
-[![](https://cranlogs.r-pkg.org/badges/vectorsurvR)](https://cran.rstudio.com/web/packages/vectorsurvR/index.html)
+[vectorsurvR](https://CRAN.R-project.org/package=vectorsurvR)
 
 VectorSurv provides public health agencies the tools to manage, visualize and analyze the spread of vector-borne diseases and make informed decisions to protect public health.
  

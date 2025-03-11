@@ -19,7 +19,7 @@
 #' @importFrom stats qnorm
 #' @export
 
-getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000,
+getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000, agency=NULL,
                              species = NULL, trap = NULL, sex = "female",  separate_by = NULL, wide = FALSE) {
 
   if (nrow(pools) <= 0) {
@@ -58,9 +58,11 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
                            "Biweek" = as.numeric(ceiling(epiweek(pools$collection_date) / 2)),
                            "Month" = as.numeric(month(pools$collection_date)))
 
-  # Default species and trap if not provided
   if (is.null(species)) {
     species <- unique(pools$species_display_name)
+  }
+  if (is.null(agency)) {
+    agency <- unique(pools$agency_code)
   }
   if (is.null(trap)) {
     trap <- unique(pools$trap_acronym)

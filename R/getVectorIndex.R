@@ -16,7 +16,7 @@
 #' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
 #' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
 #' @param wide Should the data be returned in wide/spreadsheet format
-#' @importFrom dplyr arrange select
+#' @importFrom dplyr arrange
 #' @importFrom stringr str_split str_c
 #' @examples
 #' getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle", wide = FALSE )
@@ -30,7 +30,7 @@ getVectorIndex  = function(collections, pools, interval,
                            species=NULL,
                            trap =  NULL,
                            sex = NULL,
-                           trapnight_min = 1,
+                           trapnight_min=1,
                            trapnight_max=NULL,
                            separate_by = NULL,
                            wide=FALSE){
@@ -40,7 +40,7 @@ getVectorIndex  = function(collections, pools, interval,
 
   }
 
-  pools_columns <- c("pool_id", "agency_code","collection_date", "surv_year", "num_count", "sex_type", "species_display_name", "trap_acronym", "target_acronym", "status_name")
+  pools_columns <- c("pool_id", "collection_date", "surv_year", "num_count", "sex_type", "species_display_name", "trap_acronym", "target_acronym", "status_name")
 
   if (any(!(pools_columns %in% colnames(pools)))) {
     stop("Insufficent pools data")
@@ -52,12 +52,12 @@ getVectorIndex  = function(collections, pools, interval,
 
   collections_columns =c("collection_id",
                          "collection_date",
+                         "agency_code",
                          "num_trap",
                          "trap_nights",
                          "trap_problem_bit",
                          "num_count",
                          "sex_type",
-                         "agency_code",
                          "species_display_name",
                          "trap_acronym")
 
@@ -73,10 +73,9 @@ getVectorIndex  = function(collections, pools, interval,
   }
 
 
-  IR = getInfectionRate(pools, interval, agency, target_disease, pt_estimate, scale,
-                        species, trap, sex, separate_by, wide = FALSE)
-  AB = getAbundance(collections,interval,
-                    agency,
+  IR = getInfectionRate(pools, interval, target_disease, pt_estimate, scale,
+                        agency, species, trap, sex,separate_by, wide = FALSE)
+  AB = getAbundance(collections,interval,agency,
                     species,
                     trap,
                     sex,
@@ -84,7 +83,7 @@ getVectorIndex  = function(collections, pools, interval,
                     trapnight_max,
                     separate_by)
 
-  grouping_vars <- c("Year", interval)
+  grouping_vars=c()
   if (!is.null(separate_by)) {
     if ("species" %in% separate_by) {
       grouping_vars <- c(grouping_vars, "Species")
@@ -93,55 +92,71 @@ getVectorIndex  = function(collections, pools, interval,
       grouping_vars <- c(grouping_vars, "Agency")
 
     }
+    if ("subregion" %in% separate_by) {
+      grouping_vars <- c(grouping_vars, "Subregion")
+
+    }
     if ("trap" %in% separate_by) {
       grouping_vars <- c(grouping_vars, "Trap")
-
     }
 
   }
- VI = merge(AB,IR, by = grouping_vars, all=T, sort = T, suffixes = c("_AB", "_IR"))
- VI$VectorIndex = VI$Abundance*VI$InfectionRate
- combine_two_vectors <- function(vec1, vec2) {
-   # Split the strings into character vectors
-   values1 <- if (!is.na(vec1)) str_split(vec1, ",")[[1]] else character(0)
-   values2 <- if (!is.na(vec2)) str_split(vec2, ",")[[1]] else character(0)
-
-   # Combine, deduplicate, sort, and collapse back into a string
-   combined <- unique(c(values1, values2)) %>% sort() %>% str_c(collapse = ",")
-   return(combined)
- }
-
+ VI = merge(AB,IR, by = c("Year",interval,grouping_vars), all=T, sort = T, suffixes = c("_AB", "_IR"))
+ VI$Vector_Index = VI$Abundance*VI$InfectionRate
  combine_columns_rowwise <- function(data, col1, col2, new_col_name = "Combined") {
+   if (!(col1 %in% colnames(data)) | !(col2 %in% colnames(data))) {
+     # If one or both columns are missing, return the original data unchanged
+     return(data)
+   }
 
    data %>%
-     mutate(!!new_col_name := apply(data[, c(col1, col2)], 1, function(row) {
-       combine_two_vectors(row[1], row[2])
-     }))
+     dplyr::rowwise() %>%
+     dplyr::mutate(
+       !!new_col_name := {
+         # Extract values safely for the current row using pick()
+         values1 <- if (!is.na(pick(all_of(col1)))) str_split(pick(all_of(col1)), ",")[[1]] else character(0)
+         values2 <- if (!is.na(pick(all_of(col2)))) str_split(pick(all_of(col2)), ",")[[1]] else character(0)
+
+         # Combine, remove duplicates, sort, and collapse into a single string
+         unique(c(values1, values2)) %>% sort() %>% str_c(collapse = ",")
+       }
+     ) %>%
+     dplyr::ungroup()
  }
- if (!"species" %in% separate_by) {
-     VI = combine_columns_rowwise(VI,"Species_AB","Species_IR",new_col_name = "Species" )
-   }
-   if (!"trap" %in% separate_by) {
-     VI = combine_columns_rowwise(VI,"Trap_AB","Trap_IR",new_col_name = "Trap" )
 
-   }
-   if (!"agency" %in% separate_by) {
-     VI = combine_columns_rowwise(VI,"Agency_AB","Agency_IR",new_col_name = "Agency" )
+  if ("Species_AB" %in% colnames(VI) & "Species_IR" %in% colnames(VI)) {
+   VI = combine_columns_rowwise(VI, "Species_AB", "Species_IR", new_col_name = "Species")
+ }
 
-   }
+ if ("Trap_AB" %in% colnames(VI) & "Trap_IR" %in% colnames(VI)) {
+   VI = combine_columns_rowwise(VI, "Trap_AB", "Trap_IR", new_col_name = "Trap")
+ }
+
+ if ("Agency_AB" %in% colnames(VI) & "Agency_IR" %in% colnames(VI)) {
+   VI = combine_columns_rowwise(VI, "Agency_AB", "Agency_IR", new_col_name = "Agency")
+ }
 
 
- VI  = VI %>%
-   select(Year, interval, Agency, Species, Trap, TrapEvents,Count, Abundance,Disease,InfectionRate,VectorIndex)
+  VI = VI %>%
+    select(Year,
+           interval,
+           Agency,
+           Species,
+           Count,
+           Trap,
+           TrapEvents,
+           Abundance,
+           Disease,
+           InfectionRate,
+           LowerCI,
+           UpperCI,
+           Vector_Index)
 
   if(wide==TRUE){
    VI %>%
-     pivot_wider(values_from = VectorIndex, names_from = Year, names_prefix = "VectorIndex_")->VI
+     pivot_wider(values_from = Vector_Index, names_from = Year, names_prefix = "Vector_Index_")->VI
 
-  }
-
-
-
+ }
   return(VI)
 
 }

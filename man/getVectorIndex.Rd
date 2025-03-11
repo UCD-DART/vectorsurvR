@@ -11,6 +11,7 @@ getVectorIndex(
   target_disease,
   pt_estimate,
   scale = 1000,
+  agency = NULL,
   species = NULL,
   trap = NULL,
   sex = NULL,
@@ -32,6 +33,8 @@ getVectorIndex(
 \item{pt_estimate}{The estimation type for infection rate. Options include: “mle”,“bc-”mle”, “mir”}
 
 \item{scale}{Constant to multiply infection rate, default is 1000}
+
+\item{agency}{An optional vector for filtering agency by character code}
 
 \item{species}{An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.}
 

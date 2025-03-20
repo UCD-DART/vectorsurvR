@@ -152,12 +152,14 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   if ("subregion" %in% separate_by){
   AB  = AB %>%
     select(Agency, surv_year, INTERVAL,subregion, Species,Count,TrapEvents, Trap, Abundance)
+
   }
   else{ AB  = AB %>%
     select(Agency, surv_year, INTERVAL, Species,Count,TrapEvents, Trap, Abundance)
-    colnames(AB)[3] <- interval
   }
   # Rename columns
+  colnames(AB)[3] <- interval
+
   colnames(AB)[2] <- "Year"
 
   return(AB)

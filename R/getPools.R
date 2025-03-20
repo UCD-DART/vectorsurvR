@@ -114,6 +114,8 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
   #Prevents conflicting data types within $test list
   pools$test=lapply(pools$test, as.data.frame)
+  pools$lures=lapply(pools$lures, as.data.frame)
+
   pools = pools%>%
     unnest(test, keep_empty = T, names_sep = "_")
   colnames(pools) =  str_replace(colnames(pools), "test_","")%>%

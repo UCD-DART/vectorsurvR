@@ -114,13 +114,14 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
   #Prevents conflicting data types within $test list
   pools$test=lapply(pools$test, as.data.frame)
-  pools$lures=lapply(pools$lures, as.data.frame)
 
   pools = pools%>%
     unnest(test, keep_empty = T, names_sep = "_")
   colnames(pools) =  str_replace(colnames(pools), "test_","")%>%
     str_replace_all(pattern = "\\.",replacement = "_")
-  colnames(pools)[c(1,5,11)] = c("pool_id","pool_comments","test_id")
+
+
+  colnames(pools)[c(1,4,9)] = c("pool_id","pool_comments","test_id")
 
   pools$pool_longitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,1]
   pools$pool_latitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,2]
@@ -135,7 +136,6 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
   regions_county = regions[c("id","parent","type","geoid", "namelsad")] #select id and county name
   colnames(regions_county)[1] = "region" #rename for join function
   pools = inner_join(pool_site, regions_county, by = "region")
-
   pools=pools %>%
     mutate(namelsad = if_else(!(type %in% c("state","county")),
                               # For geoid > 5, join and update 'namelsad'
@@ -148,18 +148,19 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
   colnames(pools)[which(names(pools) == "namelsad")] <- "county"
   if(arthropod=="mosquito"){
+    pools$lures=lapply(pools$lures, as.data.frame)
 
     pools =
       pools%>%
       unnest(lures, keep_empty = T,names_sep ="_" )
-  pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,primary_source,collection,pool_comments,
+  pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,collection,pool_comments,
                  surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,lures_id, lures_code, lures_description, lures_weight,num_count,test_id,value,test_date,
                  method_name,method_acronym,target_acronym,target_vector,
                  target_icd_10,status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)
 
   }
   if(arthropod!="mosquito"){
-    pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,primary_source,collection,pool_comments,
+    pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,collection,pool_comments,
                          surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,num_count,test_id,value,test_date,
                          method_name,method_acronym,target_acronym,target_vector,
                          target_icd_10,status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)

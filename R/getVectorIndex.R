@@ -102,7 +102,7 @@ getVectorIndex  = function(collections, pools, interval,
 
   }
  VI = merge(AB,IR, by = c("Year",interval,grouping_vars), all=T, sort = T, suffixes = c("_AB", "_IR"))
- VI$Vector_Index = VI$Abundance*VI$InfectionRate
+ VI$VectorIndex = VI$Abundance*VI$InfectionRate
  combine_columns_rowwise <- function(data, col1, col2, new_col_name = "Combined") {
    if (!(col1 %in% colnames(data)) | !(col2 %in% colnames(data))) {
      # If one or both columns are missing, return the original data unchanged
@@ -150,11 +150,11 @@ getVectorIndex  = function(collections, pools, interval,
            InfectionRate,
            LowerCI,
            UpperCI,
-           Vector_Index)
+           VectorIndex)
 
   if(wide==TRUE){
    VI %>%
-     pivot_wider(values_from = Vector_Index, names_from = Year, names_prefix = "Vector_Index_")->VI
+     pivot_wider(values_from = VectorIndex, names_from = Year, names_prefix = "Vector_Index_")->VI
 
  }
   return(VI)

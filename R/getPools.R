@@ -120,8 +120,7 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
   colnames(pools) =  str_replace(colnames(pools), "test_","")%>%
     str_replace_all(pattern = "\\.",replacement = "_")
 
-
-  colnames(pools)[c(1,4,9)] = c("pool_id","pool_comments","test_id")
+  colnames(pools)[c(1,4,9,12)] = c("pool_id","pool_comments","test_id","test_comments")
 
   pools$pool_longitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,1]
   pools$pool_latitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,2]

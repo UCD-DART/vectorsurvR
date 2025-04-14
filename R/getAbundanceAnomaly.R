@@ -3,7 +3,7 @@
 #' @param collections Collections data retrieved from `getArthroCollections()`
 #' @param interval Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month
 #' @param target_year Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)
-#' @param species An optional vector for filtering agency by values in agency_code.
+#' @param agency An optional vector for filtering agency by character code
 #' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
 #' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.

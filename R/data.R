@@ -14,6 +14,8 @@
 #'   \item{\code{sex_type}}{character Sex of collected arthropods}
 #'   \item{\code{species_display_name}}{character Species name of collected arthropods}
 #'   \item{\code{trap_acronym}}{character The acronym of the trap placed in the field}
+#'   \item{\code{collection_longitude}}{numeric longitude of collection}
+#'   \item{\code{collection_latitude}}{numeric latitude of collection}
 #'}
 #' @source \url{https://vectorsurv.org/}
 "sample_collections"
@@ -34,6 +36,20 @@
 #'   \item{\code{status_name}}{character Status of the tested disease, confirmed or negative}
 #'   \item{\code{trap_acronym}}{character The acronym of the trap placed in the field}
 #'   \item{\code{species_display_name}}{character Species name of collected arthropods}
+#'   \item{\code{pool_longitude}}{numeric longitude of pool}
+#'   \item{\code{pool_latitude}}{numeric latitude of pool}
 #'}
 #' @source \url{https://vectorsurv.org/}
 "sample_pools"
+
+
+#' @title Sample Spatial Data
+#' @description Sample Spatial data imitates spatial feature data
+#' @format A data frame with 3 rows and 4 variables:
+#' \describe{
+#' \item{\code{id}}{interger ID of spatial feature}
+#'   \item{\code{name}}{character Name of spatial feature}
+#'   \item{\code{geometry}}{multipolygon shape geometry spatal feature}
+#'}
+#' @source \url{https://vectorsurv.org/}
+"sample_spatial"

@@ -10,7 +10,6 @@ LazyData: true
 RoxygenNote: 7.3.2
 Imports: 
     rstudioapi,
-    dplyr,
     jsonlite,
     kableExtra,
     knitr,
@@ -19,7 +18,9 @@ Imports:
     httr,
     tidyr,
     magrittr,
-    DT
+    DT,
+    purrr,
+    sf
 Suggests: 
     testthat (>= 3.0.0),
     rmarkdown,
@@ -27,4 +28,5 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 
+    dplyr,
     R (>= 2.10)

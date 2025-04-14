@@ -19,6 +19,8 @@ A data frame with 2500 rows and 10 variables:
   \item{\code{status_name}}{character Status of the tested disease, confirmed or negative}
   \item{\code{trap_acronym}}{character The acronym of the trap placed in the field}
   \item{\code{species_display_name}}{character Species name of collected arthropods}
+  \item{\code{pool_longitude}}{numeric longitude of pool}
+  \item{\code{pool_latitude}}{numeric latitude of pool}
 }
 }
 \source{

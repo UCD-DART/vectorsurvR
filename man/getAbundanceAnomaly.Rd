@@ -24,6 +24,8 @@ getAbundanceAnomaly(
 
 \item{target_year}{Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)}
 
+\item{agency}{An optional vector for filtering agency by character code}
+
 \item{species}{An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.}
 
 \item{trap}{An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.}

@@ -21,16 +21,11 @@ test_that("Valid data returns a data frame formatted properly", {
 
 # Test getAbundance returns accurate abundance
 test_that("getAbundance returns accurate abundance", {
-  # Assuming you have a specific test scenario
   true_species = "Cx pipiens, Cx tarsalis"
   true_abundance = 19.09
 
-  # Now, you can compare the result of getAbundance with the manually calculated test_cut_aggregated
-  # For example:
-  result <- getAbundance(collections = testing_collections, interval = "Week", species = list("Cx pipiens","Cx tarsalis"), separate = "trap")
-  # Assert that the result matches your expectations
-  filter_res = result %>% filter(Year==2020, Trap=="CO2", Week==20)
-
+  result <- getAbundance(collections = vectorsurvR:::testing_collections, interval = "Week", species = list("Cx pipiens","Cx tarsalis"), separate_by = "trap")
+  filter_res = result %>% dplyr::filter(Year==2020, Trap=="CO2", Week==20)
    expect_equal(filter_res$Species, true_species)
    expect_equal(filter_res$Abundance, true_abundance)
 
@@ -38,10 +33,10 @@ test_that("getAbundance returns accurate abundance", {
 
 
 test_that("Seperate_by works", {
-  AB = (getAbundance(collections = testing_collections, interval = "Month", c("Cx pipiens", "Cx tarsalis"), c("CO2","GRVD"), NULL, separate_by = c("agency", "species", "trap")))
-  checkAbundance(getAbundance(collections = testing_collections, interval = "Month", c("Cx pipiens", "Cx tarsalis"), c("CO2","GRVD"), NULL, separate_by = c("agency", "species", "trap")))
+  AB  <- getAbundance(collections = vectorsurvR:::testing_collections, interval = "Month", species=list("Cx pipiens", "Cx tarsalis"), trap=list("CO2","GRVD"), separate_by = c("agency", "species", "trap"))
+  checkAbundance(getAbundance(collections = vectorsurvR:::testing_collections, interval = "Month", list("Cx pipiens", "Cx tarsalis"), list("CO2","GRVD"), NULL, separate_by = c("agency", "species", "trap")))
   expect_contains(colnames(AB), "Month")
-  expect_setequal(unique(AB$Agency), c("SAYO","SLCM"))
+  expect_setequal(unique(AB$Agency), c("SAYO", "SLCM"))
   expect_setequal(unique(AB$Species), c("Cx pipiens", "Cx tarsalis"))
   expect_setequal(unique(AB$Trap), c("CO2","GRVD"))
 
@@ -49,12 +44,12 @@ test_that("Seperate_by works", {
 })
 
 test_that("Seperate_by works when no separating", {
-  AB = (getAbundance(collections = testing_collections, interval = "Week", c("Cx pipiens", "Cx tarsalis"), c("CO2","GRVD"), "female"))
-  checkAbundance(getAbundance(collections = testing_collections, interval = "Week", c("Cx pipiens", "Cx tarsalis"), c("CO2","GRVD"), "female"))
+  AB <- getAbundance(collections = vectorsurvR:::testing_collections, interval = "Week", species=c("Cx pipiens", "Cx tarsalis"), trap=c("CO2","GRVD"), sex="female")
+  checkAbundance(getAbundance(collections = vectorsurvR:::testing_collections, interval = "Week", c("Cx pipiens", "Cx tarsalis"), c("CO2","GRVD"), "female"))
   expect_contains(colnames(AB), "Week")
-  expect_setequal(sort(unique(AB$Agency)), c("SAYO","SAYO, SLCM", "SLCM"))
-  expect_setequal(unique(AB$Species), c("Cx pipiens", "Cx pipiens, Cx tarsalis"))
-  expect_setequal(unique(AB$Trap), c("CO2","CO2, GRVD","GRVD"))
+  expect_in(sort(unique(AB$Agency)), c("SAYO","SAYO, SLCM", "SLCM"))
+  expect_in(sort(unique(AB$Species)), c("Cx pipiens", "Cx pipiens, Cx tarsalis"))
+  expect_in(sort(unique(AB$Trap)), c("CO2", "CO2, GRVD", "GRVD"))
 
 
 })

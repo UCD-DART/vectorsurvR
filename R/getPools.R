@@ -87,7 +87,6 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
     # Append the query string to the URL
     url_with_params <- modify_url(url, query = params)
-    #print(url_with_params)
     tryCatch({
       response <- GET(url_with_params, add_headers(headers))
       content <- content(response, as = "text")
@@ -117,10 +116,8 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
 
   pools = pools%>%
     unnest(test, keep_empty = T, names_sep = "_")
-  colnames(pools) =  str_replace(colnames(pools), "test_","")%>%
+  colnames(pools) =  str_replace(colnames(pools), "test_test_","test_")%>%
     str_replace_all(pattern = "\\.",replacement = "_")
-
-  colnames(pools)[c(1,4,9,12)] = c("pool_id","pool_comments","test_id","test_comments")
 
   pools$pool_longitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,1]
   pools$pool_latitude <- do.call(rbind, lapply(pools$location_shape_coordinates, function(x) unlist(x)))[,2]
@@ -152,10 +149,10 @@ getPools<- function(token, start_year, end_year, arthropod, agency_ids = NULL){
     pools =
       pools%>%
       unnest(lures, keep_empty = T,names_sep ="_" )
-  pools=pools%>%select(pool_id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,collection,pool_comments,
-                 surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,lures_id, lures_code, lures_description, lures_weight,num_count,test_id,value,test_date,
-                 method_name,method_acronym,target_acronym,target_vector,
-                 target_icd_10,status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)
+  pools=pools%>%select(id,pool_num,agency_id,agency_code,agency_name,site_id,site_code,site_name,pool_longitude, pool_longitude,pool_latitude,city,postal_code, county,geoid,collection,comments,
+                 surv_year,collection_date,species_display_name,species_full_name,sex_type,sex_name,trap_acronym,trap_name,trap_presence,lures_id, lures_code, lures_description, lures_weight,num_count,test_id,test_value,test_date,
+                 test_method_name,test_method_acronym,test_target_acronym,test_target_vector,
+                 test_target_icd_10,test_status_name,test_agency_name,test_agency_code,test_agency_state_acronym, add_date ,updated)
 
   }
   if(arthropod!="mosquito"){

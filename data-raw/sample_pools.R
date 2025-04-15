@@ -8,7 +8,8 @@ sample_pools$site_code = abs(as.numeric(sample_pools$site_code)-sample.int(50, 1
 sample_pools$pool_id = abs(sample_pools$pool_id-sample.int(100000, 1))
 sample_pools$surv_year= sample_pools$surv_year-3
 sample_pools$collection_date = as.Date(ymd_hms(sample_pools$collection_date)-years(3))
-sample_pools$agency_code = ifelse(sample_pools$agency_code==unique(sample_pools$agency_code)[1], "Agency_1", "Agency_2")
+sample_pools$agency_code = "AGENCY"
+sample_pools$agency_id = 01
 sample_pools=sample_pools[!is.na(sample_pools$species_display_name),]
 # Read and transform shapefile
 shape_data <- st_read("C:/Users/Christina/Desktop/Zone_shape/5126zbRtT0j5Hpe.shp")

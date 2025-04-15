@@ -16,7 +16,9 @@ sample_collections$collection_id = abs(sample_collections$collection_id - sample
 sample_collections$surv_year = sample_collections$surv_year - 3
 sample_collections$collection_date = as.Date(ymd_hms(sample_collections$collection_date) - years(3))
 sample_collections$site_code = abs(as.numeric(sample_collections$site_code) - sample.int(1000, 1))
-sample_collections$agency_code = ifelse(sample_collections$agency_code == unique(sample_collections$agency_code)[1], "Agency_1", "Agency_2")
+sample_collections$agency_code =  "AGENCY"
+sample_collections$agency_id =  01
+
 
 sample_collections = sample_collections[!is.na(sample_collections$species_display_name),]
 

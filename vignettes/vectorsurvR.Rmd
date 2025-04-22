@@ -370,10 +370,11 @@ getVectorIndex(sample_collections,
                sample_pools,
                interval = "Biweek",
                target_disease = "WNV",
-               pt_estimate = "bc-mle",
-               species = c("Cx tarsalis"), 
-               trap =  c("CO2"),
-               wide = FALSE)
+               pt_estimate = "bc-mle", 
+              
+               separate_by = c("agency","species"),
+               wide = FALSE) 
+sample_collections%>%filter(species_display_name=="Cx tarsalis", trap_acronym=="CO2")
 ```
 
 ## Tables

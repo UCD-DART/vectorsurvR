@@ -7,6 +7,8 @@
 \format{
 A data frame with 3 rows and 4 variables:
 \describe{
+ \item{\code{agency}}{character Agency name}
+ \item{\code{agency_id}}{interger Unique agency id number}
 \item{\code{id}}{interger ID of spatial feature}
   \item{\code{name}}{character Name of spatial feature}
   \item{\code{geometry}}{multipolygon shape geometry spatal feature}

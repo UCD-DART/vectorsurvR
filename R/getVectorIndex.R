@@ -40,7 +40,7 @@ getVectorIndex  = function(collections, pools, interval,
 
   }
 
-  pools_columns <- c("pool_id", "collection_date", "surv_year", "num_count", "sex_type", "species_display_name", "trap_acronym", "target_acronym", "status_name")
+  pools_columns <- c("id", "collection_date", "surv_year", "num_count", "sex_type", "species_display_name", "trap_acronym", "test_target_acronym", "test_status_name")
 
   if (any(!(pools_columns %in% colnames(pools)))) {
     stop("Insufficent pools data")

@@ -28,12 +28,11 @@ getPoolsComparisionTable = function(pools, interval, target_disease, separate_by
   if(nrow(pools)<=0){
     stop("Pools data is empty")
   }
-  pools_columns = c("pool_id", "collection_date",  "num_count", "species_display_name", "trap_acronym", "target_acronym", "status_name")
+  pools_columns = c("id", "collection_date",  "num_count", "species_display_name", "trap_acronym", "test_target_acronym", "test_status_name")
 
   if(FALSE %in% (pools_columns%in%colnames(pools))){
 
-    stop("Insufficent pools data, the following columns are required for the infection rate calculatior: pool_id
-collection_date, num_trap, trap_nights, num_count, sex_type, species_display_name, trap_acronym, target_acronym, status_name")
+    stop("Insufficent pools data")
 
   }
 
@@ -63,11 +62,11 @@ collection_date, num_trap, trap_nights, num_count, sex_type, species_display_nam
   }
 
   pools_status = pools %>%
-    dplyr::filter(target_acronym==target_disease)%>%
+    dplyr::filter(test_target_acronym==target_disease)%>%
     group_by(across(all_of(grouping_vars))) %>%
-    count(status_name)%>%
+    count(test_status_name)%>%
     pivot_wider(id_cols = c(grouping_vars),
-                names_from = "status_name",
+                names_from = "test_status_name",
                 values_from = "n",values_fill = 0)%>%
     mutate(Total = sum(Confirmed,Negative, na.rm=T))%>%
     mutate(`Percent Positive` = round((Confirmed/Total)*100,2))

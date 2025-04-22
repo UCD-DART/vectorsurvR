@@ -3,7 +3,7 @@
 #' @description `getInfectionRate()` requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
 #' @param pools  Pools data retrieved from `getPools()`
 #' @param interval Calculation interval for infection rate, accepts “collection_date”,“Biweek”,“Week”, and “Month
-#' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`
+#' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$test_target_acronym)`
 #' @param pt_estimate The estimation type for infection rate. Options include: “mle”,“bc-mle”, “mir”
 #' @param scale Constant to multiply infection rate by
 #' @param agency An optional vector for filtering agency by character code
@@ -27,8 +27,8 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
   }
 
 
-  pools_columns <- c("pool_id", "collection_date", "agency_code","surv_year", "num_count", "sex_type",
-                     "species_display_name", "trap_acronym", "target_acronym", "status_name")
+  pools_columns <- c("id", "collection_date", "agency_code","surv_year", "num_count", "sex_type",
+                     "species_display_name", "trap_acronym", "test_target_acronym", "test_status_name")
 
   if (!all(pools_columns %in% colnames(pools))) {
     stop("Insufficient pools data")
@@ -71,7 +71,7 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
     sex <- unique(pools$sex_type)
   }
   # Binary status for infection (Confirmed = 1, else 0)
-  pools$status_name <- ifelse(pools$status_name == "Confirmed", 1, 0)
+  pools$test_status_name <- ifelse(pools$test_status_name == "Confirmed", 1, 0)
   # Dynamic grouping variables
   grouping_vars <- c("surv_year", "INTERVAL")
   if (!is.null(separate_by)) {
@@ -187,30 +187,29 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
            species_display_name %in% species,
            trap_acronym %in% trap,
            sex_type %in% sex,
-           target_acronym == target_disease
+           test_target_acronym == target_disease
          ) %>%
          dplyr::group_by(across(all_of(grouping_vars))) %>%
          dplyr::summarise(Agency = paste(sort(unique(agency_code)), collapse = ", "),
                           Species = paste(sort(unique(species_display_name)), collapse = ", "),
                           Trap = paste(sort(unique(trap_acronym)), collapse = ", "),
-                          Disease = paste(sort(unique(target_acronym)), collapse = ", "),
-
+                          Disease = paste(sort(unique(test_target_acronym)), collapse = ", "),
 
            # Apply infection rate functions directly to vectors
            InfectionRate = case_when(
-             pt_estimate == "mir" ~ mir(status_name, num_count, scale = scale)[1],
-             pt_estimate == "mle" ~ mle(status_name, num_count, scale = scale)[1],
-             pt_estimate == "bc-mle" ~ bcmle(status_name, num_count, scale = scale)[1]
+             pt_estimate == "mir" ~ mir(test_status_name, num_count, scale = scale)[1],
+             pt_estimate == "mle" ~ mle(test_status_name, num_count, scale = scale)[1],
+             pt_estimate == "bc-mle" ~ bcmle(test_status_name, num_count, scale = scale)[1]
            ),
            LowerCI = case_when(
-             pt_estimate == "mir" ~ mir(status_name, num_count, scale = scale)[2],
-             pt_estimate == "mle" ~ mle(status_name, num_count, scale = scale)[2],
-             pt_estimate == "bc-mle" ~ bcmle(status_name, num_count, scale = scale)[2]
+             pt_estimate == "mir" ~ mir(test_status_name, num_count, scale = scale)[2],
+             pt_estimate == "mle" ~ mle(test_status_name, num_count, scale = scale)[2],
+             pt_estimate == "bc-mle" ~ bcmle(test_status_name, num_count, scale = scale)[2]
            ),
            UpperCI = case_when(
-             pt_estimate == "mir" ~ mir(status_name, num_count, scale = scale)[3],
-             pt_estimate == "mle" ~ mle(status_name, num_count, scale = scale)[3],
-             pt_estimate == "bc-mle" ~ bcmle(status_name, num_count, scale = scale)[3]
+             pt_estimate == "mir" ~ mir(test_status_name, num_count, scale = scale)[3],
+             pt_estimate == "mle" ~ mle(test_status_name, num_count, scale = scale)[3],
+             pt_estimate == "bc-mle" ~ bcmle(test_status_name, num_count, scale = scale)[3]
            ) # Drop grouping after summarization
          )
     end = dim(results)[2]

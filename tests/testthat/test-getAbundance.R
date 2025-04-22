@@ -11,11 +11,11 @@ checkAbundance <- function(abundance) {
 
 # Test valid data returns a data frame formatted properly
 test_that("Valid data returns a data frame formatted properly", {
-  checkAbundance(getAbundance(collections = testing_collections, interval = "Week", NULL, NULL, ))
-  checkAbundance(getAbundance(collections = testing_collections, interval = "Biweek", NULL, NULL, ))
-  checkAbundance(getAbundance(collections = testing_collections, interval = "Month", NULL, NULL, ))
-  checkAbundance(getAbundance(collections = testing_collections, interval = "Month", "Cx pipiens", NULL, NULL,separate_by = "agency"))
-  checkAbundance(getAbundance(collections = testing_collections, interval = "Biweek", NULL, c("CO2","GRVD"), NULL))
+  checkAbundance(getAbundance(collections = vectorsurvR:::testing_collections, interval = "Week", NULL, NULL, ))
+  checkAbundance(getAbundance(collections = vectorsurvR:::testing_collections, interval = "Biweek", NULL, NULL, ))
+  checkAbundance(getAbundance(collections = vectorsurvR:::testing_collections, interval = "Month", NULL, NULL, ))
+  checkAbundance(getAbundance(collections = vectorsurvR:::testing_collections, interval = "Month", "Cx pipiens", NULL, NULL,separate_by = "agency"))
+  checkAbundance(getAbundance(collections = vectorsurvR:::testing_collections, interval = "Biweek", NULL, c("CO2","GRVD"), NULL))
 })
 
 

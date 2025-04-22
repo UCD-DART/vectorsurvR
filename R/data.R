@@ -3,6 +3,8 @@
 #' @format A data frame with 2500 rows and 13 variables:
 #' \describe{
 #'  \item{\code{agency_code}}{character Four letter agency code}
+#'  \item{\code{agency_id}}{interger Unique agency id number}
+
 #'   \item{\code{collection_id}}{double Collection identification number}
 #'   \item{\code{collection_date}}{character The date the trap was picked up for collection}
 #'   \item{\code{num_trap}}{integer The number of unique traps in operation at one site}
@@ -25,15 +27,16 @@
 #' @format A data frame with 2500 rows and 10 variables:
 #' \describe{
 #' \item{\code{agency_code}}{character Four letter agency code}
-#'   \item{\code{pool_id}}{integer Pool identification number}
+#'  \item{\code{agency_id}}{interger Unique agency id number}
+#'   \item{\code{id}}{integer Pool identification number}
 #'   \item{\code{surv_year}}{integer Surveillance year of pool}
 #'   \item{\code{site_code}}{integer Identifying code of site}
 #'   \item{\code{collection_date}}{character The date the trap was picked up for collection}
 #'   \item{\code{sex_type}}{integer Sex type of collected arthropods}
 #'   \item{\code{num_count}}{integer Number of arthropods present in collection}
-#'   \item{\code{target_acronym}}{character The disease being tested for in the pool}
-#'   \item{\code{method_name}}{character Method used to test pool for disease}
-#'   \item{\code{status_name}}{character Status of the tested disease, confirmed or negative}
+#'   \item{\code{test_target_acronym}}{character The disease being tested for in the pool}
+#'   \item{\code{test_method_name}}{character Method used to test pool for disease}
+#'   \item{\code{test_status_name}}{character Status of the tested disease, confirmed or negative}
 #'   \item{\code{trap_acronym}}{character The acronym of the trap placed in the field}
 #'   \item{\code{species_display_name}}{character Species name of collected arthropods}
 #'   \item{\code{pool_longitude}}{numeric longitude of pool}
@@ -47,6 +50,9 @@
 #' @description Sample Spatial data imitates spatial feature data
 #' @format A data frame with 3 rows and 4 variables:
 #' \describe{
+#'  \item{\code{agency}}{character Agency name}
+#'  \item{\code{agency_id}}{interger Unique agency id number}
+
 #' \item{\code{id}}{interger ID of spatial feature}
 #'   \item{\code{name}}{character Name of spatial feature}
 #'   \item{\code{geometry}}{multipolygon shape geometry spatal feature}

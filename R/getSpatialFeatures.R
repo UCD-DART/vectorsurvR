@@ -4,6 +4,9 @@
 #' @param token A valid access token returned from `getToken()`
 #' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids
 #' @return A dataframe of region data, used internally to merge spatial information to collections
+#' @examples
+#' /dontrun{token=getToken()
+#' spatial = getSpatialFeatures(token)}
 #' @export
 
 

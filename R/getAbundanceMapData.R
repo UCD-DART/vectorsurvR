@@ -38,34 +38,34 @@ getAbundanceMapData <- function(collections, spatial, interval, selected_feature
       lats <- coords[coords > 0]   # Values > 0 are latitudes
 
 
-      }else{
+    }else{
 
-    # Convert string of numbers into a numeric vector
-    coords <- as.numeric(unlist(coords, recursive = TRUE))
+      # Convert string of numbers into a numeric vector
+      coords <- as.numeric(unlist(coords, recursive = TRUE))
 
-    # Ensure there's an even number of values
-    if (length(coords) %% 2 != 0) {
-      warning("Odd number of coordinates detected, skipping this entry.")
-      return(st_multipolygon())  # Return empty multipolygon
+      # Ensure there's an even number of values
+      if (length(coords) %% 2 != 0) {
+        warning("Odd number of coordinates detected, skipping this entry.")
+        return(st_multipolygon())  # Return empty multipolygon
+      }
+
+      # Split into longitude and latitude
+      num_points <- length(coords) / 2
+      longs <- coords[1:num_points]
+      lats  <- coords[(num_points + 1):length(coords)]
+
+      # Ensure valid polygon (needs at least 3 points)
+      if (length(longs) < 3 || length(lats) < 3) {
+        warning("Skipping invalid polygon with fewer than 3 points.")
+        return(st_multipolygon())
+      }
+
+      # Close the polygon if necessary
+      if (!(longs[1] == longs[length(longs)] && lats[1] == lats[length(lats)])) {
+        longs <- c(longs, longs[1])
+        lats  <- c(lats, lats[1])
+      }
     }
-
-    # Split into longitude and latitude
-    num_points <- length(coords) / 2
-    longs <- coords[1:num_points]
-    lats  <- coords[(num_points + 1):length(coords)]
-
-    # Ensure valid polygon (needs at least 3 points)
-    if (length(longs) < 3 || length(lats) < 3) {
-      warning("Skipping invalid polygon with fewer than 3 points.")
-      return(st_multipolygon())
-    }
-
-    # Close the polygon if necessary
-    if (!(longs[1] == longs[length(longs)] && lats[1] == lats[length(lats)])) {
-      longs <- c(longs, longs[1])
-      lats  <- c(lats, lats[1])
-    }
-}
     # Create coordinate matrix
     coord_matrix <- cbind(longs, lats)
 
@@ -98,7 +98,7 @@ getAbundanceMapData <- function(collections, spatial, interval, selected_feature
   # Convert collections to sf object
   collections_sf <- st_as_sf(collections, coords = c("collection_longitude", "collection_latitude"), crs = 4326)
 
- # Ensure CRS consistency
+  # Ensure CRS consistency
   collections_sf <- st_transform(collections_sf, st_crs(spa_sf))
 
   # Spatial join to assign subregion names to collections
@@ -109,10 +109,10 @@ getAbundanceMapData <- function(collections, spatial, interval, selected_feature
     dplyr::mutate(subregion = name) %>%
     dplyr::filter(!is.na(subregion))
   # Compute abundance
-    abundance <- getAbundance(collections_with_subregion, interval, separate_by = c("subregion"))
-   ab <- abundance %>%
-     dplyr::group_by(Year, !!sym(interval), subregion) %>%
-     dplyr::summarise(Abundance = mean(Abundance))
+  abundance <- getAbundance(collections_with_subregion, interval, separate_by = c("subregion"))
+  ab <- abundance %>%
+    dplyr::group_by(Year, !!sym(interval), subregion) %>%
+    dplyr::summarise(Abundance = mean(Abundance))
   colnames(ab)[3] <- "name"
   ab_sf <- spa_sf %>%
     dplyr::left_join(ab, by = "name")

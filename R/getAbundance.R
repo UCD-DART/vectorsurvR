@@ -49,13 +49,13 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   required_columns <- c("collection_id", "collection_date", "agency_code","num_trap", "trap_nights",
                         "trap_problem_bit", "num_count", "sex_type", "species_display_name",
                         "trap_acronym")
-  separate_options <- c("agency","species", "trap", "subregion")
+  separate_options <- c("agency","species", "trap", "subregion", "county")
 
   if (any(!(required_columns %in% colnames(collections)))) {
     stop("Insufficient collections data provided")
   }
   if(any(!separate_by %in% separate_options)){
-    stop("Check separate_by parameters. Accepted options are 'species', 'trap', and/or 'agency'")
+    stop("Check separate_by parameters. Accepted options are 'species', 'trap','county', and/or 'agency'")
   }
 
 
@@ -112,6 +112,11 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
       grouping_vars_trap <- c(grouping_vars_trap, "trap_acronym")
 
     }
+    if ("county" %in% separate_by) {
+      grouping_vars <- c(grouping_vars, "county")
+      grouping_vars_trap <- c(grouping_vars_trap, "county")
+
+    }
 
   }
 
@@ -127,6 +132,7 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
     dplyr::summarise(Count = sum(num_count, na.rm = TRUE),
                      Species = paste(sort(unique(species_display_name)), collapse = ", "),
                      Agency = paste(sort(unique(agency_code)), collapse = ", "),
+                     County = paste(sort(unique(county)), collapse = ", "),
                      .groups = "drop") %>% as.data.frame -> cts
 
 
@@ -151,11 +157,11 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   AB <- AB %>% arrange(desc(surv_year), INTERVAL)
   if ("subregion" %in% separate_by){
   AB  = AB %>%
-    select(Agency, surv_year, INTERVAL,subregion, Species,Count,TrapEvents, Trap, Abundance)
+    select(Agency, surv_year, INTERVAL,County,subregion, Species,Count,TrapEvents, Trap, Abundance)
 
   }
   else{ AB  = AB %>%
-    select(Agency, surv_year, INTERVAL, Species,Count,TrapEvents, Trap, Abundance)
+    select(Agency, surv_year, INTERVAL,County, Species,Count,TrapEvents, Trap, Abundance)
   }
   # Rename columns
   colnames(AB)[3] <- interval

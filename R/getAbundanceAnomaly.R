@@ -9,7 +9,7 @@
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
 #' @param trapnight_min Minimum trap night restriction for calculation. Default is 1.
 #' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
-#' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
+#' @param separate_by Separate/group the calculation by 'trap','species', 'agency'or 'county'. Default NULL does not separate.
 #' @keywords abundance
 #' @importFrom utils head
 #' @importFrom dplyr summarise summarize filter group_by distinct_at vars arrange mutate desc bind_rows rename
@@ -38,7 +38,7 @@ getAbundanceAnomaly <- function(collections, interval, target_year, agency = NUL
                  "species_display_name",
                  "trap_acronym")
 
-  separate_options <- c("agency","species", "trap")
+  separate_options <- c("agency","species", "trap", 'county')
 
 
   if(any(!(col_columns%in%colnames(collections)))) {
@@ -79,6 +79,10 @@ ab_data = getAbundance(collections,interval, agency, species, trap,sex,trapnight
     }
     if ("trap" %in% separate_by) {
       grouping_vars <- c(grouping_vars, "Trap")
+
+    }
+    if ("county" %in% separate_by) {
+      grouping_vars <- c(grouping_vars, "County")
 
     }
 

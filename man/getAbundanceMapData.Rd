@@ -4,20 +4,20 @@
 \alias{getAbundanceMapData}
 \title{Get Abundance Map Data}
 \usage{
-getAbundanceMapData(collections, spatial, interval, selected_features = NULL)
+getAbundanceMapData(collections, spatial, interval, spatial_features = NULL)
 }
 \arguments{
-\item{collections}{A dataframe containing collection coordinates}
+\item{collections}{A dataframe containing collection data retrieved from getArthroCollections()}
 
-\item{spatial}{A dataframe containing spatial data corresponding to the collections}
+\item{spatial}{A dataframe of spatial features retrieved from getSpatialFeatures()}
 
-\item{interval}{Calculation interval for abundance, accepts“Biweek”,“Week”, and “Month}
+\item{interval}{Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month"}
 
-\item{selected_features}{A character vector of spatial feature names to filter by}
+\item{spatial_features}{A character vector of spatial feature names to filter by, if NULL, all will be used}
 }
 \value{
-A dataframe of collections with associated spatial regions
+A dataframe of abundance calculations grouped by the select spatial regions
 }
 \description{
-`getAbundanceMapData()` retrieves spatial feature data and associates it with collection locations.
+`getAbundanceMapData()` for mosquito data only, function utilizes spatial feature shape data to group abundance calculations.
 }

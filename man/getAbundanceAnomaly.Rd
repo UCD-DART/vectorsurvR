@@ -36,7 +36,7 @@ getAbundanceAnomaly(
 
 \item{trapnight_max}{Maximum trap night restriction for calculation. Default is no restriction.}
 
-\item{separate_by}{Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.}
+\item{separate_by}{Separate/group the calculation by 'trap','species', 'agency'or 'county'. Default NULL does not separate.}
 }
 \value{
 Abundance anomaly calculation

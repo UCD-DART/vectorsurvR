@@ -17,3 +17,7 @@ A dataframe of region data, used internally to merge spatial information to coll
 \description{
 `getSpatialFeatures()` obtains spatial data for authorized VectorSurv Gateway accounts. Returns a list of all spatial features tied to an account.
 }
+\examples{
+/dontrun{token=getToken()
+spatial = getSpatialFeatures(token)}
+}

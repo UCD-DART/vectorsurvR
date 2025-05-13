@@ -18,7 +18,7 @@ sample_collections$collection_date = as.Date(ymd_hms(sample_collections$collecti
 sample_collections$site_code = abs(as.numeric(sample_collections$site_code) - sample.int(1000, 1))
 sample_collections$agency_code =  "AGENCY"
 sample_collections$agency_id =  01
-
+sample_collections$county = "County 1"
 
 sample_collections = sample_collections[!is.na(sample_collections$species_display_name),]
 

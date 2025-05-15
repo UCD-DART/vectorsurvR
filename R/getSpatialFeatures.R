@@ -65,6 +65,72 @@ getSpatialFeatures <- function(token, agency_ids = NULL) {
     i = i + 1
   }
 
+
+
+  # Function to convert coordinates to sf multipolygon
+  convert_to_sf <- function(coords) {
+
+    if (is.list(coords)) {
+      coords <- coords[[1]]  # Extract if it's a list of one element
+      longs <- coords[coords < 0]  # Values < 0 are longitudes
+      lats <- coords[coords > 0]   # Values > 0 are latitudes
+
+
+    }else{
+
+      # Convert string of numbers into a numeric vector
+      coords <- as.numeric(unlist(coords, recursive = TRUE))
+
+      # Ensure there's an even number of values
+      if (length(coords) %% 2 != 0) {
+        warning("Odd number of coordinates detected, skipping this entry.")
+        return(st_multipolygon())  # Return empty multipolygon
+      }
+
+      # Split into longitude and latitude
+      num_points <- length(coords) / 2
+      longs <- coords[1:num_points]
+      lats  <- coords[(num_points + 1):length(coords)]
+
+      # Ensure valid polygon (needs at least 3 points)
+      if (length(longs) < 3 || length(lats) < 3) {
+        warning("Skipping invalid polygon with fewer than 3 points.")
+        return(st_multipolygon())
+      }
+
+      # Close the polygon if necessary
+      if (!(longs[1] == longs[length(longs)] && lats[1] == lats[length(lats)])) {
+        longs <- c(longs, longs[1])
+        lats  <- c(lats, lats[1])
+      }
+    }
+    # Create coordinate matrix
+    coord_matrix <- cbind(longs, lats)
+
+    # Create a multipolygon
+    multipoly <- st_multipolygon(list(list(coord_matrix)))
+
+    return(multipoly)
+  }
+
+  # Apply conversion
+  if ("shape.coordinates" %in% colnames(geofeat)) {
+    # Apply function to all shape coordinates
+
+    geofeat$geometry <- lapply(geofeat$shape.coordinates, convert_to_sf)
+    geofeat$geometry <- st_sfc(geofeat$geometry, crs = 4326) # Set CRS
+    geofeat$geometry <- st_make_valid(geofeat$geometry)
+
+    geofeat <- st_as_sf(geofeat)
+
+  }
+
+
+
+
+
+
+
   return(geofeat)
 
 }

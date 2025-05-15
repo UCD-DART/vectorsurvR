@@ -9,6 +9,11 @@
 #' @importFrom sf st_multipolygon st_sfc st_as_sf st_join st_crs st_transform st_make_valid st_cast st_is_valid st_within
 #' @importFrom dplyr filter mutate select
 #' @importFrom purrr map map_chr
+#' @example
+#' \dontrun{token=getToken()
+#' spatial = getSpatialFeatures(token)
+#' collections = getArthrocollections(token, 2020,2021, 'mosquito')}
+#'
 #' @export
 getAbundanceMapData <- function(collections, spatial, interval, selected_features = NULL) {
 

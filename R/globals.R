@@ -7,7 +7,7 @@ utils::globalVariables(c("test","Confirmed","Negative","Positive","arthropods","
                          "pool_num", "primary_source", "sample_method_name", "sample_method_value",
                          "sex_name", "site_code", "site_id", "site_name","trapnight_min","trapnight_max","collection_latitude","collection_longitude","pool_latitude","pool_longitude",":=", "species_full_name", "test_target_icd_10",
                          "target_vector","Species", "temperature", "test_agency_code", "test_agency_name",
-                         "test_agency_state_acrnym","subregion","st_within", "test_date", "test_id","VectorIndex" ,"trap_name", "trap_presence",
+                         "test_agency_state_acrnym","County","subregion","st_within", "test_date", "test_id","VectorIndex" ,"trap_name", "trap_presence",
                          "type", "updated","method_name","method_acronym" ,"test_value", "wind_speed","city","sym",".","lures_id","geoid","id", "test_agency_state_acronym","county","namelsad","namelsad.x" ,"postal_code","type.y","namelsad.y","AbundanceCalculation","AbundanceType"))
 
 

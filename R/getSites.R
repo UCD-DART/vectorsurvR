@@ -10,51 +10,45 @@
 #' sites = getSites(token)}
 
 
-
 getSites <- function(token) {
-  if (is.null(token) | !is.character(token)) {
+  if (is.null(token) || !is.character(token)) {
     stop("Invalid token. Check username and password")
   }
 
+  # Initialize empty results
+  sites <- data.frame()
+  page <- 1
 
-  headers <- c(Authorization = paste("Bearer", token),
-               "Content-Type" = "application/json")
-
-
-  url <- "https://api.vectorsurv.org/v1/site"
-
-  #Gathers data matching parameters
-  sites = data.frame()
-  i = 1
-  while (i > 0) {
-    params <- list(pageSize = "1000", page = as.character(i))
-
-
-
-    # Append the query string to the URL
-    url_with_params <- modify_url(url, query = params)
+  # Paginated API requests
+  while(TRUE) {
+    # Build and execute request
+    req <- request("https://api.vectorsurv.org/v1/site") %>%
+      req_headers(
+        Authorization = paste("Bearer", token),
+        "Content-Type" = "application/json"
+      ) %>%
+      req_url_query(
+        pageSize = "1000",
+        page = as.character(page)
+      )
 
     tryCatch({
-      response <- GET(url_with_params, add_headers(headers))
-      content <- content(response, as = "text")
-      df_content = fromJSON(content, flatten = T)
-      if (response$status_code != 200) {
-        stop(content(response, 'parsed'))
-      }
-      #Breaks loop when df_content returns no more data
-      if (length(df_content$rows) <= 0) {
-        break
-      }
+      # Get and parse response
+      response <- req_perform(req)
+      content <- resp_body_string(response)
+      df_content <- fromJSON(content, flatten = TRUE)
 
-      sites =  rbind(sites, df_content$rows)
+      # Break if no more results
+      if (length(df_content$rows) <= 0) break
+
+      # Append results
+      sites <- bind_rows(sites, df_content$rows)
+      page <- page + 1
 
     }, error = function(e) {
-      stop(e)
+      stop("API request failed: ", e$message)
     })
-
-    i = i + 1
   }
 
   return(sites)
-
 }

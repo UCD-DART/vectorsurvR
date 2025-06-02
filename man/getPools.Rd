@@ -7,7 +7,7 @@
 getPools(token, start_year, end_year, arthropod, agency_ids = NULL)
 }
 \arguments{
-\item{token}{access token retrived from `getToken()`}
+\item{token}{access token retrieved from `getToken()`}
 
 \item{start_year}{Beginning of year range}
 
@@ -15,7 +15,7 @@ getPools(token, start_year, end_year, arthropod, agency_ids = NULL)
 
 \item{arthropod}{Specify arthropod type from: 'mosquito', 'tick', 'nontick'}
 
-\item{agency_ids}{Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids}
+\item{agency_ids}{Filter on agency id, default to NULL for all available agencies, otherwise provide a vector of agency ids}
 }
 \value{
 Dataframe of pools data

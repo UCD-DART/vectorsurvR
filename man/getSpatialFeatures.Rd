@@ -2,20 +2,20 @@
 % Please edit documentation in R/getSpatialFeatures.R
 \name{getSpatialFeatures}
 \alias{getSpatialFeatures}
-\title{Get Spatial data}
+\title{Get Spatial Features data}
 \usage{
 getSpatialFeatures(token, agency_ids = NULL)
 }
 \arguments{
-\item{token}{A valid access token returned from `getToken()`}
+\item{token}{Access token retrieved from `getToken()`}
 
-\item{agency_ids}{Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids}
+\item{agency_ids}{Optional vector of agency IDs to filter by}
 }
 \value{
-A dataframe of region data, used internally to merge spatial information to collections
+An sf object containing spatial features data
 }
 \description{
-`getSpatialFeatures()` obtains spatial data for authorized VectorSurv Gateway accounts. Returns a list of all spatial features tied to an account.
+Retrieves VectorSurv spatial features data with optional agency filtering
 }
 \examples{
 \dontrun{token=getToken()

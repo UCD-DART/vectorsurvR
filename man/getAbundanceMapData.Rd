@@ -4,7 +4,7 @@
 \alias{getAbundanceMapData}
 \title{Get Abundance Map Data}
 \usage{
-getAbundanceMapData(collections, spatial, interval, selected_features = NULL)
+getAbundanceMapData(collections, spatial, interval, selected_features)
 }
 \arguments{
 \item{collections}{A dataframe containing collection coordinates}

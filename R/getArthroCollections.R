@@ -271,8 +271,8 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     #remove unwanted/redundant columns
 
     if(!("lures_code"%in% colnames(collections))){
-      collections$lures_code = NA
-      collections$lures_description =NA
+      collections$lures_code = as.character(NA)
+      collections$lures_description =as.character(NA)
       collections$lures_id =NA
       collections$lures_weight = NA
     }

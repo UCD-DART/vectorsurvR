@@ -16,8 +16,8 @@ getToken = function() {
   password <- askForPassword("Gateway Password")
 
   # Create and send request
-  req <- request("https://api.vectorsurv.org/login") |>
-    req_headers("Content-Type" = "application/json") |>
+  req <- request("https://api.vectorsurv.org/login") %>%
+    req_headers("Content-Type" = "application/json") %>%
     req_body_json(list(
       username = username,
       password = password

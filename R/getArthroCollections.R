@@ -12,7 +12,7 @@
 #' @importFrom tidyr unnest
 #' @importFrom stats setNames
 #' @importFrom stringr str_replace str_replace_all
-#' @importFrom httr2 req_method resp_status resp_body_string req_perform
+#' @importFrom httr2 req_method resp_status resp_body_string req_perform req_url_query
 #' @importFrom sf st_intersects
 #' @importFrom dplyr bind_rows select if_else pull coalesce inner_join left_join
 #' @export
@@ -52,11 +52,11 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
   i <- 1
 
   repeat {
-    req <- request(base_url)  |>  req_method("GET") |>
+    req <- request(base_url)  %>%  req_method("GET") %>%
       req_headers(
         Authorization = paste("Bearer", token),
         `Content-Type` = "application/json"
-      ) |>
+      ) %>%
       req_url_query(
         !!!setNames(populate_params, rep("populate[]", length(populate_params))),
         pageSize = "1000",
@@ -163,7 +163,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         distance = list(max = 0)
       )
 
-      req <- req |>
+      req <- req %>%
         req_body_json(geojson_payload)
 
       # Check for overlapping features if multiple were provided
@@ -204,11 +204,14 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
   if (arthropod == "mosquito") {
     collections$arthropods <- lapply(collections$arthropods, as.data.frame)
-    collections$lures <- lapply(collections$lures, as.data.frame)
 
     collections <- collections %>%
-      unnest(arthropods, keep_empty = TRUE, names_sep = "_") |>
+      unnest(arthropods, keep_empty = TRUE, names_sep = "_")
+      collections$lures <- lapply(collections$lures, as.data.frame)
+
+    collections <- collections %>%
       unnest(lures, keep_empty = TRUE, names_sep = "_")
+
 
     colnames(collections) =  str_replace(colnames(collections), "arthropods_","")
 
@@ -222,7 +225,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
   if (arthropod == "tick") {
     collections$ticks <- lapply(collections$ticks, as.data.frame)
 
-    collections <- collections |>
+    collections <- collections %>%
       unnest(ticks, keep_empty = TRUE, names_sep = "_")
     colnames(collections) =  str_replace(colnames(collections), "ticks_","")
 
@@ -266,6 +269,13 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
   if(arthropod=="mosquito"){
     #remove unwanted/redundant columns
+
+    if(!("lures_code"%in% colnames(collections))){
+      collections$lures_code =1
+      collections$lures_description =NA
+      collections$lures_id =NA
+      collections$lures_weight = NA
+    }
     collections = collections %>%
       select(collection_id,collection_num, collection_date,
              agency_id, agency_code, agency_name, surv_year,
@@ -285,8 +295,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
              deactive_date, updated)
   }
 
-  collections <- collections %>%
-    select(where(~ !all(is.na(.)))) # Drop all-NA columns
+
 
   return(collections)
 }

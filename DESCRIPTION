@@ -19,7 +19,6 @@ Imports:
     tidyr,
     magrittr,
     DT,
-    purrr,
     sf
 Suggests: 
     testthat (>= 3.0.0),

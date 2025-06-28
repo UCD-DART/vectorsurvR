@@ -316,7 +316,7 @@ getAbundanceAnomaly(sample_collections,
 - scale: Constant to multiply result
 - species: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
 - trap: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap is unspecified, the default `NULL` will return data for all trap types.
-- wide: T/F Should the data be returned in wide/spreadsheet format
+
 
 
 
@@ -328,7 +328,7 @@ getInfectionRate(sample_pools,
                       scale = 1000,
                       species = c("Cx pipiens", "Cx tarsalis"),
                       trap = c("CO2"),
-                      separate_by="species", wide = FALSE )
+                      separate_by="species")
 
 
 
@@ -362,7 +362,7 @@ getInfectionRate(sample_pools,
 - species: Species filter for calculating abundance. Species_display_name is the accepted notation. To see a list of species present in your data run `unique(pools$species_display_name)`. If species is unspecified, the default `NULL` will return data for all species in data.
 - trap: Trap filter for calculating abundance. Trap_acronym is the is the accepted notation. Run `unique(pools$trap_acronym)` to see trap types present in your data. If trap is unspecified, the default `NULL` will return data for all trap types.
 - separate_by:Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate calculation
-- wide: T/F Should the data be returned in wide/spreadsheet format
+
 
 
 ```{r}
@@ -372,8 +372,7 @@ getVectorIndex(sample_collections,
                target_disease = "WNV",
                pt_estimate = "bc-mle", 
               
-               separate_by = c("agency","species"),
-               wide = FALSE) 
+               separate_by = c("agency","species")) 
 sample_collections%>%filter(species_display_name=="Cx tarsalis", trap_acronym=="CO2")
 ```
 

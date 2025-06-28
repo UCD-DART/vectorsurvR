@@ -17,8 +17,7 @@ getVectorIndex(
   sex = NULL,
   trapnight_min = 1,
   trapnight_max = NULL,
-  separate_by = NULL,
-  wide = FALSE
+  separate_by = NULL
 )
 }
 \arguments{
@@ -47,15 +46,14 @@ getVectorIndex(
 \item{trapnight_max}{Maximum trap night restriction for calculation. Default is no restriction.}
 
 \item{separate_by}{Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.}
-
-\item{wide}{Should the data be returned in wide/spreadsheet format}
 }
 \value{
 Dataframe containing the vector index calculation
 }
 \description{
-`getVectorIndex()`requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
+`getVectorIndex()` Calculates vector index from pools and collections data
 }
 \examples{
-getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle", wide = FALSE )
+getVectorIndex(collections=sample_collections,
+pools=sample_pools, interval="Month", target_disease = "WNV", pt_estimate="mle")
 }

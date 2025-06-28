@@ -1,6 +1,5 @@
 #' @title Calculate infection rate
-#'
-#' @description `getInfectionRate()` requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
+#' @description `getInfectionRate()` Calculates infection rate from pools data
 #' @param pools  Pools data retrieved from `getPools()`
 #' @param interval Calculation interval for infection rate, accepts “collection_date”,“Biweek”,“Week”, and “Month
 #' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$test_target_acronym)`
@@ -11,16 +10,14 @@
 #' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
 #' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
-#' @param wide Should the data be returned in wide/spreadsheet format
 #' @keywords pools infection rate
 #' @return Dataframe of infection rate calculation
-#' @importFrom tidyr pivot_wider
 #' @importFrom dplyr select case_when
 #' @importFrom stats qnorm
 #' @export
 
 getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000, agency=NULL,
-                             species = NULL, trap = NULL, sex = "female",  separate_by = NULL, wide = FALSE) {
+                             species = NULL, trap = NULL, sex = "female",  separate_by = NULL) {
 
   if (nrow(pools) <= 0) {
     stop("Pools data is empty")
@@ -219,15 +216,7 @@ results$species_display_name <- NULL
 results$trap_acronym <- NULL
 results$agency_code <- NULL
 
-  # If wide format is requested, pivot the results
-  if (wide) {
-    results <- results %>%
-      tidyr::pivot_wider(
-        names_from = Year,
-        values_from = c(InfectionRate, LowerCI, UpperCI),
-        names_prefix = "Year_"
-      )
-  }
+
 
   return(results)
 

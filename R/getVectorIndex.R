@@ -1,7 +1,7 @@
 #' Calculate vector index
 #'
 #' @description
-#' `getVectorIndex()`requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
+#' `getVectorIndex()` Calculates vector index from pools and collections data
 #' @param collections Collections data retrieved from `getArthroCollections()`
 #' @param pools  Pools data retrieved from `getPools()`
 #' @param interval Calculation interval for vector index, accepts “collection_date”,“Biweek”,“Week”, and “Month
@@ -15,11 +15,11 @@
 #' @param trapnight_min Minimum trap night restriction for calculation. Default is 1.
 #' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
 #' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
-#' @param wide Should the data be returned in wide/spreadsheet format
 #' @importFrom dplyr arrange
 #' @importFrom stringr str_split str_c
 #' @examples
-#' getVectorIndex(sample_collections, sample_pools, "Month", "WNV", "mle", wide = FALSE )
+#' getVectorIndex(collections=sample_collections,
+#' pools=sample_pools, interval="Month", target_disease = "WNV", pt_estimate="mle")
 #' @export
 #' @return Dataframe containing the vector index calculation
 
@@ -32,8 +32,7 @@ getVectorIndex  = function(collections, pools, interval,
                            sex = NULL,
                            trapnight_min=1,
                            trapnight_max=NULL,
-                           separate_by = NULL,
-                           wide=FALSE){
+                           separate_by = NULL){
 
   if (nrow(pools) <= 0) {
     stop("Pools data is empty")
@@ -74,7 +73,7 @@ getVectorIndex  = function(collections, pools, interval,
 
 
   IR = getInfectionRate(pools, interval, target_disease, pt_estimate, scale,
-                        agency, species, trap, sex,separate_by, wide = FALSE)
+                        agency, species, trap, sex,separate_by)
   AB = getAbundance(collections,interval,agency,
                     species,
                     trap,
@@ -152,11 +151,7 @@ getVectorIndex  = function(collections, pools, interval,
            UpperCI,
            VectorIndex)
 
-  if(wide==TRUE){
-   VI %>%
-     pivot_wider(values_from = VectorIndex, names_from = Year, names_prefix = "Vector_Index_")->VI
 
- }
   return(VI)
 
 }

@@ -18,6 +18,7 @@
 #'   \item{\code{trap_acronym}}{character The acronym of the trap placed in the field}
 #'   \item{\code{collection_longitude}}{numeric longitude of collection}
 #'   \item{\code{collection_latitude}}{numeric latitude of collection}
+#'   \item{\code{spatial_feature}}{character name of spatial feature to which data belongs}
 #'}
 #' @source \url{https://vectorsurv.org/}
 "sample_collections"

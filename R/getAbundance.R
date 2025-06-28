@@ -2,14 +2,14 @@
 #'
 #' @description Calculates abundance
 #' @param  collections Collections data retrieved from getArthroCollections()
-#' @param interval Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month.
+#' @param interval Calculation interval for abundance, accepts, “Biweek”,“Week”, and “Month.
 #' @param agency An optional vector for filtering agency by character code
 #' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
 #' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
 #' @param trapnight_min Minimum trap night restriction for calculation. Default is 1.
 #' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
-#' @param separate_by Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.
+#' @param separate_by Separate/group the calculation by 'trap','species', 'agency', 'county', or 'spatial_feature'. Default NULL does not separate.
 #' @return A dataframe of abundance calculations.
 #' @export
 #' @importFrom dplyr across all_of
@@ -49,7 +49,7 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   required_columns <- c("collection_id", "collection_date", "agency_code","num_trap", "trap_nights",
                         "trap_problem_bit", "num_count", "sex_type", "species_display_name",
                         "trap_acronym")
-  separate_options <- c("agency","species", "trap", "subregion", "county")
+  separate_options <- c("agency","species", "trap", "spatialfeature", "county")
 
   if (any(!(required_columns %in% colnames(collections)))) {
     stop("Insufficient collections data provided")
@@ -65,7 +65,15 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   if (!interval %in% c("Week", "Biweek", "Month")) {
     stop("Incorrect interval input. Interval accepts inputs of 'Week', 'Biweek', or 'Month'")
   }
+  if("spatial_feature" %in% separate_by){
+    if(!"spatial_feature"%in%colnames(collections)){
+      stop("No spatial_features found in collections data")
+    }
+    if("TRUE" %in% unique(collections$multiple_features)){
+      stop("There is overlapping spatial features in data. Please ensure no spatial features overlap when seperating calculation by spatial. Overlapping spatial features can lead to skewed abundance results.")
+    }
 
+  }
   if(is.null(trapnight_max)){
     trapnight_max = max(collections$trap_nights)
   }
@@ -102,9 +110,10 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
       grouping_vars_trap <- c(grouping_vars_trap, "agency_code")
 
     }
-    if ("subregion" %in% separate_by) {
-      grouping_vars <- c(grouping_vars, "subregion")
-      grouping_vars_trap <- c(grouping_vars_trap, "subregion")
+    if ("spatialfeature" %in% separate_by) {
+
+      grouping_vars <- c(grouping_vars, "spatial_feature")
+      grouping_vars_trap <- c(grouping_vars_trap, "spatial_feature")
 
     }
     if ("trap" %in% separate_by) {
@@ -133,8 +142,13 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
                      Species = paste(sort(unique(species_display_name)), collapse = ", "),
                      Agency = paste(sort(unique(agency_code)), collapse = ", "),
                      County = paste(sort(unique(county)), collapse = ", "),
+    #FIX Add conditional to display Spatial
                      .groups = "drop") %>% as.data.frame -> cts
+  if ("spatial_feature" %in% separate_by){
+    cts  = cts %>%
+      dplyr::summarise(spatial = paste(sort(unique(spatial_feature)), collapse = ", "))
 
+  }
 
   # Calculate Trap Events
   collections %>%
@@ -155,9 +169,9 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   # Calculate Abundance
   AB$Abundance <- round(AB$Count / AB$TrapEvents, 2)
   AB <- AB %>% arrange(desc(surv_year), INTERVAL)
-  if ("subregion" %in% separate_by){
+  if ("spatial_feature" %in% separate_by){
   AB  = AB %>%
-    select(Agency, surv_year, INTERVAL,County,subregion, Species,Count,TrapEvents, Trap, Abundance)
+    select(Agency, surv_year, INTERVAL,County,Spatial, Species,Count,TrapEvents, Trap, Abundance)
 
   }
   else{ AB  = AB %>%

@@ -19,7 +19,7 @@ getAbundance(
 \arguments{
 \item{collections}{Collections data retrieved from getArthroCollections()}
 
-\item{interval}{Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month.}
+\item{interval}{Calculation interval for abundance, accepts, “Biweek”,“Week”, and “Month.}
 
 \item{agency}{An optional vector for filtering agency by character code}
 
@@ -33,7 +33,7 @@ getAbundance(
 
 \item{trapnight_max}{Maximum trap night restriction for calculation. Default is no restriction.}
 
-\item{separate_by}{Separate/group the calculation by 'trap','species' or 'agency'. Default NULL does not separate.}
+\item{separate_by}{Separate/group the calculation by 'trap','species', 'agency', 'county', or 'spatial_feature'. Default NULL does not separate.}
 }
 \value{
 A dataframe of abundance calculations.

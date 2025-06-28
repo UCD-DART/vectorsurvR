@@ -13,7 +13,7 @@
 #' @importFrom stats setNames
 #' @importFrom stringr str_replace str_replace_all
 #' @importFrom httr2 req_method resp_status resp_body_string req_perform req_url_query
-#' @importFrom sf st_intersects
+#' @importFrom sf st_intersects st_drop_geometry
 #' @importFrom dplyr bind_rows select if_else pull coalesce inner_join left_join
 #' @export
 #' @examples
@@ -232,8 +232,46 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
       if(length(all_results) == 0) return(data.frame())
       collections <- bind_rows(all_results)
+
     }
 
+    collections$collection_longitude <- sapply(collections$location.shape.coordinates, function(x) unlist(x)[1])
+    collections$collection_latitude <- sapply(collections$location.shape.coordinates, function(x) unlist(x)[2])
+
+    # Convert collections to sf object for spatial join
+    collections_sf <- sf::st_as_sf(
+      collections,
+      coords = c("collection_longitude", "collection_latitude"),
+      crs = 4326
+    )
+
+    # Get the spatial features we filtered by
+    filtered_shapes <- spatial %>%
+      filter(name %in% spatial_features) %>%
+      select(name)
+
+    # Perform spatial join to identify which features contain each point
+    spatial_matches <- sf::st_join(collections_sf, filtered_shapes) %>%
+      st_drop_geometry()  # Convert back to regular dataframe
+
+    # Join the spatial feature info back to original collections
+    collections <- collections %>%
+      left_join(
+        spatial_matches %>%
+          group_by(id) %>%
+          summarize(
+            spatial_feature = paste(unique(na.omit(name)), collapse = ", "),
+            multiple_features = n_distinct(name) > 1
+          ),
+        by = "id"
+      )
+
+    # Handle points not in any spatial feature
+    collections <- collections %>%
+      mutate(
+        spatial_feature = ifelse(is.na(spatial_feature), NA_character_, spatial_feature),
+        multiple_features = ifelse(is.na(multiple_features), FALSE, multiple_features)
+      )
   } else {
     # Non-spatial filtered request
     all_data <- list()
@@ -314,14 +352,15 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
   sites = getSites(token)
   sites_zip = sites[c("id", "city", "postal_code", "region")] #selects the columns with relevant information, this can be changed of course
   regions = getRegions(token)
-  colnames(sites_zip)[1] = "site_id" #rename for join function
-
-  col_site = left_join(collections, sites_zip, by = 'site_id') #join site information to collections
   regions_county = regions[c("id","parent","type","geoid", "namelsad")] #select id and county name
   colnames(regions_county)[1] = "region" #rename for join function
   colnames(regions_county)[which(names(regions_county) == "type")] <- "region_type"
 
-  collections = left_join(col_site, regions_county, by = "region")
+  colnames(sites_zip)[1] = "site_id" #rename for join function
+
+  col_site = left_join(collections, sites_zip, by = 'site_id') #join site information to collections
+  region_site = left_join(sites_zip,regions_county, by="region")
+  collections = left_join(collections, region_site, by = "site_id")
 
   collections=collections %>%
     mutate(namelsad = if_else(!(region_type %in% c("state","county")),
@@ -332,11 +371,10 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
                               # For geoid <= 5, keep the original 'namelsad'
                               namelsad))
 
-
   colnames(collections)[which(names(collections) == "namelsad")] <- "county"
 
 
-  if(arthropod=="mosquito"){
+  if(arthropod == "mosquito") {
     #remove unwanted/redundant columns
 
     if(!("lures_code"%in% colnames(collections))){
@@ -345,26 +383,41 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       collections$lures_id =NA
       collections$lures_weight = NA
     }
-    collections = collections %>%
-      select(collection_id,collection_num, collection_date,
-             agency_id, agency_code, agency_name, surv_year,
-             comments,identified_by,species_display_name,
-             sex_name,sex_type,trap_acronym,lures_id, lures_code, lures_description, lures_weight,num_trap,
-             trap_nights,trap_problem_bit,num_count,
-             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,geoid, add_date,
-             deactive_date, updated)
-  }
-  if(arthropod=="tick"){
-    collections = collections %>%
-      select(collection_id,collection_num, collection_date_start,collection_date_end,
-             agency_id, agency_code, agency_name, surv_year,
-             comments,identified_by,species_display_name,
-             sex_name,sex_type,trap_acronym,bloodfed, attached, num_count,trap_problem_bit,sample_method_name,sample_method_value,host,humidity,wind_speed,temperature,conditions_moisture,conditions_sunlight,
-             site_id, site_code, site_name,collection_longitude,collection_latitude,city,postal_code, county,geoid, add_date,
-             deactive_date, updated)
-  }
+      base_cols <- c(
+        "collection_id", "collection_num", "collection_date",
+        "agency_id", "agency_code", "agency_name", "surv_year",
+        "comments", "identified_by", "species_display_name",
+        "sex_name", "sex_type", "trap_acronym", "lures_id",
+        "lures_code", "lures_description", "lures_weight", "num_trap",
+        "trap_nights", "trap_problem_bit", "num_count",
+        "site_id", "site_code", "site_name", "collection_longitude",
+        "collection_latitude", "city", "postal_code", "county", "geoid",
+        "add_date", "deactive_date", "updated"
+      )
 
-
+  }
+  if(arthropod == "tick") {
+    base_cols <- c(
+      "collection_id", "collection_num", "collection_date_start",
+      "collection_date_end", "agency_id", "agency_code", "agency_name",
+      "surv_year", "comments", "identified_by", "species_display_name",
+      "sex_name", "sex_type", "trap_acronym", "bloodfed", "attached",
+      "num_count", "trap_problem_bit", "sample_method_name",
+      "sample_method_value", "host", "humidity", "wind_speed",
+      "temperature", "conditions_moisture", "conditions_sunlight",
+      "site_id", "site_code", "site_name", "collection_longitude",
+      "collection_latitude", "city", "postal_code", "county", "geoid",
+      "add_date", "deactive_date", "updated"
+    )
+}
+    if(!is.null(spatial_features)) {
+      collections <- collections %>%
+        select(all_of(base_cols),spatial_feature, multiple_features)
+    } else {
+      collections <- collections %>%
+        select(all_of(base_cols))
+    }
 
   return(collections)
 }
+

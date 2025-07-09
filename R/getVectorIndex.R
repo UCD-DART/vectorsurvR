@@ -4,7 +4,7 @@
 #' `getVectorIndex()` Calculates vector index from pools and collections data
 #' @param collections Collections data retrieved from `getArthroCollections()`
 #' @param pools  Pools data retrieved from `getPools()`
-#' @param interval Calculation interval for vector index, accepts “collection_date”,“Biweek”,“Week”, and “Month
+#' @param interval Calculation interval for vector index, accepts “CollectionDate”,“Biweek”,“Week”, and “Month
 #' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`
 #' @param pt_estimate The estimation type for infection rate. Options include: “mle”,“bc-”mle”, “mir”
 #' @param scale Constant to multiply infection rate, default is 1000
@@ -24,7 +24,8 @@
 #' @return Dataframe containing the vector index calculation
 
 getVectorIndex  = function(collections, pools, interval,
-                           target_disease,pt_estimate,
+                           target_disease,
+                           pt_estimate = 'bc-mle',
                            scale = 1000,
                            agency = NULL,
                            species=NULL,
@@ -91,10 +92,7 @@ getVectorIndex  = function(collections, pools, interval,
       grouping_vars <- c(grouping_vars, "Agency")
 
     }
-    if ("subregion" %in% separate_by) {
-      grouping_vars <- c(grouping_vars, "Subregion")
 
-    }
     if ("trap" %in% separate_by) {
       grouping_vars <- c(grouping_vars, "Trap")
     }
@@ -135,6 +133,7 @@ getVectorIndex  = function(collections, pools, interval,
    VI = combine_columns_rowwise(VI, "Agency_AB", "Agency_IR", new_col_name = "Agency")
  }
 
+ VI$Disease = target_disease
 
   VI = VI %>%
     select(Year,

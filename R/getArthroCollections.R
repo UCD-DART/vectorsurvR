@@ -139,11 +139,11 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
       all_data <- list()
       i <- 1
       repeat {
-        req <- request(base_url) |> req_method("GET") |>
+        req <- request(base_url) %>% req_method("GET") %>%
           req_headers(
             Authorization = paste("Bearer", token),
             `Content-Type` = "application/json"
-          ) |>
+          ) %>%
           req_url_query(
             !!!setNames(populate_params, rep("populate[]", length(populate_params))),
             pageSize = "1000",
@@ -151,7 +151,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
             `query[surv_year][$between][0]` = start_year,
             `query[surv_year][$between][1]` = end_year,
             `query[agency][0]` = if (!is.null(agency_ids)) agency_ids else NULL
-          ) |>
+          ) %>%
           req_body_json(geojson_payload)
 
         resp <- req_perform(req)
@@ -196,11 +196,11 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         )
 
         repeat {
-          req <- request(base_url) |> req_method("GET") |>
+          req <- request(base_url) %>% req_method("GET") %>%
             req_headers(
               Authorization = paste("Bearer", token),
               `Content-Type` = "application/json"
-            ) |>
+            ) %>%
             req_url_query(
               !!!setNames(populate_params, rep("populate[]", length(populate_params))),
               pageSize = "1000",
@@ -208,7 +208,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
               `query[surv_year][$between][0]` = start_year,
               `query[surv_year][$between][1]` = end_year,
               `query[agency][0]` = if (!is.null(agency_ids)) agency_ids else NULL
-            ) |>
+            ) %>%
             req_body_json(geojson_payload)
 
           resp <- req_perform(req)
@@ -278,11 +278,11 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     i <- 1
 
     repeat {
-      req <- request(base_url) |> req_method("GET") |>
+      req <- request(base_url) %>% req_method("GET") %>%
         req_headers(
           Authorization = paste("Bearer", token),
           `Content-Type` = "application/json"
-        ) |>
+        ) %>%
         req_url_query(
           !!!setNames(populate_params, rep("populate[]", length(populate_params))),
           pageSize = "1000",

@@ -2,7 +2,7 @@
 #'
 #' @description Calculates abundance
 #' @param  collections Collections data retrieved from getArthroCollections()
-#' @param interval Calculation interval for abundance, accepts, “Biweek”,“Week”, and “Month.
+#' @param interval Calculation interval for abundance, accepts "CollectionDate",“Week”, “Biweek”, or “Month.
 #' @param agency An optional vector for filtering agency by character code
 #' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
 #' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
@@ -32,7 +32,7 @@
 
 ## Required: collections, interval
 #  Collections data should be retrieved from getArthroCollections(...)
-#interval to calculate abundance on, accepts "Week", "Biweek", "Month" where
+#interval to calculate abundance on, accepts "CollectionDate", "Week", "Biweek", "Month" where
 #both Week and Biweek are epiweek and disease biweek.
 
 ##Optional: species, trap
@@ -49,21 +49,21 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   required_columns <- c("collection_id", "collection_date", "agency_code","num_trap", "trap_nights",
                         "trap_problem_bit", "num_count", "sex_type", "species_display_name",
                         "trap_acronym")
-  separate_options <- c("agency","species", "trap", "spatialfeature", "county")
+  separate_options <- c("agency","species", "trap", "spatial", "county")
 
   if (any(!(required_columns %in% colnames(collections)))) {
     stop("Insufficient collections data provided")
   }
   if(any(!separate_by %in% separate_options)){
-    stop("Check separate_by parameters. Accepted options are 'species', 'trap','county', and/or 'agency'")
+    stop("Check separate_by parameters. Accepted options are 'species', 'trap','county', 'agency', or 'spatial'")
   }
 
 
   collections <- collections %>%
     dplyr::filter(trap_nights != 0, num_trap != 0, trap_problem_bit == FALSE)
 
-  if (!interval %in% c("Week", "Biweek", "Month")) {
-    stop("Incorrect interval input. Interval accepts inputs of 'Week', 'Biweek', or 'Month'")
+  if (!interval %in% c("CollectionDate","Week", "Biweek", "Month")) {
+    stop("Incorrect interval input. Interval accepts inputs of 'CollectionDate','Week', 'Biweek', or 'Month'")
   }
   if("spatial_feature" %in% separate_by){
     if(!"spatial_feature"%in%colnames(collections)){
@@ -82,6 +82,7 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
   }
 
   collections$INTERVAL <- switch(interval,
+                                 "CollectionDate" = as.Date(collections$collection_date),
                                  "Week" = as.numeric(epiweek(collections$collection_date)),
                                  "Biweek" = as.numeric(ceiling(epiweek(collections$collection_date) / 2)),
                                  "Month" = as.numeric(month(collections$collection_date)))
@@ -110,7 +111,7 @@ getAbundance <- function(collections, interval, agency = NULL, species = NULL, t
       grouping_vars_trap <- c(grouping_vars_trap, "agency_code")
 
     }
-    if ("spatialfeature" %in% separate_by) {
+    if ("spatial" %in% separate_by) {
 
       grouping_vars <- c(grouping_vars, "spatial_feature")
       grouping_vars_trap <- c(grouping_vars_trap, "spatial_feature")

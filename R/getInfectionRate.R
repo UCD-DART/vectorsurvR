@@ -1,7 +1,7 @@
 #' @title Calculate infection rate
 #' @description `getInfectionRate()` Calculates infection rate from pools data
 #' @param pools  Pools data retrieved from `getPools()`
-#' @param interval Calculation interval for infection rate, accepts “collection_date”,“Biweek”,“Week”, and “Month
+#' @param interval Calculation interval for infection rate, accepts “CollectionDate”,“Biweek”,“Week”, and “Month
 #' @param target_disease The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$test_target_acronym)`
 #' @param pt_estimate The estimation type for infection rate. Options include: “mle”,“bc-mle”, “mir”
 #' @param scale Constant to multiply infection rate by
@@ -16,7 +16,7 @@
 #' @importFrom stats qnorm
 #' @export
 
-getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale = 1000, agency=NULL,
+getInfectionRate <- function(pools, interval, target_disease, pt_estimate = "bc-mle", scale = 1000, agency=NULL,
                              species = NULL, trap = NULL, sex = "female",  separate_by = NULL) {
 
   if (nrow(pools) <= 0) {
@@ -31,7 +31,7 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
     stop("Insufficient pools data")
   }
 
-  valid_intervals <- c("Biweek", "Week", "Month")
+  valid_intervals <- c("CollectionDate","Biweek", "Week", "Month")
   valid_diseases <- c("WNV", "SLEV", "WEEV")
   valid_pt_estimates <- c("mle", "bc-mle", "mir")
   valid_separate_by <- c("species", "trap", "agency")
@@ -51,6 +51,7 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate, scale
 
   # Create time intervals
   pools$INTERVAL <- switch(interval,
+                           "CollectionDate" =  as.Date(pools$collection_date),
                            "Week" = as.numeric(epiweek(pools$collection_date)),
                            "Biweek" = as.numeric(ceiling(epiweek(pools$collection_date) / 2)),
                            "Month" = as.numeric(month(pools$collection_date)))

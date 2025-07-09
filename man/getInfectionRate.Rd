@@ -8,7 +8,7 @@ getInfectionRate(
   pools,
   interval,
   target_disease,
-  pt_estimate,
+  pt_estimate = "bc-mle",
   scale = 1000,
   agency = NULL,
   species = NULL,
@@ -20,7 +20,7 @@ getInfectionRate(
 \arguments{
 \item{pools}{Pools data retrieved from `getPools()`}
 
-\item{interval}{Calculation interval for infection rate, accepts “collection_date”,“Biweek”,“Week”, and “Month}
+\item{interval}{Calculation interval for infection rate, accepts “CollectionDate”,“Biweek”,“Week”, and “Month}
 
 \item{target_disease}{The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$test_target_acronym)`}
 

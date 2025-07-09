@@ -9,7 +9,7 @@ getVectorIndex(
   pools,
   interval,
   target_disease,
-  pt_estimate,
+  pt_estimate = "bc-mle",
   scale = 1000,
   agency = NULL,
   species = NULL,
@@ -25,7 +25,7 @@ getVectorIndex(
 
 \item{pools}{Pools data retrieved from `getPools()`}
 
-\item{interval}{Calculation interval for vector index, accepts “collection_date”,“Biweek”,“Week”, and “Month}
+\item{interval}{Calculation interval for vector index, accepts “CollectionDate”,“Biweek”,“Week”, and “Month}
 
 \item{target_disease}{The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`}
 

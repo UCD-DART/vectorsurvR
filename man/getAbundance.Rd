@@ -19,7 +19,7 @@ getAbundance(
 \arguments{
 \item{collections}{Collections data retrieved from getArthroCollections()}
 
-\item{interval}{Calculation interval for abundance, accepts, “Biweek”,“Week”, and “Month.}
+\item{interval}{Calculation interval for abundance, accepts "CollectionDate",“Week”, “Biweek”, or “Month.}
 
 \item{agency}{An optional vector for filtering agency by character code}
 

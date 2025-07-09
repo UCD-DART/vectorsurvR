@@ -20,7 +20,7 @@ getAbundanceAnomaly(
 \arguments{
 \item{collections}{Collections data retrieved from `getArthroCollections()`}
 
-\item{interval}{Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month}
+\item{interval}{Calculation interval for abundance, accepts “CollectionDate”,“Biweek”,“Week”, and “Month}
 
 \item{target_year}{Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)}
 

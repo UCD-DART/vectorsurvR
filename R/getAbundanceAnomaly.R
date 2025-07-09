@@ -1,7 +1,7 @@
 #' Get Abundance Anomaly
 #' @description `getAbundanceAnomaly(...) `requires at least five years prior to the target_year of arthro collections data to calculate for the specified parameters. The function uses the methods of the Gateway Abundance Anomaly calculator, and will not work if there is fewer than five years of data present.
 #' @param collections Collections data retrieved from `getArthroCollections()`
-#' @param interval Calculation interval for abundance, accepts “collection_date”,“Biweek”,“Week”, and “Month
+#' @param interval Calculation interval for abundance, accepts “CollectionDate”,“Biweek”,“Week”, and “Month
 #' @param target_year Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)
 #' @param agency An optional vector for filtering agency by character code
 #' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
@@ -66,9 +66,20 @@ getAbundanceAnomaly <- function(collections, interval, target_year, agency = NUL
 
 
 ab_data = getAbundance(collections,interval, agency, species, trap,sex,trapnight_min,trapnight_max, separate_by)
+colnames(ab_data)[3] ="INTERVAL"
 
-  colnames(ab_data)[3] ="INTERVAL"
-  grouping_vars <- c("INTERVAL")
+
+# If interval is CollectionDate, convert to MM-DD for averaging
+if (interval == "CollectionDate") {
+  ab_data$OriginalInterval <- ab_data$INTERVAL
+
+  ab_data$INTERVAL_MMDD <- format(as.Date(ab_data$INTERVAL), "%m-%d")
+  grouping_vars <- c("INTERVAL_MMDD")  # Join on MM-DD instead of original INTERVAL
+} else {
+  grouping_vars <- c("INTERVAL")  # Keep original for Month/Week/etc.
+}
+
+
   if (!is.null(separate_by)) {
     if ("species" %in% separate_by) {
       grouping_vars <- c(grouping_vars, "Species")
@@ -92,21 +103,39 @@ ab_data = getAbundance(collections,interval, agency, species, trap,sex,trapnight
 
   }
 
-    ab_data %>%
-      dplyr::group_by(across(all_of(grouping_vars))) %>%
-      dplyr::filter(Year != target_year )%>%
-      dplyr::summarize(FiveYearAvg =  mean(Abundance), YearsInAverage = paste(sort(unique(Year)), collapse = ",")) -> yr_int_average
-    ab_data_yr = ab_data %>% dplyr::filter(Year == target_year)
 
-    ab_av <- merge(ab_data_yr, yr_int_average, by=grouping_vars)
+# Calculate 5-year average (using MM-DD for dates, original for others)
+yr_int_average <- ab_data %>%
+  dplyr::group_by(across(all_of(grouping_vars))) %>%
+  dplyr::filter(Year != target_year) %>%
+  dplyr::summarize(
+    FiveYearAvg = mean(Abundance),
+    YearsInAverage = paste(sort(unique(Year)), collapse = ",")
+  )
 
+# Filter target year data
+ab_data_yr <- ab_data %>%
+  dplyr::filter(Year == target_year)
+
+# Merge with averages (match on MM-DD for dates, original for others)
+ab_av <- ab_data_yr %>%
+  left_join(
+    yr_int_average,
+    by = grouping_vars
+  )
+
+# Restore original INTERVAL for output (if using MM-DD)
+if (interval == "CollectionDate") {
+  ab_av$INTERVAL <- ab_av$OriginalInterval
+  ab_av <- ab_av %>% select(-INTERVAL_MMDD, -OriginalInterval)
+}
 
   ab_av$Delta = round((ab_av$Abundance - ab_av$FiveYearAvg)/ab_av$FiveYearAvg,4)*100
 
   ab_av = ab_av %>%
     arrange("INTERVAL")
 
-  colnames(ab_av)[1] = interval
+  colnames(ab_av)[3] = interval
 
 
   return(ab_av)

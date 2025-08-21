@@ -9,7 +9,7 @@
 #' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
 #' @param trapnight_min Minimum trap night restriction for calculation. Default is 1.
 #' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
-#' @param separate_by Separate/group the calculation by 'trap','species', 'agency','county', or "spatial_feature". Default NULL does not separate.
+#' @param separate_by Separate/group the calculation by 'trap','species', 'agency','county', or 'spatial'. Default NULL does not separate.
 #' @keywords abundance
 #' @importFrom utils head
 #' @importFrom dplyr summarise summarize filter group_by distinct_at vars arrange mutate desc bind_rows rename

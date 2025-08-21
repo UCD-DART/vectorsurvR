@@ -5,7 +5,7 @@
 \alias{sample_spatial}
 \title{Sample Spatial Data}
 \format{
-A data frame with 3 rows and 4 variables:
+A data frame with 3 rows and 5 variables:
 \describe{
  \item{\code{agency}}{character Agency name}
  \item{\code{agency_id}}{interger Unique agency id number}

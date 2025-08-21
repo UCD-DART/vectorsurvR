@@ -57,6 +57,10 @@ zone_points <- lapply(names(zones), function(zone_name) {
 # Combine all points and ensure we match sample_pools row count
 all_sample_points <- do.call(rbind, zone_points)[1:num_samples, ]
 
+
+# Shuffle
+all_sample_points <- all_sample_points[sample(nrow(all_sample_points)), ]
+
 # Final check: Ensure row count matches
 if(nrow(all_sample_points) != nrow(sample_pools)) {
   stop("Error: Mismatch in row counts! Check spatial sampling.")

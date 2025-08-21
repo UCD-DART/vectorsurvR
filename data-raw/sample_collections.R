@@ -67,6 +67,9 @@ zone_points <- lapply(names(zones), function(zone_name) {
 # Combine all points and ensure we match sample_collections row count
 all_sample_points <- do.call(rbind, zone_points)[1:num_samples, ]
 
+# Shuffle
+all_sample_points <- all_sample_points[sample(nrow(all_sample_points)), ]
+
 # Final check: Ensure row count matches
 if(nrow(all_sample_points) != nrow(sample_collections)) {
   stop("Error: Mismatch in row counts! Check spatial sampling.")
@@ -82,13 +85,26 @@ sample_collections$collection_longitude = all_sample_points$longitude
 sample_collections$collection_latitude = all_sample_points$latitude
 sample_collections$spatial_feature = all_sample_points$spatial_feature
 # Filter and sample data
-set.seed(40)  # Reproducibility for sampling
+set.seed(40)
+# Filter unwanted species
 sample_collections <- sample_collections %>%
-  group_by(surv_year, month(collection_date),.drop = TRUE) %>%
-  filter(!species_display_name %in% c("V pensylvanica", "D variabilis", "D occidentalis", "I pacificus", "Dermacentor", "V germanica")) %>%
-  sample_n(70,replace = T)
-View(sample_collections)
-sample_collections = sample_collections[,-c(grep("month",colnames(sample_collections)))]
+  filter(!species_display_name %in% c(
+    "V pensylvanica", "D variabilis", "D occidentalis",
+    "I pacificus", "Dermacentor", "V germanica"
+  ))
+
+# Determine target sample size per region × year × month
+target_n <- 50
+
+# Even sampling across spatial_feature × year × month
+set.seed(40)  # For reproducibility
+sample_collections <- sample_collections %>%
+  group_by(surv_year,
+           month = month(collection_date)) %>%
+  sample_n(target_n, replace = TRUE) %>%
+  ungroup() %>%
+  select(-month)  # Remove temporary month column
+sample_collections$multiple_features = FALSE
 # Save data
-write.csv(sample_collections, "data-raw/sample_collections.csv")
+write.csv(sample_collections, "data-raw/sample_collections.csv", row.names = FALSE)
 usethis::use_data(sample_collections, overwrite = TRUE)

@@ -5,7 +5,7 @@
 \alias{sample_pools}
 \title{Sample Pools Data}
 \format{
-A data frame with 2500 rows and 10 variables:
+A data frame with 3500 rows and 15 variables:
 \describe{
 \item{\code{agency_code}}{character Four letter agency code}
  \item{\code{agency_id}}{interger Unique agency id number}

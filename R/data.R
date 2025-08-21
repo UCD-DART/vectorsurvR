@@ -1,6 +1,6 @@
 #' @title Sample Mosquito Collections Data
 #' @description Sample Mosquito Collections data imitates the essential components of real mosquito collections data
-#' @format A data frame with 2500 rows and 13 variables:
+#' @format A data frame with 5880 rows and 17 variables:
 #' \describe{
 #'  \item{\code{agency_code}}{character Four letter agency code}
 #'  \item{\code{agency_id}}{interger Unique agency id number}
@@ -19,13 +19,15 @@
 #'   \item{\code{collection_longitude}}{numeric longitude of collection}
 #'   \item{\code{collection_latitude}}{numeric latitude of collection}
 #'   \item{\code{spatial_feature}}{character name of spatial feature to which data belongs}
+#'   \item{\code{multiple_features}}{bolean T/F if the point is found within mutiple selected spatial features}
+
 #'}
 #' @source \url{https://vectorsurv.org/}
 "sample_collections"
 
 #' @title Sample Pools Data
 #' @description Sample Pools data imitates the essential components of real mosquito pools data needed for calculations
-#' @format A data frame with 2500 rows and 10 variables:
+#' @format A data frame with 3500 rows and 15 variables:
 #' \describe{
 #' \item{\code{agency_code}}{character Four letter agency code}
 #'  \item{\code{agency_id}}{interger Unique agency id number}
@@ -49,7 +51,7 @@
 
 #' @title Sample Spatial Data
 #' @description Sample Spatial data imitates spatial feature data
-#' @format A data frame with 3 rows and 4 variables:
+#' @format A data frame with 3 rows and 5 variables:
 #' \describe{
 #'  \item{\code{agency}}{character Agency name}
 #'  \item{\code{agency_id}}{interger Unique agency id number}

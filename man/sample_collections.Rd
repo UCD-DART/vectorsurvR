@@ -5,7 +5,7 @@
 \alias{sample_collections}
 \title{Sample Mosquito Collections Data}
 \format{
-A data frame with 2500 rows and 13 variables:
+A data frame with 5880 rows and 17 variables:
 \describe{
  \item{\code{agency_code}}{character Four letter agency code}
  \item{\code{agency_id}}{interger Unique agency id number}
@@ -24,6 +24,7 @@ A data frame with 2500 rows and 13 variables:
   \item{\code{collection_longitude}}{numeric longitude of collection}
   \item{\code{collection_latitude}}{numeric latitude of collection}
   \item{\code{spatial_feature}}{character name of spatial feature to which data belongs}
+  \item{\code{multiple_features}}{bolean T/F if the point is found within mutiple selected spatial features}
 }
 }
 \source{

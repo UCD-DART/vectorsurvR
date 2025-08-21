@@ -1,7 +1,7 @@
 Package: vectorsurvR
 Type: Package
 Title: Data Access and Analytical Tools for 'VectorSurv' Users
-Version: 1.5.1
+Version: 1.5.2
 Authors@R: person("Christina", "De Cesaris", email = "cmdecesaris@ucdavis.edu", role = c("aut", "cre"))
 Description: Allows registered 'VectorSurv' <https://vectorsurv.org/> users access to data through the 'VectorSurv API' <https://api.vectorsurv.org/>. Additionally provides functions for analysis and visualization.
 License: GPL-3

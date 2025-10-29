@@ -49,7 +49,7 @@ test_that("Handles wrong/incorrect collections data", {
 test_that("getAbundance returns accurate abundance", {
   # Assuming you have a specific test scenario
   true_species = "Cx pipiens, Cx tarsalis"
-  true_abundance = 30.83
+  true_abundance = 30.8311
   true_avg = 25.9
   true_delta = 19.06
 

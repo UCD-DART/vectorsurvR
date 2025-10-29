@@ -4,10 +4,12 @@
 \alias{getSites}
 \title{Get sites data}
 \usage{
-getSites(token)
+getSites(token, agency_ids = NULL)
 }
 \arguments{
 \item{token}{A valid access token returned from `getToken()`}
+
+\item{agency_ids}{Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids, such as `agency_ids = c(55,56)`}
 }
 \value{
 A dataframe of site data

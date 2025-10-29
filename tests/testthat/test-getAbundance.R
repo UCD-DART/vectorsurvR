@@ -22,12 +22,12 @@ test_that("Valid data returns a data frame formatted properly", {
 # Test getAbundance returns accurate abundance
 test_that("getAbundance returns accurate abundance", {
   true_species = "Cx pipiens, Cx tarsalis"
-  true_abundance = 19.09
+  true_abundance = 19.0859
 
   result <- getAbundance(collections = vectorsurvR:::testing_collections, interval = "Week", species = list("Cx pipiens","Cx tarsalis"), separate_by = "trap")
   filter_res = result %>% dplyr::filter(Year==2020, Trap=="CO2", Week==20)
    expect_equal(filter_res$Species, true_species)
-   expect_equal(filter_res$Abundance, true_abundance)
+   expect_equal(filter_res$Abundance, true_abundance, tolerance = 1e-4)
 
 })
 

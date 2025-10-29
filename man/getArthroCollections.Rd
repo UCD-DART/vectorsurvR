@@ -10,7 +10,8 @@ getArthroCollections(
   end_year,
   arthropod,
   agency_ids = NULL,
-  spatial_features = NULL
+  spatial_features = NULL,
+  geocoded = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ getArthroCollections(
 \item{agency_ids}{Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids, such as `agency_ids = c(55,56)`}
 
 \item{spatial_features}{Filter data by spatial feature}
+
+\item{geocoded}{Should city and county be calculated by collection long/lat instead of user input from site inform}
 }
 \value{
 A dataframe of collections data

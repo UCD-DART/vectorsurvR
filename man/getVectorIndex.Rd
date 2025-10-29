@@ -25,21 +25,21 @@ getVectorIndex(
 
 \item{pools}{Pools data retrieved from `getPools()`}
 
-\item{interval}{Calculation interval for vector index, accepts “CollectionDate”,“Biweek”,“Week”, and “Month}
+\item{interval}{Calculation interval for vector index, accepts "CollectionDate","Biweek","Week", and "Month}
 
-\item{target_disease}{The disease to calculate infection rate for–i.e. “WNV”. Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`}
+\item{target_disease}{The disease to calculate infection rate for–i.e. "WNV". Disease acronyms are the accepted input. To see a list of disease acronyms, run `unique(pools$target_acronym)`}
 
-\item{pt_estimate}{The estimation type for infection rate. Options include: “mle”,“bc-”mle”, “mir”}
+\item{pt_estimate}{The estimation type for infection rate. Options include: "mle","bc-"mle", "mir"}
 
 \item{scale}{Constant to multiply infection rate, default is 1000}
 
-\item{agency}{An optional vector for filtering agency by character code}
+\item{agency}{Character vector for filtering agency by character code}
 
-\item{species}{An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.}
+\item{species}{Character vector for filtering species. View species in your data `unique(data$species_display_name)`. Defaults to all species if no selection}
 
-\item{trap}{An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.}
+\item{trap}{Character vector for filtering trap type by acronym. View trap types in your data`unique(data$trap_acronym`. Defaults to all trap types}
 
-\item{sex}{An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.}
+\item{sex}{Character vector for filtering sex type. View sex options `unique(data$sex_type`). Defaults to "female".}
 
 \item{trapnight_min}{Minimum trap night restriction for calculation. Default is 1.}
 

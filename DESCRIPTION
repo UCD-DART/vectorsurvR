@@ -19,7 +19,11 @@ Imports:
     tidyr,
     magrittr,
     DT,
-    sf
+    sf,
+    scales,
+    ggplot2,
+    rlang,
+    mockery
 Suggests: 
     testthat (>= 3.0.0),
     rmarkdown,

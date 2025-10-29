@@ -4,9 +4,9 @@
 #' @param interval Calculation interval for abundance, accepts “CollectionDate”,“Biweek”,“Week”, and “Month
 #' @param target_year Year to calculate analysis on. Collections data must have a year range of at least (target_year - 5, target_year)
 #' @param agency An optional vector for filtering agency by character code
-#' @param species An optional vector for filtering species. Species_display_name is the accepted notation.To see a list of species present in your data run unique(collections$species_display_name). If species is unspecified, the default NULL will return data for all species in data.
-#' @param trap An optional vector for filtering trap type by acronym. Trap_acronym is the is the accepted notation. Run unique(collections$trap_acronym) to see trap types present in your data. If trap is unspecified, the default NULL will return data for all trap types.
-#' @param sex An optional vector for filtering sex type. Accepts 'male', 'female',or 'other'. If sex is unspecified, the default NULL will return data for female sex.
+#' @param species Character vector for filtering species. View species in your data `unique(data$species_display_name)`. Defaults to all species if no selection
+#' @param trap Character vector for filtering trap type by acronym. View trap types in your data`unique(data$trap_acronym`. Defaults to all trap types
+#' @param sex Character vector for filtering sex type. View sex options `unique(data$sex_type`). Defaults to "female".
 #' @param trapnight_min Minimum trap night restriction for calculation. Default is 1.
 #' @param trapnight_max Maximum trap night restriction for calculation. Default is no restriction.
 #' @param separate_by Separate/group the calculation by 'trap','species', 'agency','county', or 'spatial'. Default NULL does not separate.
@@ -109,10 +109,9 @@ yr_int_average <- ab_data %>%
   dplyr::group_by(across(all_of(grouping_vars))) %>%
   dplyr::filter(Year != target_year) %>%
   dplyr::summarize(
-    FiveYearAvg = mean(Abundance),
+    FiveYearAvg = mean(Abundance, rm.na = T),
     YearsInAverage = paste(sort(unique(Year)), collapse = ",")
   )
-
 # Filter target year data
 ab_data_yr <- ab_data %>%
   dplyr::filter(Year == target_year)

@@ -7,6 +7,7 @@
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick'
 #' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids, such as `agency_ids = c(55,56)`
 #' @param spatial_features Filter data by spatial feature
+#' @param geocoded Should city and county be calculated by collection long/lat instead of user input from site inform
 #' @return A dataframe of collections data
 #' @importFrom jsonlite fromJSON
 #' @importFrom tidyr unnest
@@ -14,15 +15,16 @@
 #' @importFrom stringr str_replace str_replace_all
 #' @importFrom httr2 req_method resp_status resp_body_string req_perform req_url_query
 #' @importFrom sf st_intersects st_drop_geometry
-#' @importFrom dplyr bind_rows select if_else pull coalesce inner_join left_join
+#' @importFrom dplyr bind_rows select if_else pull coalesce inner_join distinct full_join left_join ungroup
+#' @importFrom rlang %||%
 #' @export
 #' @examples
 #' \dontrun{
 #' token = getToken()
 #' collections = getArthroCollections(token, 2021, 2022, 'mosquito',c(55,56), TRUE)}
 
-getArthroCollections <- function(token, start_year, end_year, arthropod, agency_ids = NULL, spatial_features=NULL) {
-
+getArthroCollections <- function(token, start_year, end_year, arthropod, agency_ids = NULL, spatial_features=NULL,
+                                 geocoded = TRUE) {
   convert_to_sf <- function(coords) {
 
     if (is.list(coords)) {
@@ -84,7 +86,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
   if (!is.null(agency_ids) && length(agency_ids) > 1) {
     return(bind_rows(lapply(agency_ids, function(aid) {
-      getArthroCollections(token, start_year, end_year, arthropod, agency_ids = aid)
+      getArthroCollections(token, start_year, end_year, arthropod, agency_ids = aid, geocoded)
     })))
   }
 
@@ -327,7 +329,13 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
     collections = collections %>%  dplyr::filter(!(species_display_name%in%c("V pensylvanica","D variabilis" ,"D occidentalis","I pacificus","Dermacentor","V germanica")))
     collections$collection_longitude <- sapply(collections$location_shape_coordinates, function(x) unlist(x)[1])
     collections$collection_latitude <- sapply(collections$location_shape_coordinates, function(x) unlist(x)[2])
-  }
+
+
+
+
+
+
+    }
 
   if (arthropod == "tick") {
     collections$ticks <- lapply(collections$ticks, as.data.frame)
@@ -375,6 +383,124 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
 
   if(arthropod == "mosquito") {
+
+    # Add reverse geocoding if requested
+    if(geocoded) {
+
+      reverse_geocode_arcgis <- function(lat, lon) {
+        # First try: Standard reverse geocode
+        url1 <- "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode"
+
+        city <- NA_character_
+        county <- NA_character_
+
+        tryCatch({
+          resp <- request(url1) %>%
+            req_url_query(
+              location = paste0(lon, ",", lat),
+              f = "json",
+              outSR = 4326
+            ) %>%
+            req_perform()
+
+          result <- resp_body_json(resp)
+          city <- result$address$City %||%
+            result$address$Municipality %||%
+            result$address$Neighborhood %||%
+            NA_character_
+
+          county <- result$address$Subregion %||% NA_character_
+
+        }, error = function(e) {
+          # Silently continue to fallback
+        })
+
+        # If no city found, try finding nearest populated place
+        if(is.na(city)) {
+          url2 <- "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates"
+
+          tryCatch({
+            resp <- request(url2) %>%
+              req_url_query(
+                location = paste0(lon, ",", lat),
+                category = "Populated Place",
+                maxLocations = 1,
+                f = "json",
+                outSR = 4326
+              ) %>%
+              req_perform()
+
+            result <- resp_body_json(resp)
+
+            if(length(result$candidates) > 0) {
+              # Extract city from the address
+              address_parts <- strsplit(result$candidates[[1]]$address, ", ")[[1]]
+              if(length(address_parts) > 0) {
+                city <- address_parts[1]
+              }
+            }
+          }, error = function(e) {
+            # Keep city as NA
+          })
+        }
+
+        list(
+          geocoded_city = city,
+          geocoded_county = county
+        )
+      }
+
+      # Create a dataframe with unique coordinates to minimize API calls
+      unique_coords <- collections %>%
+        select(collection_longitude, collection_latitude) %>%
+        distinct() %>%
+        filter(!is.na(collection_longitude) & !is.na(collection_latitude))
+
+      if(nrow(unique_coords) > 0) {
+        message("Reverse geocoding ", nrow(unique_coords), " unique locations using ArcGIS...")
+
+        # Apply reverse geocoding to each unique coordinate pair
+        geocoded_results <- lapply(1:nrow(unique_coords), function(i) {
+          if(i %% 10 == 0) {  # Progress update every 10 locations
+            message("  Processing location ", i, " of ", nrow(unique_coords))
+          }
+
+          result <- reverse_geocode_arcgis(
+            lat = unique_coords$collection_latitude[i],
+            lon = unique_coords$collection_longitude[i]
+          )
+
+          # Small delay to respect rate limits (adjust as needed)
+          Sys.sleep(0.1)
+
+          data.frame(
+            collection_longitude = unique_coords$collection_longitude[i],
+            collection_latitude = unique_coords$collection_latitude[i],
+            geocoded_city = result$geocoded_city,
+            geocoded_county = result$geocoded_county,
+            stringsAsFactors = FALSE
+          )
+        })
+
+        # Combine results
+        geocoded_data <- bind_rows(geocoded_results)
+
+        # Join back to main collections dataframe
+        collections <- collections %>%
+          left_join(geocoded_data, by = c("collection_longitude", "collection_latitude"))
+
+        # Override city and county columns with geocoded values
+        collections <- collections %>%
+          mutate(
+            city = coalesce(geocoded_city, city),
+            county = coalesce(geocoded_county, county)
+          ) %>%
+          select(-geocoded_city, -geocoded_county)  # Remove temporary columns
+
+        message("Geocoding complete!")
+
+      }
+    }
     #remove unwanted/redundant columns
 
     if(!("lures_code"%in% colnames(collections))){
@@ -394,6 +520,8 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
         "collection_latitude", "city", "postal_code", "county", "geoid",
         "add_date", "deactive_date", "updated"
       )
+
+
 
   }
   if(arthropod == "tick") {

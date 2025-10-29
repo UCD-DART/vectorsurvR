@@ -2,6 +2,8 @@
 #' @description
 #' `getSites()` obtains site data for authorized VectorSurv Gateway accounts.
 #' @param token A valid access token returned from `getToken()`
+#' @param agency_ids Filter on agency id, default to NULL for all available agencies,otherwise provide a vector of agency ids, such as `agency_ids = c(55,56)`
+
 #' @return A dataframe of site data
 #' @export
 #' @examples
@@ -10,9 +12,15 @@
 #' sites = getSites(token)}
 
 
-getSites <- function(token) {
+getSites <- function(token, agency_ids = NULL) {
   if (is.null(token) || !is.character(token)) {
     stop("Invalid token. Check username and password")
+  }
+
+  if (!is.null(agency_ids) && length(agency_ids) > 1) {
+    return(bind_rows(lapply(agency_ids, function(aid) {
+      getSites(token, agency_ids = aid)
+    })))
   }
 
   # Initialize empty results
@@ -29,7 +37,9 @@ getSites <- function(token) {
       ) %>%
       req_url_query(
         pageSize = "1000",
-        page = as.character(page)
+        page = as.character(page),
+        `query[agency][0]` = if (!is.null(agency_ids)) agency_ids else NULL
+
       )
 
     tryCatch({

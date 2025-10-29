@@ -9,7 +9,12 @@ utils::globalVariables(c("test","Confirmed","Negative","Positive","arthropods","
                          "target_vector","Species", "temperature", "test_agency_code", "test_agency_name",
                          "test_agency_state_acrnym","County","region_type","setNames","subregion","st_within", "test_date", "test_id","VectorIndex" ,"trap_name", "trap_presence",
                          "type", "updated","method_name","method_acronym" ,"where",".data","test_value", "wind_speed","city","sym",".","lures_id","geoid","id", "test_agency_state_acronym","county",
-                         "namelsad","namelsad.x" ,"postal_code","type.y","namelsad.y","AbundanceCalculation","AbundanceType", "spatial_feature", "na.omit","n_distinct", "multiple_features", "Spatial"))
+                         "namelsad","namelsad.x" ,"postal_code","type.y","namelsad.y","AbundanceCalculation","AbundanceType", "spatial_feature", "na.omit","n_distinct", "multiple_features", "Spatial","temp_key",
+                         "df",
+                         "geocoded",
+                         "target_year",
+                         "FiveYearAvg",'geocoded_city','geocoded_county'
+))
 
 
 

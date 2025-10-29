@@ -6,7 +6,6 @@
 #' @param end_year End of year range
 #' @param arthropod Specify arthropod type from: 'mosquito', 'tick', 'nontick'
 #' @param agency_ids Filter on agency id, default to NULL for all available agencies, otherwise provide a vector of agency ids
-
 #' @keywords pools
 #' @return Dataframe of pools data
 #' @examples
@@ -15,9 +14,10 @@
 #' getPools(token, start_year = 2020, end_year = 2021, arthropod = 'tick', 55)}
 #' @export
 #' @importFrom httr2 request req_headers req_perform resp_body_json req_url_query
-#' @importFrom dplyr bind_rows inner_join select mutate if_else coalesce
+#' @importFrom dplyr bind_rows inner_join select mutate if_else coalesce rename
 #' @importFrom tidyr unnest
 #' @importFrom lubridate year today
+
 
 getPools <- function(token, start_year, end_year, arthropod, agency_ids = NULL) {
 
@@ -141,11 +141,15 @@ getPools <- function(token, start_year, end_year, arthropod, agency_ids = NULL) 
       id, pool_num, agency_id, agency_code, agency_name, site_id, site_code, site_name,
       pool_longitude, pool_latitude, city, postal_code, county, geoid, collection, comments,
       surv_year, collection_date, species_display_name, species_full_name, sex_type, sex_name,
-      trap_acronym, trap_name, trap_presence, lures_id, lures_code, lures_description, lures_weight,
-      num_count, test_id, test_value, test_date, test_method_name, test_method_acronym,
+      trap_acronym, trap_name, trap_presence, lures_code, lures_description, lures_weight,
+      num_count, test_value, test_date, test_method_name, test_method_acronym,
       test_target_acronym, test_target_vector, test_target_icd_10, test_status_name,
       test_agency_name, test_agency_code, test_agency_state_acronym, add_date, updated
     )
+
+    pools <- pools %>%
+      rename(pool_id = id)
+
   } else {
     pools <- dplyr::select(
       pools,

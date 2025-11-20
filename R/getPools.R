@@ -138,7 +138,7 @@ getPools <- function(token, start_year, end_year, arthropod, agency_ids = NULL) 
 
     pools <- dplyr::select(
       pools,
-      id, pool_num, agency_id, agency_code, agency_name, site_id, site_code, site_name,
+      pool_id, pool_num, agency_id, agency_code, agency_name, site_id, site_code, site_name,
       pool_longitude, pool_latitude, city, postal_code, county, geoid, collection, comments,
       surv_year, collection_date, species_display_name, species_full_name, sex_type, sex_name,
       trap_acronym, trap_name, trap_presence, lures_code, lures_description, lures_weight,
@@ -147,8 +147,7 @@ getPools <- function(token, start_year, end_year, arthropod, agency_ids = NULL) 
       test_agency_name, test_agency_code, test_agency_state_acronym, add_date, updated
     )
 
-    pools <- pools %>%
-      rename(pool_id = id)
+
 
   } else {
     pools <- dplyr::select(

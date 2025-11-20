@@ -24,7 +24,7 @@
 #' collections = getArthroCollections(token, 2021, 2022, 'mosquito',c(55,56), TRUE)}
 
 getArthroCollections <- function(token, start_year, end_year, arthropod, agency_ids = NULL, spatial_features=NULL,
-                                 geocoded = TRUE) {
+                                 geocoded = FALSE) {
   convert_to_sf <- function(coords) {
 
     if (is.list(coords)) {
@@ -357,7 +357,7 @@ getArthroCollections <- function(token, start_year, end_year, arthropod, agency_
 
 
 
-  sites = getSites(token)
+  sites = getSites(token, agency_ids=agency_ids)
   sites_zip = sites[c("id", "city", "postal_code", "region")] #selects the columns with relevant information, this can be changed of course
   regions = getRegions(token)
   regions_county = regions[c("id","parent","type","geoid", "namelsad")] #select id and county name

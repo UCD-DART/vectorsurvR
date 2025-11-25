@@ -24,7 +24,7 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate = "bc-
   }
 
 
-  pools_columns <- c( "collection_date", "pool_num","agency_code","surv_year", "num_count", "sex_type",
+  pools_columns <- c( "collection_date","agency_code","surv_year", "num_count", "sex_type",
                      "species_display_name", "trap_acronym", "test_target_acronym", "test_status_name")
 
   if (!all(pools_columns %in% colnames(pools))) {
@@ -87,76 +87,76 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate = "bc-
   # Filter and group data
 
   mir <-
-         function(x,m,n=rep(1,length(x)), alpha=0.05, scale)
-         {
-           N <- sum(m*n)
-           mir <- sum(x)/N
-           mir_stderr <- sqrt(mir*(1-mir)/N)
-           z <- qnorm(1-alpha/2)
-           return(c(p=mir*scale,lower=max(0, mir - z * mir_stderr)*scale, upper = min(1, mir + z * mir_stderr)*scale))
-         }
+    function(x,m,n=rep(1,length(x)), alpha=0.05, scale)
+    {
+      N <- sum(m*n)
+      mir <- sum(x)/N
+      mir_stderr <- sqrt(mir*(1-mir)/N)
+      z <- qnorm(1-alpha/2)
+      return(c(p=mir*scale,lower=max(0, mir - z * mir_stderr)*scale, upper = min(1, mir + z * mir_stderr)*scale))
+    }
 
-       mle <-
-         function(x, m, n = rep(1., length(x)), tol = 1e-008, alpha=0.05, scale)
-         {
-           #
-           # This is the implementation using Newton-Raphson, as given
-           # in the Walter, Hildreth, Beaty paper, Am. J. Epi., 1980
-           #
-           if(length(m) == 1.) m <- rep(m, length(x)) else if(length(m) != length(x))
-             stop("\n ... x and m must have same length if length(m) > 1")
-           if(any(x > n))
-             stop("x elements must be <= n elements")
-           if(all(x == 0.))
-             return(c(p = 0, lower = 0, upper =0))
-           if(sum(x) == sum(n)) return(NA)
-           p_new <- 1 - (1 - sum(x)/sum(n))^(1/mean(m)) # starting value
-           done <- 0
-           N <- sum(n * m)
-           while(!done) {
-             p_old <- p_new
-             p_new <- p_old - (N - sum((m * x)/(1 - (1 - p_old)^m)))/
-               sum((m^2 * x * (1 - p_old)^(m - 1))/(1 - (1 -
-                                                           p_old)^m)^2)
-             if(abs(p_new - p_old) < tol) #tolerace
-               done <- 1
-           }
-           p_hat = p_new
+  mle <-
+    function(x, m, n = rep(1., length(x)), tol = 1e-008, alpha=0.05, scale)
+    {
+      #
+      # This is the implementation using Newton-Raphson, as given
+      # in the Walter, Hildreth, Beaty paper, Am. J. Epi., 1980
+      #
+      if(length(m) == 1.) m <- rep(m, length(x)) else if(length(m) != length(x))
+        stop("\n ... x and m must have same length if length(m) > 1")
+      if(any(x > n))
+        stop("x elements must be <= n elements")
+      if(all(x == 0.))
+        return(c(p = 0, lower = 0, upper =0))
+      if(sum(x) == sum(n)) return(NA)
+      p_new <- 1 - (1 - sum(x)/sum(n))^(1/mean(m)) # starting value
+      done <- 0
+      N <- sum(n * m)
+      while(!done) {
+        p_old <- p_new
+        p_new <- p_old - (N - sum((m * x)/(1 - (1 - p_old)^m)))/
+          sum((m^2 * x * (1 - p_old)^(m - 1))/(1 - (1 -
+                                                      p_old)^m)^2)
+        if(abs(p_new - p_old) < tol) #tolerace
+          done <- 1
+      }
+      p_hat = p_new
 
-           if(length(m) == 1)
-             m <- rep(m, length(x))
+      if(length(m) == 1)
+        m <- rep(m, length(x))
 
-           if(p_hat > 0 & p_hat < 1){
-             p_stderr <- sqrt(1/sum((m^2 * n * (1 - p_hat)^(m - 2))/(1 - (1 - p_hat)^m)))}
-           else{p_stderr<-0}
+      if(p_hat > 0 & p_hat < 1){
+        p_stderr <- sqrt(1/sum((m^2 * n * (1 - p_hat)^(m - 2))/(1 - (1 - p_hat)^m)))}
+      else{p_stderr<-0}
 
-           z <- qnorm(1 - alpha/2)
-           return(c(p = p_hat*scale, lower = max(0, p_hat - z * p_stderr)*scale, upper = min(1, p_hat +
-                                                                            z * p_stderr)*scale))
+      z <- qnorm(1 - alpha/2)
+      return(c(p = p_hat*scale, lower = max(0, p_hat - z * p_stderr)*scale, upper = min(1, p_hat +
+                                                                                          z * p_stderr)*scale))
 
-         }
-       bcmle <- function(x, m, n = rep(1., length(x)), tol = 1e-008, alpha=0.05, scale)
-       {
-         #
-         # This is the implementation using Newton-Raphson, as given
-         # in the Walter, Hildreth, Beaty paper, Am. J. Epi., 1980
-         #
-         if(length(m) == 1.) m <- rep(m, length(x)) else if(length(m) != length(x))
-           stop("\n ... x and m must have same length if length(m) > 1")
-         if(any(x > n))
-           stop("x elements must be <= n elements")
-         if(all(x == 0.))
-           return(c(p = 0, lower = 0, upper =0))
-         if(sum(x) == sum(n)) return(NA)
-         p_new <- 1 - (1 - sum(x)/sum(n))^(1/mean(m)) # starting value
-         done <- 0
-         N <- sum(n * m)
-         while(!done) { #updates p_hat based on
-           p_old <- p_new
-           p_new <- p_old - (N - sum((m * x)/(1 - (1 - p_old)^m)))/
-             sum((m^2 * x * (1 - p_old)^(m - 1))/(1 - (1 -
-                                                         p_old)^m)^2)
-           if(abs(p_new - p_old) < tol)
+    }
+  bcmle <- function(x, m, n = rep(1., length(x)), tol = 1e-008, alpha=0.05, scale)
+  {
+    #
+    # This is the implementation using Newton-Raphson, as given
+    # in the Walter, Hildreth, Beaty paper, Am. J. Epi., 1980
+    #
+    if(length(m) == 1.) m <- rep(m, length(x)) else if(length(m) != length(x))
+      stop("\n ... x and m must have same length if length(m) > 1")
+    if(any(x > n))
+      stop("x elements must be <= n elements")
+    if(all(x == 0.))
+      return(c(p = 0, lower = 0, upper =0))
+    if(sum(x) == sum(n)) return(NA)
+    p_new <- 1 - (1 - sum(x)/sum(n))^(1/mean(m)) # starting value
+    done <- 0
+    N <- sum(n * m)
+    while(!done) { #updates p_hat based on
+      p_old <- p_new
+      p_new <- p_old - (N - sum((m * x)/(1 - (1 - p_old)^m)))/
+        sum((m^2 * x * (1 - p_old)^(m - 1))/(1 - (1 -
+                                                    p_old)^m)^2)
+      if(abs(p_new - p_old) < tol)
              done <- 1
          }
          p_hat = p_new

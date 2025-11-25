@@ -151,12 +151,12 @@ getPools <- function(token, start_year, end_year, arthropod, agency_ids = NULL) 
 
   } else {
     pools <- dplyr::select(
-      pools,
-      pool_id, pool_num, agency_id, agency_code, agency_name, site_id, site_code, site_name,
-      pool_longitude, pool_latitude, city, postal_code, county, geoid, collection, pool_comments,
+      pools, id,
+      pool_num, agency_id, agency_code, agency_name, site_id, site_code, site_name,
+      pool_longitude, pool_latitude, city, postal_code, county, geoid, collection, comments,
       surv_year, collection_date, species_display_name, species_full_name, sex_type, sex_name,
-      trap_acronym, trap_name, trap_presence, num_count, test_id, value, test_date,
-      method_name, method_acronym, target_acronym, target_vector, target_icd_10, status_name,
+      trap_acronym, trap_name, trap_presence, num_count, test_id, test_value, test_date,
+      test_method_name, test_method_acronym, test_target_acronym, test_target_vector, test_target_icd_10, test_status_name,
       test_agency_name, test_agency_code, test_agency_state_acronym, add_date, updated
     )
   }

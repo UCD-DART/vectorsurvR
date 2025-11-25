@@ -3,7 +3,7 @@ library(lubridate)
 library(dplyr)
 set.seed(42)
 pools = getPools(getToken(),2018,2024,'mosquito')
-sample_pools = pools[c("agency_code","id","surv_year","collection_date","site_code" ,"species_display_name" ,"sex_type","trap_acronym" ,"num_count", "test_target_acronym","test_method_name" ,"test_status_name")]
+sample_pools = pools[c("agency_code","pool_id","surv_year","collection_date","site_code" ,"species_display_name" ,"sex_type","trap_acronym" ,"num_count", "test_target_acronym","test_method_name" ,"test_status_name")]
 sample_pools$site_code = abs(as.numeric(sample_pools$site_code)-sample.int(50, 1))
 sample_pools$id = abs(sample_pools$id-sample.int(100000, 1))
 sample_pools$surv_year= sample_pools$surv_year-3

@@ -11,7 +11,7 @@ getArthroCollections(
   arthropod,
   agency_ids = NULL,
   spatial_features = NULL,
-  geocoded = TRUE
+  geocoded = FALSE
 )
 }
 \arguments{

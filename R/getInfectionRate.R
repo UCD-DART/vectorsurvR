@@ -24,7 +24,7 @@ getInfectionRate <- function(pools, interval, target_disease, pt_estimate = "bc-
   }
 
 
-  pools_columns <- c("pool_id", "collection_date", "agency_code","surv_year", "num_count", "sex_type",
+  pools_columns <- c( "collection_date", "pool_num","agency_code","surv_year", "num_count", "sex_type",
                      "species_display_name", "trap_acronym", "test_target_acronym", "test_status_name")
 
   if (!all(pools_columns %in% colnames(pools))) {

@@ -22,7 +22,14 @@ Imports:
     sf,
     scales,
     ggplot2,
-    rlang
+    rlang,
+    leaflet,
+    leaflet.extras,
+    leaflet.minicharts,
+    viridis,
+    mapview,
+    webshot,
+    webshot2
 Suggests: 
     testthat (>= 3.0.0),
     rmarkdown,

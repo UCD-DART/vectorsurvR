@@ -13,7 +13,13 @@ utils::globalVariables(c("test","Confirmed","Negative","Positive","arthropods","
                          "df",
                          "geocoded",
                          "target_year",
-                         "FiveYearAvg",'geocoded_city','geocoded_county'
+                         "FiveYearAvg",'geocoded_city','geocoded_county', 'time_period_value',
+                         'is_active','n','first','species_count','leaflet',
+                         'addProviderTiles','providers','addCircleMarkers',
+                         'total_count','addHeatmap','n_species','semi_join',
+                         'colorFactor','addMinicharts','addLegend','addControl',
+                         'addScaleBar','addLayersControl','layersControlOptions',
+                         'fitBounds','mapshot'
 ))
 
 

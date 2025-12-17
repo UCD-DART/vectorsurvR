@@ -1,5 +1,5 @@
-#' @title Plot Species Map
-#' @description Plot map of mosquito species
+#'@title Plot Species Map
+#'@description Plot map of mosquito species
 #'@param token x
 #'@param target_year x
 #'@param target_species x
@@ -13,43 +13,88 @@
 #'@param width
 #'@param height
 
+#'@title Plot Species Map (FULL VERSION)
 plotSpeciesMap <- function(token, target_year, target_species = NULL,
                            trap_type = NULL, agency_ids = NULL,
                            time_period = NULL, interval = "Month",
-                           basemap = "Topographic", show_heatmap = FALSE,
-                           output_file = NULL, output_format = "leaflet",
-                           width = 1200, height = 800) {
+                           basemap = "Topographic", spatial_features = NULL,
+                           show_heatmap = FALSE, output_file = NULL,
+                           output_format = "leaflet", width = 1200, height = 800) {
 
+  library(leaflet)
+  library(dplyr)
+  library(tidyr)
+  library(sf)
 
-  # Get ALL sites (unfiltered)
+  # Get spatial features if requested
+  spatial_filtered <- NULL
+  if(!is.null(spatial_features)){
+    spatial <- getSpatialFeatures(token, agency_ids = agency_ids)
+
+    if(!is.null(spatial) && nrow(spatial) > 0) {
+      spatial_filtered <- spatial %>% filter(name %in% spatial_features)
+
+      if(nrow(spatial_filtered) > 0 && inherits(spatial_filtered, "sf")) {
+
+        # Ensure valid
+        if(is.na(st_crs(spatial_filtered))) st_crs(spatial_filtered) <- 4326
+        spatial_filtered <- st_make_valid(spatial_filtered)
+      } else {
+        cat("No valid spatial features found\n")
+        spatial_filtered <- NULL
+      }
+    }
+    cat("================================\n\n")
+  }
+
+  # Get sites
   sites <- getSites(token, agency_ids = agency_ids)
+  sites$site_longitude <- sapply(sites$shape.coordinates, function(x) if(!is.null(x) && length(x) > 0) unlist(x)[1] else NA)
+  sites$site_latitude <- sapply(sites$shape.coordinates, function(x) if(!is.null(x) && length(x) > 0) unlist(x)[2] else NA)
 
-  sites$site_longitude <- sapply(sites$shape.coordinates, function(x) unlist(x)[1])
-  sites$site_latitude <- sapply(sites$shape.coordinates, function(x) unlist(x)[2])
+  # Get collection data
+  data_full <- getArthroCollections(
+    token,
+    start_year = target_year,
+    end_year = target_year,
+    arthropod = "mosquito",
+    agency_ids = agency_ids,
+    geocoded = FALSE
+  )
 
-  # Get the data
-  data_full <- getArthroCollections(token, target_year, target_year,
-                                    arthropod = "mosquito", agency_ids = agency_ids, geocoded = F)
+  # Check if data was retrieved
+  if (is.null(data_full) || nrow(data_full) == 0) {
+    warning("No data retrieved")
+    return(NULL)
+  }
 
   # Filter data
+  data <- data_full
+
   if (!is.null(target_species)) {
-    data <- data_full %>% filter(species_display_name %in% target_species)
+    data <- data %>% filter(species_display_name %in% target_species)
   }
 
   if (!is.null(trap_type)) {
     data <- data %>% filter(trap_acronym %in% trap_type)
   }
 
-  # Remove rows with missing coordinates
-  data <- data %>%
-    filter(!is.na(collection_longitude) & !is.na(collection_latitude))
+  data <- data %>% filter(!is.na(collection_longitude) & !is.na(collection_latitude))
 
-  # Add temporal grouping
+  if (nrow(data) == 0) {
+    warning("No data with valid coordinates after filtering")
+    return(NULL)
+  }
+
+  # Process dates and time periods
+  if (!inherits(data$collection_date, "Date")) {
+    data$collection_date <- as.Date(data$collection_date)
+  }
+
   data <- data %>%
     mutate(
-      collection_date = as.Date(collection_date),
       week = as.integer(format(collection_date, "%U")),
-      biweek = as.integer(format(collection_date, "%U")) %/% 2,
+      biweek = as.integer(format(collection_date, "%U")) %/% 2 + 1,
       month = as.integer(format(collection_date, "%m")),
       month_name = format(collection_date, "%B"),
       time_period_value = case_when(
@@ -59,31 +104,38 @@ plotSpeciesMap <- function(token, target_year, target_species = NULL,
       )
     )
 
-  # Filter to specific time period if requested
   if (!is.null(time_period)) {
-    data <- data %>% filter(time_period_value == time_period)
+    if (is.numeric(time_period)) {
+      month_names <- c("January", "February", "March", "April", "May", "June",
+                       "July", "August", "September", "October", "November", "December")
+      if (time_period >= 1 && time_period <= 12) {
+        time_period_name <- month_names[time_period]
+        data <- data %>% filter(month == time_period | month_name == time_period_name)
+      }
+    } else {
+      data <- data %>% filter(time_period_value == time_period)
+    }
   }
 
-  # Get active sites for this time period (sites with ANY collections, even if 0 mosquitoes)
-  active_site_coords <- data %>%
+  # Process sites
+  active_site_coords <- data_full %>%
     distinct(collection_longitude, collection_latitude) %>%
+    filter(!is.na(collection_longitude) & !is.na(collection_latitude)) %>%
     mutate(is_active = TRUE)
 
-  # Mark which sites are active
   sites <- sites %>%
-    left_join(
-      active_site_coords,
-      by = c("site_longitude" = "collection_longitude",
-             "site_latitude" = "collection_latitude")
-    ) %>%
-    mutate(is_active = ifelse(is.na(is_active), FALSE, is_active))
+    left_join(active_site_coords,
+              by = c("site_longitude" = "collection_longitude",
+                     "site_latitude" = "collection_latitude")) %>%
+    mutate(is_active = ifelse(is.na(is_active), FALSE, TRUE))
 
-  # Separate active and inactive sites
-  year_sites = sites[sites$code%in%unique(data_full$site_code),]
+  year_sites <- sites %>%
+    filter(code %in% unique(data_full$site_code[!is.na(data_full$site_code)]))
+
   active_sites <- year_sites %>% filter(is_active == TRUE)
   inactive_sites <- year_sites %>% filter(is_active == FALSE)
 
-  # Summarize data - keep track of species at each location
+  # Summarize data for mapping
   map_data <- data %>%
     group_by(collection_longitude, collection_latitude, species_display_name) %>%
     summarise(
@@ -100,170 +152,89 @@ plotSpeciesMap <- function(token, target_year, target_species = NULL,
     ) %>%
     ungroup()
 
-  # Create base map with selected basemap
+  cat("\n=== BUILDING MAP ===\n")
+
+  # Create base map WITHOUT spatial features first
   m <- leaflet() %>%
     {
       if (basemap == "Satellite") {
-        addProviderTiles(., providers$Esri.WorldImagery, group = "Satellite")
+        addProviderTiles(., providers$Esri.WorldImagery)
       } else if (basemap == "Topographic") {
-        addProviderTiles(., providers$Esri.WorldTopoMap, group = "Topographic")
+        addProviderTiles(., providers$Esri.WorldTopoMap)
       } else if (basemap == "Terrain") {
-        addProviderTiles(., providers$Esri.WorldTerrain, group = "Terrain")
-      } else if (basemap == "OpenTopoMap") {
-        addProviderTiles(., providers$OpenTopoMap, group = "OpenTopoMap")
+        addProviderTiles(., providers$Esri.WorldTerrain)
       } else {
-        addProviderTiles(., providers$Esri.WorldImagery, group = "Satellite")
+        addProviderTiles(., providers$Esri.WorldTopoMap)
       }
-    } %>%
+    }
 
-    # Add inactive monitoring sites for that year (grey)
-    addCircleMarkers(
-      data = inactive_sites,
-      lng = ~site_longitude, lat = ~site_latitude,
-      radius = 2,
-      color = "darkgrey",
-      fillColor = "lightgrey",
-      fillOpacity = 0.4,
-      stroke = TRUE,
-      weight = 1,
-      popup = ~paste("<b>Site:</b>", name, "<br>",
-                     "<b>Status:</b> No collections this period<br>",
-                     "<b>Lat:</b>", round(site_latitude, 4), "<br>",
-                     "<b>Lon:</b>", round(site_longitude, 4)),
-      group = "Monitoring Sites"
-    ) %>%
+  cat("Base map created\n")
 
-    # Add active monitoring sites (highlighted - black with white border)
-    addCircleMarkers(
-      data = active_sites,
-      lng = ~site_longitude, lat = ~site_latitude,
-      radius = 3,
-      color = "white",
-      fillColor = "black",
-      fillOpacity = 0.8,
-      stroke = TRUE,
-      weight = 2,
-      popup = ~paste("<b>Site:</b>", name, "<br>",
-                     "<b>Status:</b> Active this period<br>",
-                     "<b>Lat:</b>", round(site_latitude, 4), "<br>",
-                     "<b>Lon:</b>", round(site_longitude, 4)),
-      group = "Monitoring Sites"
-    )
+  # Add inactive sites
+  if (nrow(inactive_sites) > 0) {
+    m <- m %>%
+      addCircleMarkers(
+        data = inactive_sites,
+        lng = ~site_longitude, lat = ~site_latitude,
+        radius = 2,
+        color = "darkgrey",
+        fillColor = "lightgrey",
+        fillOpacity = 0.4,
+        popup = ~paste("<b>Site:</b>", name),
+        group = "Monitoring Sites"
+      )
+    cat("Added", nrow(inactive_sites), "inactive sites\n")
+  }
 
-  # Add collection data (consider adding for abundance?)
+  # Add active sites
+  if (nrow(active_sites) > 0) {
+    m <- m %>%
+      addCircleMarkers(
+        data = active_sites,
+        lng = ~site_longitude, lat = ~site_latitude,
+        radius = 3,
+        color = "white",
+        fillColor = "black",
+        fillOpacity = 0.8,
+        popup = ~paste("<b>Site:</b>", name),
+        group = "Monitoring Sites"
+      )
+    cat("Added", nrow(active_sites), "active sites\n")
+  }
+
+  # Add collection data
   if (nrow(map_data) > 0) {
-    if (show_heatmap) {
-      # Aggregate for heatmap
-      heatmap_data <- map_data %>%
-        group_by(collection_longitude, collection_latitude) %>%
-        summarise(total_count = first(total_count), .groups = "drop")
+    all_species <- unique(map_data$species_display_name)
+    species_colors <- setNames(viridis::plasma(length(all_species)), all_species)
+
+    location_summary <- map_data %>%
+      group_by(collection_longitude, collection_latitude) %>%
+      summarise(n_species = first(n_species), .groups = "drop")
+
+    single_species_locs <- location_summary %>% filter(n_species == 1)
+
+    if (nrow(single_species_locs) > 0) {
+      single_data <- map_data %>%
+        semi_join(single_species_locs, by = c("collection_longitude", "collection_latitude"))
+
+      species_palette <- colorFactor(species_colors, domain = all_species)
 
       m <- m %>%
-        addHeatmap(
-          data = heatmap_data,
+        addCircleMarkers(
+          data = single_data,
           lng = ~collection_longitude,
           lat = ~collection_latitude,
-          intensity = ~total_count,
-          blur = 20,
-          max = 0.8,
-          radius = 15,
+          radius = ~sqrt(species_count) * 2,
+          color = "white",
+          fillColor = ~species_palette(species_display_name),
+          fillOpacity = 0.8,
+          popup = ~paste("<b>Species:</b>", species_display_name),
           group = "Collections"
         )
-    } else {
-      # Get all unique species for consistent colors
-      all_species <- unique(map_data$species_display_name)
-      species_colors <- setNames(
-        viridis::plasma(length(all_species)),
-        all_species
-      )
+      cat("Added", nrow(single_data), "collection markers\n")
+    }
 
-      # Separate single vs multi-species locations
-      location_summary <- map_data %>%
-        group_by(collection_longitude, collection_latitude) %>%
-        summarise(
-          n_species = first(n_species),
-          total_count = first(total_count),
-          .groups = "drop"
-        )
-
-      single_species_locs <- location_summary %>% filter(n_species == 1)
-      multi_species_locs <- location_summary %>% filter(n_species > 1)
-
-      # Add circle markers for single-species locations
-      if (nrow(single_species_locs) > 0) {
-        single_data <- map_data %>%
-          semi_join(single_species_locs, by = c("collection_longitude", "collection_latitude"))
-
-        species_palette <- colorFactor(species_colors, domain = all_species)
-
-        m <- m %>%
-          addCircleMarkers(
-            data = single_data,
-            lng = ~collection_longitude,
-            lat = ~collection_latitude,
-            radius = ~sqrt(species_count) * 2,
-            color = "white",
-            fillColor = ~species_palette(species_display_name),
-            fillOpacity = 0.8,
-            stroke = TRUE,
-            weight = 1.5,
-            popup = ~paste("<b>Species:</b>", species_display_name, "<br>",
-                           "<b>Count:</b>", species_count, "<br>",
-                           "<b>Collections:</b>", species_collections, "<br>",
-                           "<b>County:</b>", county, "<br>",
-                           "<b>Trap:</b>", trap_acronym),
-            group = "Collections"
-          )
-      }
-
-      # Add pie charts for multi-species locations
-      if (nrow(multi_species_locs) > 0) {
-        # Prepare wide format for minicharts
-        pie_wide <- map_data %>%
-          semi_join(multi_species_locs, by = c("collection_longitude", "collection_latitude")) %>%
-          select(collection_longitude, collection_latitude, species_display_name, species_count, total_count) %>%
-          pivot_wider(
-            id_cols = c(collection_longitude, collection_latitude, total_count),
-            names_from = species_display_name,
-            values_from = species_count,
-            values_fill = 0
-          )
-
-        # Only proceed if we have valid data
-        if (nrow(pie_wide) > 0) {
-          # Get species columns in correct order
-          species_cols <- intersect(all_species, names(pie_wide))
-
-          # Make sure we have at least 2 species columns (otherwise it's not really multi-species)
-          if (length(species_cols) >= 2) {
-            chartdata <- as.matrix(pie_wide[, species_cols])
-
-            # Ensure chartdata is numeric matrix
-            if (!is.numeric(chartdata)) {
-              chartdata <- apply(chartdata, 2, as.numeric)
-            }
-
-            # Get colors as unnamed vector in same order as species_cols
-            pie_colors <- unname(species_colors[species_cols])
-
-            # Add pie charts
-            m <- m %>%
-              addMinicharts(
-                lng = pie_wide$collection_longitude,
-                lat = pie_wide$collection_latitude,
-                type = "pie",
-                chartdata = chartdata,
-                colorPalette = pie_colors,
-                width = 45 * sqrt(pie_wide$total_count / max(pie_wide$total_count)),
-                transitionTime = 0,
-                opacity = 0.9,
-                layerId = paste0("pie_", 1:nrow(pie_wide))
-              )
-          }
-        }
-      }
-
-      # Add legend
+    if (length(all_species) > 0) {
       m <- m %>%
         addLegend(
           position = "bottomright",
@@ -275,73 +246,62 @@ plotSpeciesMap <- function(token, target_year, target_species = NULL,
     }
   }
 
-  # Add title and scale
-  title_text <- if (!is.null(time_period)) {
-    paste0("<div style='background:white;padding:8px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,0.3);'>",
-           "<b>Mosquito Collections - ", time_period, " ", target_year, "</b>",
-           if (!is.null(target_species)) paste0("<br><i>", paste(target_species, collapse=", "), "</i>") else "",
-           "</div>")
-  } else {
-    paste0("<div style='background:white;padding:8px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,0.3);'>",
-           "<b>Mosquito Collections - ", target_year, "</b>",
-           if (!is.null(target_species)) paste0("<br><i>", paste(target_species, collapse=", "), "</i>") else "",
-           "</div>")
+  # NOW add spatial features LAST
+  if(!is.null(spatial_filtered) && nrow(spatial_filtered) > 0) {
+    cat("Adding spatial features...\n")
+
+    tryCatch({
+      m <- m %>%
+        addPolygons(
+          data = spatial_filtered,
+          fillColor = "#0066CC",
+          color = "#0066CC",
+          weight = 2,
+          opacity = 0.8,
+          fillOpacity = 0.15,
+          popup = ~paste("<b>Area:</b>", name),
+          group = "Spatial Features"
+        )
+      cat("Spatial features added successfully!\n")
+    }, error = function(e) {
+      cat("ERROR adding spatial features:", e$message, "\n")
+    })
   }
 
-  # Calculate bounds for map view based on collection locations
-  all_lons <- data$collection_longitude
-  all_lats <- data$collection_latitude
-
-  # Remove NAs
-  all_lons <- all_lons[!is.na(all_lons)]
-  all_lats <- all_lats[!is.na(all_lats)]
+  # Add title and controls
+  title_text <- paste0(
+    "<div style='background:white;padding:8px;border-radius:4px;'>",
+    "<b>Mosquito Collections - ", target_year, "</b>",
+    "</div>"
+  )
 
   m <- m %>%
     addControl(html = title_text, position = "topright") %>%
-    addScaleBar(position = "bottomleft") %>%
+    addScaleBar(position = "bottomleft")
+
+  # Add layers control
+  groups <- c("Monitoring Sites", "Collections")
+  if(!is.null(spatial_filtered) && nrow(spatial_filtered) > 0) {
+    groups <- c(groups, "Spatial Features")
+  }
+
+  m <- m %>%
     addLayersControl(
-      overlayGroups = c("Monitoring Sites", "Collections"),
+      overlayGroups = groups,
       options = layersControlOptions(collapsed = FALSE)
     )
 
-  # Only add fitBounds if we have valid coordinates
-  if (length(all_lons) > 0 && length(all_lats) > 0) {
-    m <- m %>%
-      fitBounds(
-        lng1 = min(all_lons),
-        lat1 = min(all_lats),
-        lng2 = max(all_lons),
-        lat2 = max(all_lats)
-      )
-  }
+  # Set bounds based on data (NOT spatial features)
+  m <- m %>%
+    fitBounds(
+      min(data$collection_longitude, na.rm = TRUE),
+      min(data$collection_latitude, na.rm = TRUE),
+      max(data$collection_longitude, na.rm = TRUE),
+      max(data$collection_latitude, na.rm = TRUE)
+    )
 
-  # Handle output format
-  if (output_format == "pdf" || output_format == "png") {
-    # Generate filename if not provided
-    if (is.null(output_file)) {
-      timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-      period_str <- if (!is.null(time_period)) paste0("_", gsub(" ", "_", time_period)) else ""
-      output_file <- paste0("map_", target_year, period_str, "_", timestamp,
-                            if (output_format == "pdf") ".pdf" else ".png")
-    }
+  cat("Map complete!\n")
+  cat("====================\n\n")
 
-    # Create webshot
-    webshot_result <- mapshot(m, file = output_file,
-                              remove_controls = c("zoomControl", "homeButton"),
-                              vwidth = width, vheight = height)
-    message(paste("Map saved to:", output_file))
-    return(webshot_result)
-
-  } else if (!is.null(output_file)) {
-    # Save file but still return leaflet object
-    mapshot(m, file = output_file,
-            remove_controls = c("zoomControl", "homeButton"),
-            vwidth = width, vheight = height)
-    message(paste("Map saved to:", output_file))
-    return(m)
-
-  } else {
-    # Return interactive leaflet map
-    return(m)
-  }
+  suppressWarnings(return(m))
 }

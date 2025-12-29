@@ -41,7 +41,7 @@ getSpeciesTable <- function(token,
 
   # Get collections data
   collections <- getArthroCollections(token, target_year, target_year,
-                                      arthropod = 'mosquito', agency_id, geocoded = T)
+                                      arthropod = 'mosquito', agency_ids = agency_id, geocoded = T)
 
   # Validate separate_by parameter
   if (!is.null(separate_by)) {
@@ -63,13 +63,11 @@ getSpeciesTable <- function(token,
   abundance_data <- getAbundance(
     collections = collections,
     interval = interval,
-    agency = agency_id,
     species = species,
     trap = trap,
     sex = sex,
     separate_by = separate_by
   )
-
   # Keep the nice display names from getAbundance output
   # Map from user input (short names) to getAbundance column names (formatted display names)
   if (!is.null(separate_by)) {
@@ -142,7 +140,7 @@ getSpeciesTable <- function(token,
   # Select only columns that exist in the data
   existing_cols <- intersect(display_cols, names(abundance_data))
   display_data <- abundance_data %>% select(all_of(existing_cols))
-
+  print(display_data)
   # Filter display_names to match existing columns
   display_names <- display_names[display_cols %in% existing_cols]
 

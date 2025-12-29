@@ -35,6 +35,7 @@ plotPoolsMap<- function(token, target_year, target_disease = NULL,
   agency <- NULL
   if(show_agency_boundaries == TRUE){
     agency <- getAgency(token)
+    agency <- filter(id %in% agency_ids)
     if(!is.null(agency) && nrow(agency) > 0) {
       cat("Loaded", nrow(agency), "agency boundaries\n")
     } else {
@@ -75,8 +76,8 @@ plotPoolsMap<- function(token, target_year, target_disease = NULL,
   data <- data %>%
     mutate(
       collection_date = as.Date(collection_date),
-      week = as.integer(format(collection_date, "%U")),
-      biweek = as.integer(format(collection_date, "%U")) %/% 2,
+      week = as.integer(epiweek(collection_date)),
+      biweek = as.integer(epiweek(collection_date)) %/% 2,
       month = as.integer(format(collection_date, "%m")),
       month_name = format(collection_date, "%B"),
       year = format(collection_date, "%Y"),
@@ -122,7 +123,7 @@ plotPoolsMap<- function(token, target_year, target_disease = NULL,
   map_data <- data %>%
     group_by(pool_longitude, pool_latitude, species_display_name, test_result, test_target_acronym) %>%
     summarise(
-      pool_count = n_distinct(pool_id),
+      pool_count = n_distinct(id),
       mosquito_count = sum(num_count, na.rm = TRUE),
       county = first(county),
       trap_acronym = first(trap_acronym),
@@ -368,7 +369,7 @@ plotPoolsMap<- function(token, target_year, target_disease = NULL,
         data = negative_summary,
         lng = ~pool_longitude,
         lat = ~pool_latitude,
-        radius = ~sqrt(total_pools) * 3,
+        radius = ~sqrt(total_pools),
         color = "white",
         fillColor = "#4575b4",
         fillOpacity = 0.7,

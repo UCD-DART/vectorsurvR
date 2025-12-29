@@ -25,7 +25,7 @@ plotSpeciesMap <- function(token, target_year, target_species = NULL,
   library(dplyr)
   library(tidyr)
   library(sf)
-
+  library(lubridate)
   # Get spatial features if requested
   spatial_filtered <- NULL
   if(!is.null(spatial_features)){
@@ -93,8 +93,8 @@ plotSpeciesMap <- function(token, target_year, target_species = NULL,
 
   data <- data %>%
     mutate(
-      week = as.integer(format(collection_date, "%U")),
-      biweek = as.integer(format(collection_date, "%U")) %/% 2 + 1,
+      week = as.integer(epiweek(collection_date)),
+      biweek = as.integer(epiweek(collection_date)) %/% 2 + 1,
       month = as.integer(format(collection_date, "%m")),
       month_name = format(collection_date, "%B"),
       time_period_value = case_when(

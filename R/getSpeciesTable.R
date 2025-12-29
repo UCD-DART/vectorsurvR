@@ -140,7 +140,6 @@ getSpeciesTable <- function(token,
   # Select only columns that exist in the data
   existing_cols <- intersect(display_cols, names(abundance_data))
   display_data <- abundance_data %>% select(all_of(existing_cols))
-  print(display_data)
   # Filter display_names to match existing columns
   display_names <- display_names[display_cols %in% existing_cols]
 

@@ -13,6 +13,7 @@ plotSpeciesMap(
   time_period = NULL,
   interval = "Month",
   basemap = "Topographic",
+  spatial_features = NULL,
   show_heatmap = FALSE,
   output_file = NULL,
   output_format = "leaflet",

@@ -63,7 +63,6 @@ getSpeciesTable <- function(token,
   abundance_data <- getAbundance(
     collections = collections,
     interval = interval,
-    agency = agency_id,
     species = species,
     trap = trap,
     sex = sex,

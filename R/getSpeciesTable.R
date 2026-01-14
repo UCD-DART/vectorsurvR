@@ -5,10 +5,9 @@
 #' or time intervals. The table has output options based on document format.
 #'
 #' @param token Authentication token for API access, obtained from `getToken()`
-#' @param interval Time interval for aggregation. One of: "CollectionDate", "Week", "Biweek", "Month"
+#' @param interval Time interval for aggregation. One of: "CollectionDate", "Week", "Biweek", "Month", or NULL for year-level summary
 #' @param target_year The focal year to highlight in the plot (integer)
 #' @param cumulative T/F Adds columns for the cumulative sum count Default to FALSE
-#' @param include_trap_nights T/F Adds column for the tally of trap nights
 #' @param include_abundance T/F Adds column for abundance (non-cumulative only)
 #' @param species Character vector for filtering species. View species in your data `unique(data$species_display_name)`. Defaults to all species if no selection
 #' @param trap Character vector for filtering trap type by acronym. View trap types in your data`unique(data$trap_acronym`. Defaults to all trap types
@@ -24,24 +23,17 @@
 #' @export
 
 getSpeciesTable <- function(token,
-                             interval,
-                             target_year,
-                             cumulative = FALSE,
-                             include_trap_nights = TRUE,
-                             include_abundance = FALSE,
-                             species = NULL,
-                             trap = NULL,
-                             sex = "female",
-                             separate_by = NULL,
-                             output_format = "auto",
-                             caption = NULL,
-                             agency_id = NULL) {
-
-
-
-  # Get collections data
-  collections <- getArthroCollections(token, target_year, target_year,
-                                      arthropod = 'mosquito', agency_ids = agency_id, geocoded = T)
+                            interval = NULL,
+                            target_year,
+                            cumulative = FALSE,
+                            include_abundance = FALSE,
+                            species = NULL,
+                            trap = NULL,
+                            sex = "female",
+                            separate_by = NULL,
+                            output_format = "auto",
+                            caption = NULL,
+                            agency_id = NULL) {
 
   # Validate separate_by parameter
   if (!is.null(separate_by)) {
@@ -56,20 +48,17 @@ getSpeciesTable <- function(token,
     }
   }
 
-  # separate_by is already in the format needed for getAbundance separate_by
-  separate_by <- separate_by
+  # Get collections data
+  if(!is.null(separate_by) && any(c("city","county","spatial") %in% separate_by)){
+    collections <- getArthroCollections(token, target_year, target_year,
+                                        arthropod = 'mosquito', agency_id, geocoded = T)
+  } else {
+    collections <- getArthroCollections(token, target_year, target_year,
+                                        arthropod = 'mosquito', agency_id, geocoded = F)
+  }
 
-  # Get abundance data
-  abundance_data <- getAbundance(
-    collections = collections,
-    interval = interval,
-    species = species,
-    trap = trap,
-    sex = sex,
-    separate_by = separate_by
-  )
-  # Keep the nice display names from getAbundance output
-  # Map from user input (short names) to getAbundance column names (formatted display names)
+  # Map separate_by to display names
+  separate_by_display <- NULL
   if (!is.null(separate_by)) {
     input_to_display <- c(
       "site" = "Site_Name",
@@ -79,21 +68,70 @@ getSpeciesTable <- function(token,
       "trap" = "Trap",
       "spatial" = "Spatial"
     )
-
-    # Replace separate_by with the actual column names that exist in the data
-    separate_by <- input_to_display[separate_by]
-    separate_by <- separate_by[!is.na(separate_by)]
+    separate_by_display <- input_to_display[separate_by]
+    separate_by_display <- separate_by_display[!is.na(separate_by_display)]
   }
+
+  # Get abundance data
+  if (is.null(interval)) {
+    # For year-level summary, get granular data and aggregate
+    abundance_data <- getAbundance(
+      collections = collections,
+      interval = "CollectionDate",
+      species = species,
+      trap = trap,
+      sex = sex,
+      separate_by = separate_by
+    )
+
+    # Aggregate to year level - no abundance column since it doesn't make sense for yearly data
+    group_vars <- c("Species")
+    if (!is.null(separate_by_display)) {
+      # Use the display names that actually exist in abundance_data
+      existing_separate_cols <- intersect(separate_by_display, names(abundance_data))
+      if (length(existing_separate_cols) > 0) {
+        group_vars <- c(group_vars, existing_separate_cols)
+      }
+    }
+
+    abundance_data <- abundance_data %>%
+      group_by(across(all_of(group_vars))) %>%
+      summarise(
+        Count = sum(Count, na.rm = TRUE),
+        TrapEvents = sum(TrapEvents, na.rm = TRUE),
+        .groups = "drop"
+      )
+  } else {
+    # For interval-based summary, use interval directly
+    abundance_data <- getAbundance(
+      collections = collections,
+      interval = interval,
+      species = species,
+      trap = trap,
+      sex = sex,
+      separate_by = separate_by
+    )
+  }
+
+  # Add Year column
+  abundance_data <- abundance_data %>%
+    mutate(Year = target_year)
 
   # Calculate cumulative values if requested
   if (cumulative) {
     cum_group_vars <- c("Species")
-    if (!is.null(separate_by)) {
-      cum_group_vars <- c(cum_group_vars, separate_by)
+    if (!is.null(separate_by_display)) {
+      cum_group_vars <- c(cum_group_vars, separate_by_display)
+    }
+
+    # Determine ordering variables
+    order_vars <- cum_group_vars
+    if (!is.null(interval)) {
+      order_vars <- c(order_vars, interval)
     }
 
     abundance_data <- abundance_data %>%
-      arrange(across(all_of(c(cum_group_vars, interval)))) %>%
+      arrange(across(all_of(order_vars))) %>%
       group_by(across(all_of(cum_group_vars))) %>%
       mutate(
         Cumulative_Count = cumsum(Count),
@@ -103,35 +141,39 @@ getSpeciesTable <- function(token,
   }
 
   # Build column selection dynamically
-  display_cols <- c(interval, "Species")
-  display_names <- c(interval, "Species")
+  display_cols <- c()
+  display_names <- c()
+
+  # Add interval if provided
+  if (!is.null(interval)) {
+    display_cols <- c(display_cols, interval)
+    display_names <- c(display_names, interval)
+  }
+
+  # Add Year column after interval
+  display_cols <- c(display_cols, "Year")
+  display_names <- c(display_names, "Year")
+
+  # Add Species
+  display_cols <- c(display_cols, "Species")
+  display_names <- c(display_names, "Species")
 
   # Add grouping columns
-  if (!is.null(separate_by)) {
-    display_cols <- c(display_cols, separate_by)
-    display_names <- c(display_names, separate_by)
+  if (!is.null(separate_by_display)) {
+    display_cols <- c(display_cols, separate_by_display)
+    display_names <- c(display_names, separate_by_display)
   }
 
   # Add count and trap event columns based on cumulative flag
   if (cumulative) {
-    display_cols <- c(display_cols, "Cumulative_Count")
-    display_names <- c(display_names, "Cumulative Count")
-
-    if (include_trap_nights) {
-      display_cols <- c(display_cols, "Cumulative_TrapEvents")
-      display_names <- c(display_names, "Cumulative Trap Events")
-    }
+    display_cols <- c(display_cols, "Cumulative_Count", "Cumulative_TrapEvents")
+    display_names <- c(display_names, "Cumulative Count", "Cumulative Trap Events")
   } else {
-    display_cols <- c(display_cols, "Count")
-    display_names <- c(display_names, "Count")
+    display_cols <- c(display_cols, "Count", "TrapEvents")
+    display_names <- c(display_names, "Count", "Trap Events")
 
-    if (include_trap_nights) {
-      display_cols <- c(display_cols, "TrapEvents")
-      display_names <- c(display_names, "Trap Events")
-    }
-
-    # Only add abundance for non-cumulative
-    if (include_abundance && "Abundance" %in% names(abundance_data)) {
+    # Only add abundance for non-cumulative and when interval is not NULL
+    if (include_abundance && !is.null(interval) && "Abundance" %in% names(abundance_data)) {
       display_cols <- c(display_cols, "Abundance")
       display_names <- c(display_names, "Abundance")
     }
@@ -140,21 +182,28 @@ getSpeciesTable <- function(token,
   # Select only columns that exist in the data
   existing_cols <- intersect(display_cols, names(abundance_data))
   display_data <- abundance_data %>% select(all_of(existing_cols))
+
   # Filter display_names to match existing columns
   display_names <- display_names[display_cols %in% existing_cols]
 
   # Generate caption if not provided
   if (is.null(caption)) {
-    grouping_text <- if (!is.null(separate_by)) {
-      paste("Grouped by:", paste(separate_by, collapse = ", "))
+    grouping_text <- if (!is.null(separate_by_display)) {
+      paste("Grouped by:", paste(separate_by_display, collapse = ", "))
     } else {
       "Overall"
+    }
+
+    interval_text <- if (!is.null(interval)) {
+      paste("- Interval:", interval)
+    } else {
+      "- Year Summary"
     }
 
     caption <- paste(
       "Mosquito Collection Summary -", target_year,
       ifelse(cumulative, "(Cumulative)", "(Non-cumulative)"),
-      "- Interval:", interval, "-", grouping_text
+      interval_text, "-", grouping_text
     )
   }
 
@@ -175,7 +224,9 @@ getSpeciesTable <- function(token,
   }
 
   # Calculate number of label vs numeric columns for alignment
-  n_label_cols <- length(c(interval, "Species", separate_by))
+  label_col_names <- c(interval, "Year", "Species", separate_by_display)
+  label_col_names <- label_col_names[!is.na(label_col_names) & !is.null(label_col_names)]
+  n_label_cols <- length(label_col_names)
   n_numeric_cols <- length(display_names) - n_label_cols
 
   # Create kable table

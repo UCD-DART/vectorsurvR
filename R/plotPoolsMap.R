@@ -1,19 +1,72 @@
+#' @title Create Interactive Map of Mosquito Pool Testing Data
+#'
+#' @description Generates an interactive Leaflet map visualizing mosquito pool testing results
+#' by location, species, and test outcome. The map displays positive and negative pools,
+#' monitoring sites, and optional spatial features with filtering capabilities.
+#'
+#' @param token Authentication token for API access (character)
+#' @param target_year Target surveillance year for data retrieval (numeric)
+#' @param target_disease Optional vector of disease acronyms to filter results (character)
+#' @param species Optional vector of species names to filter results (character)
+#' @param trap_type Optional vector of trap acronyms to filter results (character)
+#' @param agency_ids Optional vector of agency IDs to filter results (character)
+#' @param time_period Optional time period to filter results within the year (character)
+#' @param interval Time interval for grouping data: "Week", "Biweek", "Month", or "Year" (character, default = "Month")
+#' @param basemap Base map type: "Topographic", "Satellite", "Terrain", or "OpenTopoMap" (character, default = "Topographic")
+#' @param spatial_features Optional vector of spatial feature names to display (character)
+#' @param show_agency_boundaries Whether to display agency boundaries (logical, default = TRUE)
+#' @param output_file Optional file path to save map output (character)
+#' @param output_format Output format: "html" (interactive), "pdf", or "png" (character, default = "html")
+#' @param width Map width in pixels for saved output (numeric, default = 1200)
+#' @param height Map height in pixels for saved output (numeric, default = 800)
+#'
+#' @return If output_format = "html", returns a Leaflet map object. If output_format = "pdf" or "png",
+#' returns the map object and saves to the specified file.
+#'
+#' @export
+#' @importFrom leaflet leaflet addProviderTiles addPolygons addCircleMarkers addControl
+#' @importFrom leaflet addScaleBar addLayersControl fitBounds addLegend
+#' @importFrom leaflet.minicharts addMinicharts
+#' @importFrom dplyr filter group_by summarise mutate distinct left_join semi_join
+#' @importFrom dplyr arrange ungroup case_when
+#' @importFrom tidyr pivot_wider
+#' @importFrom lubridate epiweek month
+#' @importFrom sf st_as_sf
+#' @importFrom viridis plasma
+#' @importFrom htmltools HTML
+#'
+#' @examples
+#' \dontrun{
+#' # Basic map for 2023 data
+#' map <- plotPoolsMap(token = my_token, target_year = 2023)
+#'
+#' # Map with specific disease and time period
+#' map <- plotPoolsMap(
+#'   token = my_token,
+#'   target_year = 2023,
+#'   target_disease = "WNV",
+#'   time_period = "July",
+#'   interval = "Month"
+#' )
+#'
+#' # Map with spatial features and agency boundaries
+#' map <- plotPoolsMap(
+#'   token = my_token,
+#'   target_year = 2023,
+#'   agency_ids = 55,
+#'   spatial_features = c("Zone3", "Downtown"),
+#'   basemap = "Satellite"
+#' )
+#'
+#' }
 plotPoolsMap<- function(token, target_year, target_disease = NULL,
-                                      target_species = NULL, trap_type = NULL,
+                                      species = NULL, trap_type = NULL,
                                       agency_ids = NULL, time_period = NULL,
                                       interval = "Month", basemap = "Topographic",
                                       spatial_features = NULL, show_agency_boundaries = TRUE,
-                                      output_file = NULL, output_format = "leaflet",
+                                      output_file = NULL, output_format = "html",
                                       width = 1200, height = 800) {
 
-  library(leaflet)
-  library(leaflet.extras)
-  library(leaflet.minicharts)
-  library(dplyr)
-  library(viridis)
-  library(lubridate)
-  library(tidyr)
-  library(sf)
 
   # Get spatial features if requested
   spatial_filtered <- NULL
@@ -60,8 +113,8 @@ plotPoolsMap<- function(token, target_year, target_disease = NULL,
     data <- data %>% filter(test_target_acronym %in% target_disease)
   }
 
-  if (!is.null(target_species)) {
-    data <- data %>% filter(species_display_name %in% target_species)
+  if (!is.null(species)) {
+    data <- data %>% filter(species_display_name %in% species)
   }
 
   if (!is.null(trap_type)) {

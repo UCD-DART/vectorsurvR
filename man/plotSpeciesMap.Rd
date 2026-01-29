@@ -2,16 +2,16 @@
 % Please edit documentation in R/plotSpeciesMap.R
 \name{plotSpeciesMap}
 \alias{plotSpeciesMap}
-\title{Plot Species Map}
+\title{Create Interactive Map of Mosquito Species Collection Data}
 \usage{
 plotSpeciesMap(
   token,
   target_year,
-  target_species = NULL,
-  trap_type = NULL,
+  species = NULL,
+  trap = NULL,
   agency_ids = NULL,
+  interval = NULL,
   time_period = NULL,
-  interval = "Month",
   basemap = "Topographic",
   spatial_features = NULL,
   show_heatmap = FALSE,
@@ -22,14 +22,41 @@ plotSpeciesMap(
 )
 }
 \arguments{
-\item{token}{x}
+\item{token}{Authentication token for API access retrieved from getToken()}
 
-\item{target_year}{x}
+\item{target_year}{Target surveillance year for data retrieval}
 
-\item{target_species}{x}
+\item{species}{Optional vector of species names to filter results. View  with `unique(data$species_display_name)`}
 
-\item{trap_type}{x}
+\item{trap}{Optional vector of trap acronyms to filter results. View available
+trap types with `unique(data$trap_acronym)`}
+
+\item{agency_ids}{Optional vector of agency IDs to filter results when access to multiple agencies}
+
+\item{interval}{Time interval to select time period from: "Week", "Biweek", "Month" or NULL. If NULL data is for entire year.}
+
+\item{time_period}{Optional time period to filter results within the designated interval. Can be numeric
+(1-12 for months) or character (e.g., "July", "Week 5")}
+
+\item{basemap}{Base map design: "Topographic", "Satellite", or "Terrain"}
+
+\item{spatial_features}{Optional vector of spatial feature names to display as polygons. View available features using `getSpatialFeatures()`}
+
+\item{show_heatmap}{Whether to display heatmap layer}
+
+\item{output_file}{Optional file path to save map output}
+
+\item{output_format}{X}
+
+\item{width}{Map width in pixels for saved output (numeric, default = 1200)}
+
+\item{height}{Map height in pixels for saved output (numeric, default = 800)}
+}
+\value{
+Returns a map object visualizing mosquito species collection data. Returns
+        NULL if no data is available after filtering.
 }
 \description{
-Plot map of mosquito species
+Generates an interactive Leaflet map visualizing mosquito species collection data and monitoring sites
+from surveillance activities. Displays collection locations colored by species found in that location during the indicated time period, with the option to include spatial features
 }

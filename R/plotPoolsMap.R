@@ -88,7 +88,7 @@ plotPoolsMap<- function(token, target_year, target_disease = NULL,
   agency <- NULL
   if(show_agency_boundaries == TRUE){
     agency <- getAgency(token)
-    agency <- filter(id %in% agency_ids)
+    agency <- agency %>% filter(id %in% agency_ids)
     if(!is.null(agency) && nrow(agency) > 0) {
       cat("Loaded", nrow(agency), "agency boundaries\n")
     } else {
@@ -191,15 +191,13 @@ plotPoolsMap<- function(token, target_year, target_disease = NULL,
   m <- leaflet() %>%
     {
       if (basemap == "Satellite") {
-        addProviderTiles(., providers$Esri.WorldImagery)
+        addProviderTiles(., "Esri.WorldImagery")
       } else if (basemap == "Topographic") {
-        addProviderTiles(., providers$Esri.WorldTopoMap)
+        addProviderTiles(., "Esri.WorldTopoMap")
       } else if (basemap == "Terrain") {
-        addProviderTiles(., providers$Esri.WorldTerrain)
-      } else if (basemap == "OpenTopoMap") {
-        addProviderTiles(., providers$OpenTopoMap)
+        addProviderTiles(., "Esri.WorldTerrain")
       } else {
-        addProviderTiles(., providers$Esri.WorldTopoMap)
+        addProviderTiles(., "Esri.WorldTopoMap")
       }
     }
 

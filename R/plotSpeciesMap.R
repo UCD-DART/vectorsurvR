@@ -14,17 +14,13 @@
 #'  (1-12 for months) or character (e.g., "July", "Week 5")
 #' @param basemap Base map design: "Topographic", "Satellite", or "Terrain"
 #' @param spatial_features Optional vector of spatial feature names to display as polygons. View available features using `getSpatialFeatures()`
-#' @param show_heatmap Whether to display heatmap layer
-#' @param output_file Optional file path to save map output
-#' @param output_format X
 #' @param width Map width in pixels for saved output (numeric, default = 1200)
 #' @param height Map height in pixels for saved output (numeric, default = 800)
 #' @importFrom leaflet leaflet addProviderTiles addCircleMarkers addPolygons addLegend addControl addScaleBar addLayersControl layersControlOptions fitBounds colorFactor addMarkers makeIcon
 #' @importFrom dplyr filter mutate group_by summarise ungroup left_join semi_join distinct first row_number n
-#' @importFrom sf st_crs st_make_valid st_as_sf st_sf st_polygon st_sfc
+#' @importFrom sf st_crs<- st_make_valid st_as_sf st_sf st_polygon st_sfc st_crs
 #' @importFrom viridis plasma
 #' @importFrom lubridate epiweek
-#' @importFrom htmltools HTML
 #'
 #' @return Returns a map object visualizing mosquito species collection data. Returns
 #'         NULL if no data is available after filtering.
@@ -33,8 +29,7 @@
 plotSpeciesMap <- function(token, target_year, species = NULL,
                            trap = NULL, agency_ids = NULL, interval = NULL,
                            time_period = NULL, basemap = "Topographic", spatial_features = NULL,
-                           show_heatmap = FALSE, output_file = NULL,
-                           output_format = "leaflet", width = 1200, height = 800) {
+                           width = 1200, height = 800) {
 
   # Helper function to create SVG pie chart
   create_pie_svg <- function(values, colors, radius = 20) {

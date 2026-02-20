@@ -33,7 +33,6 @@
 #' @importFrom lubridate epiweek month
 #' @importFrom sf st_as_sf
 #' @importFrom viridis plasma
-#' @importFrom htmltools HTML
 #'
 #' @examples
 #' \dontrun{

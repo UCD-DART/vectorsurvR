@@ -14,9 +14,6 @@ plotSpeciesMap(
   time_period = NULL,
   basemap = "Topographic",
   spatial_features = NULL,
-  show_heatmap = FALSE,
-  output_file = NULL,
-  output_format = "leaflet",
   width = 1200,
   height = 800
 )
@@ -41,12 +38,6 @@ trap types with `unique(data$trap_acronym)`}
 \item{basemap}{Base map design: "Topographic", "Satellite", or "Terrain"}
 
 \item{spatial_features}{Optional vector of spatial feature names to display as polygons. View available features using `getSpatialFeatures()`}
-
-\item{show_heatmap}{Whether to display heatmap layer}
-
-\item{output_file}{Optional file path to save map output}
-
-\item{output_format}{X}
 
 \item{width}{Map width in pixels for saved output (numeric, default = 1200)}
 

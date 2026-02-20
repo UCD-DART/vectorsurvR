@@ -17,7 +17,8 @@ getToken = function() {
 
   # Create and send request
   req <- request("https://api.vectorsurv.org/login") %>%
-    req_headers("Content-Type" = "application/json") %>%
+    req_headers("Content-Type" = "application/json",
+                "X-User-Agent" = "r-package") %>%
     req_body_json(list(
       username = username,
       password = password

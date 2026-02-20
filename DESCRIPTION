@@ -24,12 +24,9 @@ Imports:
     ggplot2,
     rlang,
     leaflet,
-    leaflet.extras,
-    leaflet.minicharts,
+    base64enc,
     viridis,
-    mapview,
-    webshot,
-    webshot2
+    leaflet.minicharts
 Suggests: 
     testthat (>= 3.0.0),
     rmarkdown,

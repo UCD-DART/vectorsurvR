@@ -9,17 +9,15 @@ plotPoolsMap(
   target_year,
   target_disease = NULL,
   species = NULL,
-  trap_type = NULL,
+  trap = NULL,
   agency_ids = NULL,
   time_period = NULL,
   interval = "Month",
   basemap = "Topographic",
   spatial_features = NULL,
   show_agency_boundaries = TRUE,
-  output_file = NULL,
-  output_format = "html",
-  width = 1200,
-  height = 800
+  html = TRUE,
+  height = 400
 )
 }
 \arguments{
@@ -31,7 +29,7 @@ plotPoolsMap(
 
 \item{species}{Optional vector of species names to filter results (character)}
 
-\item{trap_type}{Optional vector of trap acronyms to filter results (character)}
+\item{trap}{Optional vector of trap acronyms to filter results (character)}
 
 \item{agency_ids}{Optional vector of agency IDs to filter results (character)}
 
@@ -45,17 +43,13 @@ plotPoolsMap(
 
 \item{show_agency_boundaries}{Whether to display agency boundaries (logical, default = TRUE)}
 
-\item{output_file}{Optional file path to save map output (character)}
+\item{html}{Logical. TRUE (default) returns an interactive leaflet widget for HTML output.
+Set to FALSE when knitting to Word or PDF to return a static screenshot instead.}
 
-\item{output_format}{Output format: "html" (interactive), "pdf", or "png" (character, default = "html")}
-
-\item{width}{Map width in pixels for saved output (numeric, default = 1200)}
-
-\item{height}{Map height in pixels for saved output (numeric, default = 800)}
+\item{height}{Pixel height of the screenshot when html = FALSE. Default is 400.}
 }
 \value{
-If output_format = "html", returns a Leaflet map object. If output_format = "pdf" or "png",
-returns the map object and saves to the specified file.
+A leaflet map object (html = TRUE) or a static image (html = FALSE).
 }
 \description{
 Generates an interactive Leaflet map visualizing mosquito pool testing results
@@ -64,26 +58,34 @@ monitoring sites, and optional spatial features with filtering capabilities.
 }
 \examples{
 \dontrun{
-# Basic map for 2023 data
-map <- plotPoolsMap(token = my_token, target_year = 2023)
+# Basic map for a target year
+plotPoolsMap(token, target_year = 2023)
 
-# Map with specific disease and time period
-map <- plotPoolsMap(
-  token = my_token,
-  target_year = 2023,
+# Filter by disease and time period
+plotPoolsMap(
+  token          = token,
+  target_year    = 2023,
   target_disease = "WNV",
-  time_period = "July",
-  interval = "Month"
+  interval       = "Month",
+  time_period    = "July"
 )
 
-# Map with spatial features and agency boundaries
-map <- plotPoolsMap(
-  token = my_token,
-  target_year = 2023,
-  agency_ids = 55,
+# With spatial features and satellite basemap
+plotPoolsMap(
+  token            = token,
+  target_year      = 2023,
+  agency_ids       = 55,
   spatial_features = c("Zone3", "Downtown"),
-  basemap = "Satellite"
+  basemap          = "Satellite"
 )
 
+# Static output for Word or PDF reports
+plotPoolsMap(
+  token          = token,
+  target_year    = 2023,
+  target_disease = "WNV",
+  html           = FALSE,
+  height         = 500
+)
 }
 }

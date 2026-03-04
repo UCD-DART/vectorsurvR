@@ -3,7 +3,6 @@
 #' Retrieves VectorSurv agency data with shape coordinates converted to sf geometry
 #' @param token Access token retrieved from `getToken()`
 #' @return An sf object containing agency data with geometry
-#' @export
 #' @importFrom httr2 request req_headers req_perform resp_body_string req_url_query
 #' @importFrom jsonlite fromJSON
 #' @importFrom dplyr bind_rows

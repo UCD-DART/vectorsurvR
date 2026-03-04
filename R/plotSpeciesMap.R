@@ -14,11 +14,11 @@
 #'  (1-12 for months) or character (e.g., "July", "Week 5")
 #' @param basemap Base map design: "Topographic", "Satellite", or "Terrain"
 #' @param spatial_features Optional vector of spatial feature names to display as polygons. View available features using `getSpatialFeatures()`
-#' @param width Map width in pixels for saved output (numeric, default = 1200)
-#' @param height Map height in pixels for saved output (numeric, default = 800)
+#' @param html T/F Is this map for use in an html document? If not, map will be converted in to a screenshot
+#' @param height T/F Relevant for non html files. Sets the height of the map image
 #' @importFrom leaflet leaflet addProviderTiles addCircleMarkers addPolygons addLegend addControl addScaleBar addLayersControl layersControlOptions fitBounds colorFactor addMarkers makeIcon
 #' @importFrom dplyr filter mutate group_by summarise ungroup left_join semi_join distinct first row_number n
-#' @importFrom sf st_crs<- st_make_valid st_as_sf st_sf st_polygon st_sfc st_crs
+#' @importFrom sf st_make_valid st_as_sf st_sf st_polygon st_sfc st_crs st_crs<-
 #' @importFrom viridis plasma
 #' @importFrom lubridate epiweek
 #'
@@ -28,8 +28,8 @@
 #' @export
 plotSpeciesMap <- function(token, target_year, species = NULL,
                            trap = NULL, agency_ids = NULL, interval = NULL,
-                           time_period = NULL, basemap = "Topographic", spatial_features = NULL,
-                           width = 1200, height = 800) {
+                           time_period = NULL, basemap = "Topographic",
+                           spatial_features = NULL, html = TRUE, height = 400) {
 
   # Helper function to create SVG pie chart
   create_pie_svg <- function(values, colors, radius = 20) {
@@ -465,15 +465,14 @@ plotSpeciesMap <- function(token, target_year, species = NULL,
     }
   }
 
+  # Keep this for both html and static - just one title_text, no if/else
   title_text <- paste0(
-    "<div style='background:white;padding:8px;border-radius:4px;'>",
+    "<div style='background:white;padding:8px;border-radius:4px;text-align:left;'>",
     "<b>", paste(title_parts, collapse = " | "), "</b>",
     "</div>"
   )
 
-  m <- m %>%
-    addControl(html = title_text, position = "topright") %>%
-    addScaleBar(position = "bottomleft")
+  m <- m %>% addControl(html = title_text, position = "topleft")
 
   # Add layers control
   groups <- c("Monitoring Sites", "Collections")
@@ -484,11 +483,13 @@ plotSpeciesMap <- function(token, target_year, species = NULL,
     groups <- c(groups, "Agency Boundaries")
   }
 
-  m <- m %>%
-    addLayersControl(
-      overlayGroups = groups,
-      options = layersControlOptions(collapsed = FALSE)
-    )
+  if (html) {
+    m <- m %>%
+      addLayersControl(
+        overlayGroups = groups,
+        options = layersControlOptions(collapsed = FALSE)
+      )
+  }
 
   # Set bounds
   m <- m %>%
@@ -499,8 +500,10 @@ plotSpeciesMap <- function(token, target_year, species = NULL,
       max(data$collection_latitude, na.rm = TRUE)
     )
 
-  cat("Map complete!\n")
-  cat("====================\n\n")
+  if (html) {
+    suppressWarnings(return(m))
+  } else {
+    return(.show_map(m, height = height))
+  }
 
-  suppressWarnings(return(m))
 }

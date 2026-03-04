@@ -14,8 +14,8 @@ plotSpeciesMap(
   time_period = NULL,
   basemap = "Topographic",
   spatial_features = NULL,
-  width = 1200,
-  height = 800
+  html = TRUE,
+  height = 400
 )
 }
 \arguments{
@@ -39,9 +39,9 @@ trap types with `unique(data$trap_acronym)`}
 
 \item{spatial_features}{Optional vector of spatial feature names to display as polygons. View available features using `getSpatialFeatures()`}
 
-\item{width}{Map width in pixels for saved output (numeric, default = 1200)}
+\item{html}{T/F Is this map for use in an html document? If not, map will be converted in to a screenshot}
 
-\item{height}{Map height in pixels for saved output (numeric, default = 800)}
+\item{height}{T/F Relevant for non html files. Sets the height of the map image}
 }
 \value{
 Returns a map object visualizing mosquito species collection data. Returns

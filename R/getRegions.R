@@ -1,6 +1,6 @@
 #' @title Get region data
 #' @description
-#' `getSites()` obtains site data for authorized VectorSurv Gateway accounts.
+#' `getRegions()` obtains region data for authorized VectorSurv Gateway accounts.
 #' @param token A valid access token returned from `getToken()`
 #' @return A dataframe of region data, used internally to merge spatial information to collections
 

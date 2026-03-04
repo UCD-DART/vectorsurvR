@@ -4,7 +4,6 @@
 #' @param token Access token retrieved from `getToken()`
 #' @param agency_ids Optional vector of agency IDs to filter by
 #' @return An sf object containing spatial features data
-#' @export
 #' @importFrom httr2 request req_headers req_perform resp_body_string req_url_query
 #' @importFrom jsonlite fromJSON
 #' @importFrom dplyr bind_rows

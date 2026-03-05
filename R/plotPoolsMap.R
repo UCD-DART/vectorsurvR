@@ -127,11 +127,15 @@ plotPoolsMap <- function(token, target_year, target_disease = NULL,
   if (!is.null(species)) {
     data <- data %>% filter(species_display_name %in% species)
     cat("Filtered to species:", paste(species, collapse = ", "), "\n")
+  } else {
+    cat("No species filter applied — including all species\n")
   }
 
   if (!is.null(trap)) {
     data <- data %>% filter(trap_acronym %in% trap)
     cat("Filtered to trap(s):", paste(trap, collapse = ", "), "\n")
+  } else {
+    cat("No trap filter applied — including all traps\n")
   }
 
   # Remove rows with missing coordinates
@@ -158,12 +162,22 @@ plotPoolsMap <- function(token, target_year, target_disease = NULL,
         interval == "Year"   ~ year,
         TRUE                 ~ year
       ),
+      # FIX: Added catch-all TRUE ~ "Unknown" so rows with unexpected
+      # test_status_name values are not silently dropped as NA
       test_result = case_when(
         tolower(test_status_name) == "confirmed" ~ "Positive",
         tolower(test_status_name) == "negative"  ~ "Negative",
-        tolower(test_status_name) == "pending"   ~ "Pending"
+        tolower(test_status_name) == "pending"   ~ "Pending",
+        TRUE                                     ~ "Unknown"
       )
     )
+
+  # Diagnostic: show what test_status_name values came back from the API
+  cat("Unique test_status_name values from API:", paste(unique(data_full$test_status_name), collapse = ", "), "\n")
+  cat("Mapped test_result values:", paste(unique(data$test_result), collapse = ", "), "\n")
+  cat("Rows per test_result:\n")
+  print(table(data$test_result, useNA = "always"))
+  cat("================================\n\n")
 
   # Filter to specific time period if requested
   if (!is.null(time_period) && interval != "Year") {
@@ -208,6 +222,8 @@ plotPoolsMap <- function(token, target_year, target_disease = NULL,
   positive_pools <- map_data %>% filter(test_result == "Positive")
   negative_pools <- map_data %>% filter(test_result == "Negative")
 
+  cat("Positive pool locations:", nrow(positive_pools), "\n")
+  cat("Negative pool locations:", nrow(negative_pools), "\n")
   cat("=== BUILDING MAP ===\n")
 
   # Create base map

@@ -50,7 +50,7 @@
 #' @import ggplot2
 #' @importFrom scales hue_pal
 #' @export
-plotVectorAbundance <- function(token, interval, target_year, start_year = NULL, end_year = NULL, species, trap, agency_ids = NULL, sex = "female", trapnight_min = 1, trapnight_max = NULL) {
+plotVectorAbundance <- function(token, interval, target_year, start_year = NULL, end_year = NULL, species, trap=NULL, agency_ids = NULL, sex = "female", trapnight_min = 1, trapnight_max = NULL) {
 
   # Validate input parameters
   if (is.null(end_year)) {

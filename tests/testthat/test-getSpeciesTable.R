@@ -150,15 +150,13 @@ test_that("getSpeciesTable parameter validation works", {
 test_that("getSpeciesTable handles edge cases with testing data", {
   mockery::stub(getSpeciesTable, "getArthroCollections", vectorsurvR:::testing_collections)
 
-      # Test with include_trap_nights = FALSE
       result_no_trap <- getSpeciesTable(
         token = "dummy-token",
         interval = "Month",
         target_year = 2023,
-        include_trap_nights = FALSE,
         output_format = "simple"
       )
-      expect_false("TrapEvents" %in% names(result_no_trap))
+      expect_true("TrapEvents" %in% names(result_no_trap))
 
       # Test with include_abundance = TRUE (non-cumulative)
       result_abund <- getSpeciesTable(

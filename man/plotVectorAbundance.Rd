@@ -11,7 +11,7 @@ plotVectorAbundance(
   start_year = NULL,
   end_year = NULL,
   species,
-  trap,
+  trap = NULL,
   agency_ids = NULL,
   sex = "female",
   trapnight_min = 1,

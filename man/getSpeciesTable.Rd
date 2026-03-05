@@ -6,10 +6,9 @@
 \usage{
 getSpeciesTable(
   token,
-  interval,
+  interval = NULL,
   target_year,
   cumulative = FALSE,
-  include_trap_nights = TRUE,
   include_abundance = FALSE,
   species = NULL,
   trap = NULL,
@@ -23,13 +22,11 @@ getSpeciesTable(
 \arguments{
 \item{token}{Authentication token for API access, obtained from `getToken()`}
 
-\item{interval}{Time interval for aggregation. One of: "CollectionDate", "Week", "Biweek", "Month"}
+\item{interval}{Time interval for aggregation. One of: "CollectionDate", "Week", "Biweek", "Month", or NULL for year-level summary}
 
 \item{target_year}{The focal year to highlight in the plot (integer)}
 
 \item{cumulative}{T/F Adds columns for the cumulative sum count Default to FALSE}
-
-\item{include_trap_nights}{T/F Adds column for the tally of trap nights}
 
 \item{include_abundance}{T/F Adds column for abundance (non-cumulative only)}
 

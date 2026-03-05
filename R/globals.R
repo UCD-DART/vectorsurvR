@@ -1,6 +1,6 @@
 #global var NOTE
 
-utils::globalVariables(c("test","Confirmed","Negative","Positive","arthropods","Abundance","Total","PointEstimate","ticks","UpperCI","LowerCI","INTERVAL","pool_id","surv_year" ,"InfectionRate","TrapEvents", "test_target_vector","target_acronym","target_icd_10","status_name","value","collection_date", "sex" ,"num_count","test_target_acronym" , "test_status_name" , "sex_type" ,"trap_acronym","collection_id","trap_problem_bit","trap_nights","num_trap","species_display_name","add_date", "agency_code", "agency_id", "agency_name", "attached", "bloodfed",
+utils::globalVariables(c("code","st_crs","st_crs<-","month_name","biweek","week","total_pools","species_pools","mosquito_count","pool_count","test_result","test","Confirmed","Negative","Positive","arthropods","Abundance","Total","PointEstimate","ticks","UpperCI","LowerCI","INTERVAL","pool_id","surv_year" ,"InfectionRate","TrapEvents", "test_target_vector","target_acronym","target_icd_10","status_name","value","collection_date", "sex" ,"num_count","test_target_acronym" , "test_status_name" , "sex_type" ,"trap_acronym","collection_id","trap_problem_bit","trap_nights","num_trap","species_display_name","add_date", "agency_code", "agency_id", "agency_name", "attached", "bloodfed",
                          "collection", "collection_date_end", "collection_date_start", "Year","lures","lures_code","lures_weight","lures_description","collection_num",
                          "comments","OriginalInterval" ,"INTERVAL_MMDD","conditions_moisture", "conditions_sunlight", "deactive_date", "host",
                          "humidity","Agency","Trap","Species","Disease","name","Count","pick" ,"identified_by", "test_method_acronym", "test_method_name", "pool_comments",
@@ -13,7 +13,13 @@ utils::globalVariables(c("test","Confirmed","Negative","Positive","arthropods","
                          "df",
                          "geocoded",
                          "target_year",
-                         "FiveYearAvg",'geocoded_city','geocoded_county'
+                         "FiveYearAvg",'geocoded_city','geocoded_county', 'time_period_value',
+                         'is_active','n','first','species_count','leaflet',
+                         'addProviderTiles','providers','addCircleMarkers',
+                         'total_count','addHeatmap','n_species','semi_join',
+                         'colorFactor','addMinicharts','addLegend','addControl',
+                         'addScaleBar','addLayersControl','layersControlOptions',
+                         'fitBounds','mapshot'
 ))
 
 

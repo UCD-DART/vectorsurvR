@@ -1,39 +1,31 @@
-#' Get Spatial Features data
+#' Get Agency data
 #'
-#' Retrieves VectorSurv spatial features data with optional agency filtering
+#' Retrieves VectorSurv agency data with shape coordinates converted to sf geometry
 #' @param token Access token retrieved from `getToken()`
-#' @param agency_ids Optional vector of agency IDs to filter by
-#' @return An sf object containing spatial features data
+#' @return An sf object containing agency data with geometry
 #' @importFrom httr2 request req_headers req_perform resp_body_string req_url_query
 #' @importFrom jsonlite fromJSON
 #' @importFrom dplyr bind_rows
 #' @importFrom sf st_multipolygon st_sfc st_as_sf st_make_valid
 #' @examples
-#' \dontrun{token=getToken()
-#' spatial = getSpatialFeatures(token)}
+#' \dontrun{
+#' token <- getToken()
+#' agency <- getAgency(token)
+#' }
 #' @export
-
-getSpatialFeatures <- function(token, agency_ids = NULL) {
+getAgency <- function(token) {
   if (is.null(token) || !is.character(token)) {
     stop("Invalid token. Check username and password")
   }
 
-  # Handle multiple agencies with recursion
-  if (!is.null(agency_ids) && length(agency_ids) > 1) {
-    spatial_list <- lapply(agency_ids, function(aid) {
-      getSpatialFeatures(token, agency_ids = aid)
-    })
-    return(dplyr::bind_rows(spatial_list))
-  }
-
   # Initialize empty results
-  geofeat <- data.frame()
+  agency <- data.frame()
   page <- 1
 
   # Paginated API requests
   while(TRUE) {
-    # Build and execute request
-    req <- request("https://api.vectorsurv.org/v1/geo-feature") %>%
+    # Build request with httr2
+    req <- request("https://api.vectorsurv.org/v1/agency") %>%
       req_headers(
         Authorization = paste("Bearer", token),
         "Content-Type" = "application/json"
@@ -41,36 +33,41 @@ getSpatialFeatures <- function(token, agency_ids = NULL) {
       req_url_query(
         pageSize = "1000",
         page = as.character(page),
-        `query[agency][0]` = agency_ids
+        `populate[]` = "shape"
       )
 
+    # Execute request and process with jsonlite
     tryCatch({
-      # Get and parse response
       response <- req_perform(req)
       content <- resp_body_string(response)
       df_content <- fromJSON(content, flatten = TRUE)
 
-      # Break if no more results
       if (length(df_content$rows) <= 0) break
 
-      # Append results
-      geofeat <- dplyr::bind_rows(geofeat, df_content$rows)
+      agency <- bind_rows(agency, df_content$rows)
       page <- page + 1
-
     }, error = function(e) {
       stop("API request failed: ", e$message)
     })
   }
 
-  # Convert coordinates to sf multipolygon
+  # Convert coordinates to sf multipolygon (same function as getSpatialFeatures)
   convert_to_sf <- function(coords) {
-    if (is.list(coords)) {
-      coords <- coords[[1]]  # Extract if it's a list of one element
-      longs <- coords[coords < 0]  # Values < 0 are longitudes
-      lats <- coords[coords > 0]   # Values > 0 are latitudes
-    } else {
-      # Convert string of numbers into a numeric vector
-      coords <- as.numeric(unlist(coords, recursive = TRUE))
+    if (is.null(coords) || length(coords) == 0) {
+      return(sf::st_multipolygon())  # Return empty multipolygon
+    }
+
+    tryCatch({
+      # Flatten any nested list structures and convert to numeric
+      if (is.list(coords)) {
+        coords <- unlist(coords, recursive = TRUE)
+      }
+
+      # Convert to numeric vector
+      coords <- as.numeric(coords)
+
+      # Remove any NAs
+      coords <- coords[!is.na(coords)]
 
       # Ensure there's an even number of values
       if (length(coords) %% 2 != 0) {
@@ -94,20 +91,23 @@ getSpatialFeatures <- function(token, agency_ids = NULL) {
         longs <- c(longs, longs[1])
         lats <- c(lats, lats[1])
       }
-    }
 
-    # Create coordinate matrix and multipolygon
-    coord_matrix <- cbind(longs, lats)
-    sf::st_multipolygon(list(list(coord_matrix)))
+      # Create coordinate matrix and multipolygon
+      coord_matrix <- cbind(longs, lats)
+      sf::st_multipolygon(list(list(coord_matrix)))
+    }, error = function(e) {
+      warning("Error converting coordinates: ", e$message)
+      return(sf::st_multipolygon())  # Return empty multipolygon on error
+    })
   }
 
   # Convert to sf object if shape coordinates exist
-  if ("shape.coordinates" %in% colnames(geofeat)) {
-    geofeat$geometry <- lapply(geofeat$shape.coordinates, convert_to_sf)
-    geofeat$geometry <- sf::st_sfc(geofeat$geometry, crs = 4326)
-    geofeat$geometry <- sf::st_make_valid(geofeat$geometry)
-    geofeat <- sf::st_as_sf(geofeat)
+  if ("shape.coordinates" %in% colnames(agency)) {
+    agency$geometry <- lapply(agency$shape.coordinates, convert_to_sf)
+    agency$geometry <- suppressWarnings(sf::st_sfc(agency$geometry, crs = 4326))
+    agency$geometry <- suppressWarnings(sf::st_make_valid(agency$geometry))
+    agency <- sf::st_as_sf(agency)
   }
 
-  return(geofeat)
+  return(agency)
 }

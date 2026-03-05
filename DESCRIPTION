@@ -1,8 +1,13 @@
 Package: vectorsurvR
 Type: Package
 Title: Data Access and Analytical Tools for 'VectorSurv' Users
+<<<<<<< HEAD
 Version: 1.6.2
 Authors@R: person("Christina", "De Cesaris", email = "cmdecesaris@ucdavis.edu", role = c("aut", "cre"))
+=======
+Version: 1.6.3
+Authors@R: c(person("Christina", "De Cesaris", email = "cmdecesaris@ucdavis.edu", role = c("aut")),person("Lincoln", "Wells", email = "lcwells@ucdavus.edu", role = c("aut")),person("VectorSurv", "Staff", email = "help@vectorsurv.org", role = c("aut","cre")))
+>>>>>>> dev
 Description: Allows registered 'VectorSurv' <https://vectorsurv.org/> users access to data through the 'VectorSurv API' <https://api.vectorsurv.org/>. Additionally provides functions for analysis and visualization.
 License: GPL-3
 Encoding: UTF-8
@@ -22,12 +27,18 @@ Imports:
     sf,
     scales,
     ggplot2,
-    rlang
+    rlang,
+    leaflet,
+    base64enc,
+    viridis,
+    leaflet.minicharts
 Suggests: 
     testthat (>= 3.0.0),
     rmarkdown,
     devtools,
-    mockery
+    mockery,
+    webshot2,
+    htmlwidgets
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 

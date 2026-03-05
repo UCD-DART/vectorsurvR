@@ -23,6 +23,9 @@ plotInvasiveSums(
 
 \item{agency_ids}{An optional vector for filtering agency by id}
 }
+\value{
+ggplot object
+}
 \description{
 This function graphs the cumulative sum of invasive mosquito specie(s) as a line chart over a selected interval.The bar chart shows the interval sum of invasive specie(s).
 For cumulative sum, a convex slope indicates increased rate of species trappings, concave a decrease in rate, and liner a constant rate.

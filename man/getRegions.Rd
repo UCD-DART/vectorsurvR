@@ -13,5 +13,5 @@ getRegions(token)
 A dataframe of region data, used internally to merge spatial information to collections
 }
 \description{
-`getSites()` obtains site data for authorized VectorSurv Gateway accounts.
+`getRegions()` obtains region data for authorized VectorSurv Gateway accounts.
 }

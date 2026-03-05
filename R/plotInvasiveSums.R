@@ -8,6 +8,8 @@
 #' @param target_year Year to plot
 #' @param invasive_species Names of invasive species to be plotted, multiple invasive species are entered in vector format i.e. `invasive_species = c("Ae aegypti", "Ae albopictus")`
 #' @param agency_ids An optional vector for filtering agency by id
+#' @export
+#' @return ggplot object
 
 plotInvasiveSums <- function(token, interval, target_year, invasive_species, agency_ids = NULL) {
   # Get data for the last 5 years plus current year
@@ -95,7 +97,7 @@ plotInvasiveSums <- function(token, interval, target_year, invasive_species, age
     geom_point(aes(y = cumsum, color = Species, group = Species), size = 2) +
     labs(
       title = paste("Invasive Species:", paste(invasive_species, collapse = ", ")),
-      subtitle = paste("Counts and Cumulative Sum -", year),
+      subtitle = paste("Counts and Cumulative Sum -", target_year),
       x = interval,
       y = "Count",
       fill = "Species",

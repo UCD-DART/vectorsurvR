@@ -49,7 +49,11 @@ getSpeciesTable <- function(token,
   }
 
   # Get collections data
+<<<<<<< HEAD
   if(any(c("city","county","spatial") %in% separate_by)){
+=======
+  if(!is.null(separate_by) && any(c("city","county","spatial") %in% separate_by)){
+>>>>>>> dev
     collections <- getArthroCollections(token, target_year, target_year,
                                         arthropod = 'mosquito', agency_id, geocoded = T)
   } else {
@@ -57,6 +61,7 @@ getSpeciesTable <- function(token,
                                         arthropod = 'mosquito', agency_id, geocoded = F)
   }
 
+<<<<<<< HEAD
   # Get abundance data
   # If interval is NULL, use "Year" as a placeholder that we'll handle
   if (is.null(interval)) {
@@ -110,6 +115,10 @@ getSpeciesTable <- function(token,
 
   # Keep the nice display names from getAbundance output
   # Map from user input (short names) to getAbundance column names (formatted display names)
+=======
+  # Map separate_by to display names
+  separate_by_display <- NULL
+>>>>>>> dev
   if (!is.null(separate_by)) {
     input_to_display <- c(
       "site" = "Site_Name",
@@ -119,17 +128,66 @@ getSpeciesTable <- function(token,
       "trap" = "Trap",
       "spatial" = "Spatial"
     )
-
-    # Replace separate_by with the actual column names that exist in the data
-    separate_by <- input_to_display[separate_by]
-    separate_by <- separate_by[!is.na(separate_by)]
+    separate_by_display <- input_to_display[separate_by]
+    separate_by_display <- separate_by_display[!is.na(separate_by_display)]
   }
+
+  # Get abundance data
+  if (is.null(interval)) {
+    # For year-level summary, get granular data and aggregate
+    abundance_data <- getAbundance(
+      collections = collections,
+      interval = "CollectionDate",
+      species = species,
+      trap = trap,
+      sex = sex,
+      separate_by = separate_by
+    )
+
+    # Aggregate to year level - no abundance column since it doesn't make sense for yearly data
+    group_vars <- c("Species")
+    if (!is.null(separate_by_display)) {
+      # Use the display names that actually exist in abundance_data
+      existing_separate_cols <- intersect(separate_by_display, names(abundance_data))
+      if (length(existing_separate_cols) > 0) {
+        group_vars <- c(group_vars, existing_separate_cols)
+      }
+    }
+
+    abundance_data <- abundance_data %>%
+      group_by(across(all_of(group_vars))) %>%
+      summarise(
+        Count = sum(Count, na.rm = TRUE),
+        TrapEvents = sum(TrapEvents, na.rm = TRUE),
+        .groups = "drop"
+      )
+  } else {
+    # For interval-based summary, use interval directly
+    abundance_data <- getAbundance(
+      collections = collections,
+      interval = interval,
+      species = species,
+      trap = trap,
+      sex = sex,
+      separate_by = separate_by
+    )
+  }
+
+  # Add Year column
+  abundance_data <- abundance_data %>%
+    mutate(Year = target_year)
 
   # Calculate cumulative values if requested
   if (cumulative) {
     cum_group_vars <- c("Species")
-    if (!is.null(separate_by)) {
-      cum_group_vars <- c(cum_group_vars, separate_by)
+    if (!is.null(separate_by_display)) {
+      cum_group_vars <- c(cum_group_vars, separate_by_display)
+    }
+
+    # Determine ordering variables
+    order_vars <- cum_group_vars
+    if (!is.null(interval)) {
+      order_vars <- c(order_vars, interval)
     }
 
     # Determine ordering variables
@@ -167,9 +225,9 @@ getSpeciesTable <- function(token,
   display_names <- c(display_names, "Species")
 
   # Add grouping columns
-  if (!is.null(separate_by)) {
-    display_cols <- c(display_cols, separate_by)
-    display_names <- c(display_names, separate_by)
+  if (!is.null(separate_by_display)) {
+    display_cols <- c(display_cols, separate_by_display)
+    display_names <- c(display_names, separate_by_display)
   }
 
   # Add count and trap event columns based on cumulative flag
@@ -196,8 +254,8 @@ getSpeciesTable <- function(token,
 
   # Generate caption if not provided
   if (is.null(caption)) {
-    grouping_text <- if (!is.null(separate_by)) {
-      paste("Grouped by:", paste(separate_by, collapse = ", "))
+    grouping_text <- if (!is.null(separate_by_display)) {
+      paste("Grouped by:", paste(separate_by_display, collapse = ", "))
     } else {
       "Overall"
     }
@@ -232,7 +290,11 @@ getSpeciesTable <- function(token,
   }
 
   # Calculate number of label vs numeric columns for alignment
+<<<<<<< HEAD
   label_col_names <- c(interval, "Year", "Species", separate_by)
+=======
+  label_col_names <- c(interval, "Year", "Species", separate_by_display)
+>>>>>>> dev
   label_col_names <- label_col_names[!is.na(label_col_names) & !is.null(label_col_names)]
   n_label_cols <- length(label_col_names)
   n_numeric_cols <- length(display_names) - n_label_cols

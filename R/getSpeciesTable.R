@@ -49,11 +49,8 @@ getSpeciesTable <- function(token,
   }
 
   # Get collections data
-<<<<<<< HEAD
-  if(any(c("city","county","spatial") %in% separate_by)){
-=======
+
   if(!is.null(separate_by) && any(c("city","county","spatial") %in% separate_by)){
->>>>>>> dev
     collections <- getArthroCollections(token, target_year, target_year,
                                         arthropod = 'mosquito', agency_id, geocoded = T)
   } else {
@@ -61,64 +58,9 @@ getSpeciesTable <- function(token,
                                         arthropod = 'mosquito', agency_id, geocoded = F)
   }
 
-<<<<<<< HEAD
-  # Get abundance data
-  # If interval is NULL, use "Year" as a placeholder that we'll handle
-  if (is.null(interval)) {
-    abundance_data <- getAbundance(
-      collections = collections,
-      interval = "CollectionDate",  # Get the most granular data
-      species = species,
-      trap = trap,
-      sex = sex,
-      separate_by = separate_by
-    )
 
-    # Aggregate to year level by removing the interval column and summarizing
-    group_vars <- c("Species")
-    if (!is.null(separate_by)) {
-      input_to_display <- c(
-        "site" = "Site_Name",
-        "city" = "City",
-        "county" = "County",
-        "agency" = "Agency",
-        "trap" = "Trap",
-        "spatial" = "Spatial"
-      )
-      display_names_temp <- input_to_display[separate_by]
-      display_names_temp <- display_names_temp[!is.na(display_names_temp)]
-      group_vars <- c(group_vars, display_names_temp)
-    }
-
-    # Aggregate to year level - no abundance column since it doesn't make sense for yearly data
-    abundance_data <- abundance_data %>%
-      group_by(across(all_of(group_vars))) %>%
-      summarise(
-        Count = sum(Count, na.rm = TRUE),
-        TrapEvents = sum(TrapEvents, na.rm = TRUE),
-        .groups = "drop"
-      )
-  } else {
-    abundance_data <- getAbundance(
-      collections = collections,
-      interval = interval,
-      species = species,
-      trap = trap,
-      sex = sex,
-      separate_by = separate_by
-    )
-  }
-
-  # Add Year column
-  abundance_data <- abundance_data %>%
-    mutate(Year = target_year)
-
-  # Keep the nice display names from getAbundance output
-  # Map from user input (short names) to getAbundance column names (formatted display names)
-=======
   # Map separate_by to display names
   separate_by_display <- NULL
->>>>>>> dev
   if (!is.null(separate_by)) {
     input_to_display <- c(
       "site" = "Site_Name",
@@ -290,11 +232,8 @@ getSpeciesTable <- function(token,
   }
 
   # Calculate number of label vs numeric columns for alignment
-<<<<<<< HEAD
-  label_col_names <- c(interval, "Year", "Species", separate_by)
-=======
+
   label_col_names <- c(interval, "Year", "Species", separate_by_display)
->>>>>>> dev
   label_col_names <- label_col_names[!is.na(label_col_names) & !is.null(label_col_names)]
   n_label_cols <- length(label_col_names)
   n_numeric_cols <- length(display_names) - n_label_cols
